@@ -29,6 +29,7 @@ export function usePlayerPolling() {
         if (res.response.status === 404) {
           setPlayerDetails({ name: playerDetails.name || "", id: "" });
         }
+        if (res.data) setPlayerState(res.data);
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === "AbortError") {
