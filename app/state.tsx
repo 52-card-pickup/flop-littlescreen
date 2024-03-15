@@ -1,7 +1,11 @@
+import { RecoilEnv, atom } from "recoil";
 import { components } from "./flopClient/spec";
-import { atom } from "recoil";
-type GameClientRoom = components["schemas"]["GameClientRoom"];
-type GamePlayerState = components["schemas"]["GamePlayerState"];
+
+// Grim workaround to stop dev environment warnings
+// https://github.com/facebookexperimental/Recoil/issues/733#issuecomment-1404481267
+RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
+
+export type GamePlayerState = components["schemas"]["GamePlayerState"];
 
 const initialPlayerState: GamePlayerState = {
   balance: 0,
@@ -13,16 +17,9 @@ const initialPlayerState: GamePlayerState = {
   ],
   callAmount: 0,
   minRaiseBy: 0,
+  currentRoundStake: 0,
   turnExpiresDt: new Date().getTime(),
   lastUpdate: new Date().getTime(),
-};
-
-const initialGameState: GameClientRoom = {
-  cards: [],
-  players: [],
-  lastUpdate: new Date().getTime(),
-  pot: 0,
-  state: "offline",
 };
 
 export const playerState = atom({
@@ -38,7 +35,9 @@ export const playerDetailsState = atom({
   },
 });
 
-export const gameState = atom({
-  key: "gameState",
-  default: initialGameState,
+export const devState = atom({
+  key: "devState",
+  default: {
+    showSwitchboard: false,
+  },
 });

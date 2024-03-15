@@ -130,6 +130,12 @@ export interface components {
     CardSuite: "hearts" | "diamonds" | "clubs" | "spades";
     /** @enum {string} */
     CardValue: "ace" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king";
+    CompletedGame: {
+      playerCards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]][];
+      /** Format: uint */
+      winnerIdx: number;
+      winningHand: string;
+    };
     /** @description Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object. */
     Components: {
       /** @description An object to hold reusable Callback Objects. */
@@ -229,9 +235,12 @@ export interface components {
       /** Format: uint64 */
       balance: number;
       name: string;
+      /** Format: uint64 */
+      turnExpiresDt?: number | null;
     };
     GameClientRoom: {
       cards: [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]][];
+      completed?: components["schemas"]["CompletedGame"] | null;
       /** Format: uint64 */
       lastUpdate: number;
       players: components["schemas"]["GameClientPlayer"][];
@@ -247,6 +256,8 @@ export interface components {
       /** Format: uint64 */
       callAmount: number;
       cards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]];
+      /** Format: uint64 */
+      currentRoundStake: number;
       /** Format: uint64 */
       lastUpdate: number;
       /** Format: uint64 */

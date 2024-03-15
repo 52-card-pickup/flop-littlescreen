@@ -1,13 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
-import { playerDetailsState } from "~/state";
+import usePlayerDetails from "~/hooks/usePlayerDetails";
+import { devState } from "~/state";
 import { client } from "../flopClient";
 
 export default function Index() {
-  const setPlayerDetails = useSetRecoilState(playerDetailsState);
+  const setDev = useSetRecoilState(devState);
   const [name, setname] = React.useState<string>("");
   const navigate = useNavigate();
+  const { setPlayerDetails } = usePlayerDetails();
 
   return (
     <div
@@ -18,6 +20,15 @@ export default function Index() {
       <form
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
+          if (name === "dev") {
+            setDev({ showSwitchboard: true });
+            setPlayerDetails({
+              name: "dev",
+              id: "dev",
+            });
+            navigate(`/game`);
+            return;
+          }
           client
             .POST("/api/v1/join", { body: { name } })
             .then((res) => {
@@ -50,6 +61,16 @@ export default function Index() {
           className="px-4 py-2 bg-french_gray-300 text-white rounded hover:bg-blue-700 transition duration-150 ease-in-out"
         >
           Join
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            client.POST("/api/v1/room/reset");
+          }}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition duration-150 ease-in-out"
+        >
+          Reset
         </button>
       </form>
     </div>

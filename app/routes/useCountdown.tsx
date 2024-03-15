@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
 interface CountdownProps {
-  onEnd: () => void;
+  turnExpiresDt: number;
 }
 
-export function useCountdown({ onEnd }: CountdownProps) {
+export function useCountdown({ turnExpiresDt }: CountdownProps) {
   const [end, setEnd] = useState<Date>(new Date());
   const [timeLeft, setTimeLeft] = useState<number>(
     (end.getTime() - Date.now()) / 1000
@@ -15,17 +15,10 @@ export function useCountdown({ onEnd }: CountdownProps) {
     if (running) {
       const interval = setInterval(() => {
         setTimeLeft((end.getTime() - Date.now()) / 1000);
-      }, 1000);
+      }, 100);
       return () => clearInterval(interval);
     }
   }, [running, end]);
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      onEnd();
-      setRunning(false);
-    }
-  }, [timeLeft, onEnd]);
 
   const start = (end: Date) => {
     setTimeLeft((end.getTime() - Date.now()) / 1000);
@@ -36,6 +29,12 @@ export function useCountdown({ onEnd }: CountdownProps) {
   const stop = () => {
     setRunning(false);
   };
+
+  useEffect(() => {
+    if (turnExpiresDt) {
+      start(new Date(turnExpiresDt));
+    }
+  }, [turnExpiresDt]);
 
   return {
     timeLeft,
