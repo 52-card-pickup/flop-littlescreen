@@ -20,6 +20,7 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
   },
   { playState: "Waiting", yourTurn: false, state: "playing" },
   { playState: "setBalance", balance: 1000 },
+  { playState: "complete", state: "complete" },
 ];
 
 export default function Develop() {

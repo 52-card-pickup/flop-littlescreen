@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import Cards from "~/components/Cards";
+import { client } from "~/flopClient";
 import { useCountdown } from "~/routes/useCountdown";
 import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
 
-const modes = ["yourturn", "waiting"] as const;
+const modes = ["yourturn", "waiting", "complete"] as const;
 
 interface Props {
   state: GamePlayerState;
@@ -21,6 +22,10 @@ export default function GameScreen(props: Props) {
   const [stake, setStake] = useState<number>(0);
 
   useEffect(() => {
+    if (props.state.state === "complete") {
+      setMode("complete");
+      return;
+    }
     if (props.state.state === "offline") setMode("waiting");
     if (props.state.yourTurn) setMode("yourturn");
     if (!props.state.yourTurn) setMode("waiting");
@@ -33,7 +38,7 @@ export default function GameScreen(props: Props) {
   return (
     <div
       className={cn(
-        "grid h-screen transition-all duration-500 bg-charcoal-900",
+        "grid h-dvh transition-all duration-500 bg-charcoal-900",
         mode === "yourturn"
           ? "grid-rows-[1fr,5fr,1fr,1fr] delay-0"
           : "grid-rows-[2fr,5fr,2fr,0fr] delay-300"
@@ -119,34 +124,6 @@ export default function GameScreen(props: Props) {
           </div>
         </div>
         <div className="place-self-center grid grid-cols-[2fr,1fr] w-5/6 gap-3">
-          {/* <input
-            className={cn(
-              "bg-white text-black font-bold py-2 px-4 rounded-md w-12",
-              "transition-all duration-300",
-              mode === "yourturn"
-                ? "opacity-100 delay-300"
-                : "opacity-0 duration-300"
-            )}
-            value={stake}
-            onChange={(e) => {
-              // Directly set the input to the current value, without clamping
-              setStake(parseFloat(e.target.value) || 0);
-            }}
-            onBlur={(e) => {
-              // Apply clamping when input loses focus
-              const value = parseFloat(e.target.value) || 0;
-              const clampedValue = Math.min(
-                Math.max(value, props.state.minRaiseBy),
-                props.state.balance
-              );
-              setStake(clampedValue);
-            }}
-            step="1"
-            type="number"
-            min={props.state.minRaiseBy}
-            max={props.state.balance}
-          ></input> */}
-
           <div className="flex items-center space-x-4">
             <input
               type="range"
@@ -192,9 +169,25 @@ export default function GameScreen(props: Props) {
             Bet
           </button>
         </div>
-        {/* <div className="place-self-center m-3">
-         
-        </div> */}
+      </div>
+      <div
+        className={cn(
+          "place-self-center p-2",
+          mode === "complete" ? "opacity-100" : "opacity-0"
+        )}
+      >
+        <button
+          className={cn(
+            "bg-wenge-500 hover:bg-wenge-700 text-white font-bold py-2 px-4 rounded-md",
+            "transition-all duration-300",
+            "opacity-100 delay-300"
+          )}
+          onClick={() => {
+            client.POST("/api/v1/room/close");
+          }}
+        >
+          Next Round
+        </button>
       </div>
     </div>
   );
