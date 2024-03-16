@@ -38,7 +38,7 @@ export default function GameScreen(props: Props) {
   return (
     <div
       className={cn(
-        "grid h-dvh transition-all duration-500 bg-charcoal-900",
+        "grid h-dvh transition-all duration-500 bg-slate-200",
         mode === "yourturn"
           ? "grid-rows-[1fr,5fr,1fr,1fr] delay-0"
           : "grid-rows-[2fr,5fr,2fr,0fr] delay-300"
@@ -64,14 +64,14 @@ export default function GameScreen(props: Props) {
           stake === 0 ? "grid-cols-[1fr,0fr]" : "grid-cols-[1fr,1fr] gap-4"
         )}
       >
-        <div className="place-self-center">£{props.state.balance}</div>
+        <div className="place-self-center text-charcoal-500">£{props.state.balance}</div>
         <div
           className={cn(
-            "place-self-center",
-            stake !== 0 ? "opacity-100" : "opacity-0"
+            "place-self-center text-charcoal-500",
+            props.state.currentRoundStake !== 0 ? "opacity-100" : "opacity-0"
           )}
         >
-          {props.state.currentRoundStake}
+          £{props.state.currentRoundStake}
         </div>
       </div>
       <div

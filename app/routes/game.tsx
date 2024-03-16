@@ -27,17 +27,20 @@ export default function Game() {
   if (player.state === "waiting" || player.state === "offline") {
     return (
       <div
-        className="bg-charcoal-500 min-h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr,1fr] 
-      text-white place-self-center"
+        className="min-h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr,1fr] 
+      text-white place-self-center bg-slate-200"
       >
-        <button
-          onClick={() => {
-            client.POST("/api/v1/room/close");
-          }}
-        >
-          Start game
-        </button>
-      </div>
+        <div className="flex justify-center items-center h-screen">
+          <button
+            onClick={() => {
+              client.POST("/api/v1/room/close");
+            }}
+            className="bg-french_gray-300 text-white hover:bg-cerulean-500 transition-all duration-300 p-2 rounded-md"
+          >
+            Start Game
+          </button>
+        </div>
+      </div >
     );
   }
 
