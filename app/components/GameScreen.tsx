@@ -61,7 +61,7 @@ export default function GameScreen(props: Props) {
       <div
         className={cn(
           "grid text-white font-bold transition-all duration-300 w-full",
-          stake === 0 ? "grid-cols-[1fr,0fr]" : "grid-cols-[1fr,1fr] gap-4"
+          props.state.currentRoundStake === 0 ? "grid-cols-[1fr,0fr]" : "grid-cols-[1fr,1fr] gap-4"
         )}
       >
         <div className="place-self-center text-charcoal-500">£{props.state.balance}</div>
@@ -117,9 +117,9 @@ export default function GameScreen(props: Props) {
                 }
               }}
             >
-              {props.state.callAmount === 0
+              {props.state.callAmount === 0 || props.state.callAmount === props.state.currentRoundStake
                 ? "Check"
-                : `Call ($${props.state.callAmount})`}
+                : `Call ($${props.state.callAmount - props.state.currentRoundStake})`}
             </button>
           </div>
         </div>
