@@ -14,9 +14,11 @@ export function usePlayerPolling() {
     if (dev.showSwitchboard) return;
     if (loading) return;
     const abortController = new AbortController();
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let lastUpdate: number | null = null;
 
     async function fetchData() {
+      const before = Date.now();
       try {
         const res = await client.GET(`/api/v1/player/{player_id}`, {
           params: {
@@ -24,12 +26,19 @@ export function usePlayerPolling() {
             // as intended
             path: { player_id: playerDetails.id },
           },
+          query: lastUpdate === null ? {} : {
+            timeout: "15000",
+            since: lastUpdate,
+          },
           signal: abortController.signal,
         });
         if (res.response.status === 404) {
           setPlayerDetails({ name: playerDetails.name || "", id: "" });
         }
-        if (res.data) setPlayerState(res.data);
+        if (res.data) {
+          setPlayerState(res.data);
+          lastUpdate = res.data.lastUpdate;
+        }
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === "AbortError") {
@@ -46,14 +55,18 @@ export function usePlayerPolling() {
           console.error("An unknown error occurred");
         }
       } finally {
-        timeoutId = setTimeout(fetchData, 1000);
+        const elapsed = Date.now() - before;
+        const delay = Math.max(0, 1000 - elapsed);
+        timeoutId = setTimeout(fetchData, delay);
       }
     }
 
     fetchData();
 
     return () => {
-      clearTimeout(timeoutId);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       abortController.abort();
     };
   }, [loading]);
