@@ -129,7 +129,7 @@ export interface components {
     /** @enum {string} */
     CardSuite: "hearts" | "diamonds" | "clubs" | "spades";
     /** @enum {string} */
-    CardValue: "ace" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king";
+    CardValue: "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king" | "ace";
     CompletedGame: {
       playerCards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]][];
       /** Format: uint */
