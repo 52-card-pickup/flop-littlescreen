@@ -10,6 +10,7 @@ export function useGoogleCastScripts() {
     w.gCastReady = false;
 
     w["__onGCastApiAvailable"] = function (isAvailable: boolean) {
+      console.log("cast api available", isAvailable);
       if (isAvailable) {
         w.gCastReady = true;
       }
@@ -17,7 +18,6 @@ export function useGoogleCastScripts() {
 
     const script = document.createElement("script");
     script.src = "//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1";
-    script.async = true;
     document.head.appendChild(script);
   }, []);
 }

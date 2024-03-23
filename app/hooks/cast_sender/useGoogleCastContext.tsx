@@ -1,9 +1,15 @@
 import { useEffect } from "react";
 import { type GlobalCastContext } from "./types";
 
+
 export function useGoogleCastContext() {
   useEffect(() => {
     const w = window as unknown as GlobalCastContext;
+
+    console.log("checking cast ready", w.gCastReady);
+
+    // w.gCastReady = true;
+    // console.log("cast ready set to true for testing");
 
     if (w.gCastReady) {
       console.log("cast ready");
