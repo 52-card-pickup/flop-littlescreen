@@ -22,13 +22,11 @@ export function usePlayerPolling() {
       try {
         const res = await client.GET(`/api/v1/player/{player_id}`, {
           params: {
-            // @ts-expect-error: Unsure why the client doesn't accept this - but it works
-            // as intended
             path: { player_id: playerDetails.id },
-          },
-          query: lastUpdate === null ? {} : {
-            timeout: "15000",
-            since: lastUpdate,
+            query: lastUpdate === null ? {} : {
+              timeout: "15000",
+              since: lastUpdate,
+            },
           },
           signal: abortController.signal,
         });
