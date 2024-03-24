@@ -1,6 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
+import FlopButton from "~/components/FlopButton";
 import GameScreen from "~/components/GameScreen";
 import { client } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
@@ -31,16 +32,15 @@ export default function Game() {
       text-white place-self-center bg-slate-200"
       >
         <div className="flex justify-center items-center h-screen">
-          <button
+          <FlopButton
             onClick={() => {
               client.POST("/api/v1/room/close");
             }}
-            className="bg-french_gray-300 text-white hover:bg-cerulean-500 transition-all duration-300 p-2 rounded-md"
           >
             Start Game
-          </button>
+          </FlopButton>
         </div>
-      </div >
+      </div>
     );
   }
 
