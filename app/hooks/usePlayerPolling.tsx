@@ -13,9 +13,22 @@ export function usePlayerPolling() {
   useEffect(() => {
     if (dev.showSwitchboard) return;
     if (loading) return;
+    if (!playerDetails.id) return;
     const abortController = new AbortController();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let lastUpdate: number | null = null;
+
+    function cancel() {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      try {
+        abortController.abort();
+      } catch (error) {
+        console.info("Failed to abort fetch:", error);
+      }
+    }
 
     async function fetchData() {
       const before = Date.now();
@@ -23,10 +36,13 @@ export function usePlayerPolling() {
         const res = await client.GET(`/api/v1/player/{player_id}`, {
           params: {
             path: { player_id: playerDetails.id },
-            query: lastUpdate === null ? {} : {
-              timeout: "15000",
-              since: lastUpdate,
-            },
+            query:
+              lastUpdate === null
+                ? {}
+                : {
+                    timeout: "15000",
+                    since: lastUpdate,
+                  },
           },
           signal: abortController.signal,
         });
@@ -40,15 +56,16 @@ export function usePlayerPolling() {
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === "AbortError") {
-            console.error("Fetch aborted");
-            if (error instanceof Response && error.status === 404) {
-              console.error("Player not found");
-              setPlayerDetails({ name: playerDetails.name || "", id: "" });
-            }
-          } else {
-            console.error("Failed to fetch data:", error);
-            setPlayerState((prevState) => ({ ...prevState, state: "offline" }));
+            console.info("Fetch aborted");
+            return;
           }
+          if (error instanceof Response && error.status === 404) {
+            console.error("Player not found");
+            setPlayerDetails({ name: playerDetails.name || "", id: "" });
+            return;
+          }
+          console.error("Failed to fetch data:", error);
+          setPlayerState((prevState) => ({ ...prevState, state: "offline" }));
         } else {
           console.error("An unknown error occurred");
         }
@@ -62,10 +79,14 @@ export function usePlayerPolling() {
     fetchData();
 
     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      abortController.abort();
+      cancel();
     };
-  }, [loading]);
+  }, [
+    loading,
+    playerDetails.id,
+    playerDetails.name,
+    setPlayerDetails,
+    setPlayerState,
+    dev.showSwitchboard,
+  ]);
 }
