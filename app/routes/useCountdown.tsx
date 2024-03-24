@@ -37,7 +37,7 @@ export function useCountdown({ turnExpiresDt }: CountdownProps) {
   }, [turnExpiresDt]);
 
   return {
-    timeLeft,
+    timeLeft: Math.max(0, timeLeft),
     start,
     stop,
   };
