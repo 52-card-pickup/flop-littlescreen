@@ -11,6 +11,32 @@ export default function Index() {
   const navigate = useNavigate();
   const { setPlayerDetails } = usePlayerDetails();
 
+  function join() {
+    if (name === "dev") {
+      setDev({ showSwitchboard: true });
+      setPlayerDetails({
+        name: "dev",
+        id: "dev",
+      });
+      navigate(`/game`);
+      return;
+    }
+    client
+      .POST("/api/v1/join", { body: { name } })
+      .then((res) => {
+        if (res.data) {
+          setPlayerDetails({
+            name,
+            id: res.data.id,
+          });
+          navigate(`/game`);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
   return (
     <div
       className="bg-slate-200 min-h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr]"
@@ -20,34 +46,12 @@ export default function Index() {
       <form
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
-          if (name === "dev") {
-            setDev({ showSwitchboard: true });
-            setPlayerDetails({
-              name: "dev",
-              id: "dev",
-            });
-            navigate(`/game`);
-            return;
-          }
-          client
-            .POST("/api/v1/join", { body: { name } })
-            .then((res) => {
-              if (res.data) {
-                setPlayerDetails({
-                  name,
-                  id: res.data.id,
-                });
-                navigate(`/game`);
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-            });
+          join();
         }}
-        className="flex flex-col items-center justify-center space-y-4"
+        className="grid grid-cols-2 items-center justify-center space-y-4 gap-4 px-8"
       >
         <input
-          className="px-4 py-2 bg-slate-300 text-black rounded hover:bg-slate-400 transition duration-150 ease-in-out"
+          className="col-span-2 px-4 py-2 bg-slate-300 text-black rounded hover:bg-slate-400 transition duration-150 ease-in-out"
           type="text"
           id="name"
           name="name"
