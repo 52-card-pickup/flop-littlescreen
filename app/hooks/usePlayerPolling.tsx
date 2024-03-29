@@ -17,6 +17,7 @@ export function usePlayerPolling() {
     const abortController = new AbortController();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let lastUpdate: number | null = null;
+    console.info("Starting player polling");
 
     function cancel() {
       if (timeoutId) {
@@ -52,6 +53,7 @@ export function usePlayerPolling() {
         if (res.data) {
           setPlayerState(res.data);
           lastUpdate = res.data.lastUpdate;
+          console.info("Player state updated, lastUpdate:", lastUpdate);
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -69,11 +71,11 @@ export function usePlayerPolling() {
         } else {
           console.error("An unknown error occurred");
         }
-      } finally {
-        const elapsed = Date.now() - before;
-        const delay = Math.max(0, 1000 - elapsed);
-        timeoutId = setTimeout(fetchData, delay);
       }
+      const elapsed = Date.now() - before;
+      const delay = Math.max(0, 1000 - elapsed);
+      console.info("Polling delay:", delay);
+      timeoutId = setTimeout(fetchData, delay);
     }
 
     fetchData();
@@ -81,12 +83,6 @@ export function usePlayerPolling() {
     return () => {
       cancel();
     };
-  }, [
-    loading,
-    playerDetails.id,
-    playerDetails.name,
-    setPlayerDetails,
-    setPlayerState,
-    dev.showSwitchboard,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, playerDetails.id]);
 }
