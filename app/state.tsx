@@ -16,7 +16,7 @@ const initialPlayerState: GamePlayerState = {
     ["clubs", "2"],
   ],
   callAmount: 0,
-  minRaiseBy: 0,
+  minRaiseTo: 0,
   currentRoundStake: 0,
   turnExpiresDt: new Date().getTime(),
   lastUpdate: new Date().getTime(),

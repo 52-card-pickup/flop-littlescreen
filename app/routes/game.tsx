@@ -57,10 +57,10 @@ export default function Game() {
             },
           });
         },
-        bet: (stake: number) => {
+        raiseTo: (stake: number) => {
           client.POST("/api/v1/play", {
             body: {
-              action: "raise",
+              action: "raiseTo",
               stake: stake,
               playerId: playerDetails.id,
             },

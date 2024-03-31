@@ -9,14 +9,17 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
     yourTurn: true,
     state: "playing",
     callAmount: 0,
+    minRaiseTo: 20,
     turnExpiresDt: new Date().getTime() + 15000,
+    balance: 1000
   },
   {
     playState: "Your turn (call)",
     yourTurn: true,
     state: "playing",
     callAmount: 100,
-    minRaiseBy: 100,
+    minRaiseTo: 200,
+    balance: 1000
   },
   { playState: "Waiting", yourTurn: false, state: "playing" },
   { playState: "setBalance", balance: 1000 },
@@ -31,7 +34,7 @@ export default function Develop() {
       <div
         className={cn(
           "absolute top-20 left-0 w-full h-10 bg-charcoal-900 bg-opacity-50",
-          "transition-all duration-300 grid grid-cols-4 gap-4"
+          "transition-all duration-300 grid grid-cols-4 gap-4 z-50"
         )}
       >
         {modes.map((mode, idx) => (
@@ -48,10 +51,10 @@ export default function Develop() {
       <GameScreen
         state={player}
         actions={{
-          bet: () => {},
-          call: () => {},
-          check: () => {},
-          fold: () => {},
+          raiseTo: () => { },
+          call: () => { },
+          check: () => { },
+          fold: () => { },
         }}
       />
     </>

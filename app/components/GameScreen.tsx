@@ -12,7 +12,7 @@ interface Props {
   state: GamePlayerState;
   actions: {
     fold: () => void;
-    bet: (stake: number) => void;
+    raiseTo: (stake: number) => void;
     check: () => void;
     call: (amount: number) => void;
   };
@@ -124,28 +124,33 @@ export default function GameScreen(props: Props) {
                 <input
                   type="range"
                   className="slider bg-white color-black accent-wenge-700 grow"
-                  min={props.state.minRaiseBy} // Minimum value
+                  min={0} // Minimum value
                   max={props.state.balance} // Maximum value
                   value={stake} // Current value
-                  onChange={(e) => setStake(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    if (parseFloat(e.target.value) < props.state.minRaiseTo) {
+                      return setStake(0);
+                    }
+                    return setStake(parseFloat(e.target.value));
+                  }}
                   step="5" // Adjust stepping as necessary
                 />
                 <input
                   type="number"
                   className="w-20 p-2 border rounded-md"
-                  min={props.state.minRaiseBy} // Enforce minimum value
+                  min={0} // Enforce minimum value
                   max={props.state.balance} // Enforce maximum value
                   value={stake} // Sync with slider
                   onChange={(e) =>
                     setStake(
-                      parseFloat(e.target.value) || props.state.minRaiseBy
+                      parseFloat(e.target.value) || props.state.minRaiseTo
                     )
                   }
                   onBlur={(e) => {
                     // Clamping logic on blur to handle manual input
                     const value = parseFloat(e.target.value) || 0;
                     const clampedValue = Math.min(
-                      Math.max(value, props.state.minRaiseBy),
+                      Math.max(value, props.state.minRaiseTo),
                       props.state.balance
                     );
                     setStake(clampedValue);
@@ -162,7 +167,7 @@ export default function GameScreen(props: Props) {
                   onClick={() => {
                     switch (betAction) {
                       case "bet":
-                        props.actions.bet(stake);
+                        props.actions.raiseTo(stake);
                         break;
                       case "check":
                         props.actions.check();
@@ -176,8 +181,8 @@ export default function GameScreen(props: Props) {
                   {betAction === "check"
                     ? "Check"
                     : betAction === "call"
-                    ? `Call (£${stakeToCall})`
-                    : `Bet £${stake}`}
+                      ? `Call (£${stakeToCall})`
+                      : `Raise to £${stake}`}
                 </FlopButton>
               </div>
             </div>
@@ -209,7 +214,7 @@ export default function GameScreen(props: Props) {
 
 function calculateBetAction(stake: number, callAmount: number) {
   if (callAmount > 0) {
-    return stake > callAmount ? "bet" : "call";
+    return stake >= callAmount ? "bet" : "call";
   }
   return stake > 0 ? "bet" : "check";
 }
