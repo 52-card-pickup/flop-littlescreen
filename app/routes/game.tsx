@@ -1,5 +1,5 @@
 import { useNavigate } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import FlopButton from "~/components/FlopButton";
 import GameScreen from "~/components/GameScreen";
@@ -7,6 +7,7 @@ import { client } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { usePlayerPolling } from "~/hooks/usePlayerPolling";
 import { playerState } from "~/state";
+import cn from "~/utils/cn";
 
 export default function Game() {
   usePlayerPolling();
@@ -14,7 +15,13 @@ export default function Game() {
   const [player] = useRecoilState(playerState);
   const { playerDetails, loading } = usePlayerDetails();
 
+  const [error, setError] = useState(false);
+  const [hasErrored, setHasErrored] = useState(false);
+
   const navigate = useNavigate();
+
+  const showStartGameButton =
+    player.state === "waiting" || player.state === "offline";
 
   useEffect(() => {
     if (
@@ -25,20 +32,62 @@ export default function Game() {
     }
   }, [loading, playerDetails, navigate]);
 
-  if (player.state === "waiting" || player.state === "offline") {
+  useEffect(() => {
+    if (!error) return;
+
+    let handle: ReturnType<typeof setTimeout> | null = null;
+    handle = setTimeout(() => {
+      setError(false);
+      handle = null;
+    }, 1000);
+
+    setHasErrored(true);
+
+    return () => {
+      if (handle) {
+        clearTimeout(handle);
+        setError(false);
+      }
+    };
+  }, [error]);
+
+  if (showStartGameButton) {
     return (
       <div
         className="min-h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr,1fr] 
       text-white place-self-center bg-slate-200"
       >
-        <div className="flex justify-center items-center h-screen">
-          <FlopButton
-            onClick={() => {
-              client.POST("/api/v1/room/close");
-            }}
-          >
-            Start Game
-          </FlopButton>
+        <div className={cn("grid justify-center items-center h-screen")}>
+          <div className={cn("flex flex-col justify-center items-center")}>
+            {hasErrored && (
+              <div className="h-40">
+                <h2 className="text-black animate-pulse font-bold text-2xl p-8 text-center">
+                  Failed to start game, please try again
+                </h2>
+              </div>
+            )}
+            <div className={cn(error ? "animate-ping" : "")}>
+              <FlopButton
+                onClick={() => {
+                  setHasErrored(false);
+                  client
+                    .POST("/api/v1/room/close")
+                    .catch((e) => {
+                      console.error(e);
+                      return { error: e };
+                    })
+                    .then((x) => {
+                      if (x.error) {
+                        console.warn("error starting game");
+                        setError(true);
+                      }
+                    });
+                }}
+              >
+                Start Game
+              </FlopButton>
+            </div>
+          </div>
         </div>
       </div>
     );

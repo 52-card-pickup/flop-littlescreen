@@ -17,6 +17,7 @@ export function usePlayerPolling() {
     const abortController = new AbortController();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let lastUpdate: number | null = null;
+    let delay = 1000;
     console.info("Starting player polling");
 
     function cancel() {
@@ -47,6 +48,7 @@ export function usePlayerPolling() {
           },
           signal: abortController.signal,
         });
+        delay = 1000;
         if (res.response.status === 404) {
           setPlayerDetails({ name: playerDetails.name || "", id: "" });
         }
@@ -71,11 +73,20 @@ export function usePlayerPolling() {
         } else {
           console.error("An unknown error occurred");
         }
+
+        if (delay < 60_000) {
+          delay = delay * 2;
+          console.info(`Increasing polling delay to: ${delay} ms`);
+        } else {
+          console.info("Max polling delay reached, cancelling polling");
+          cancel();
+          return;
+        }
       }
       const elapsed = Date.now() - before;
-      const delay = Math.max(0, 1000 - elapsed);
-      console.info("Polling delay:", delay);
-      timeoutId = setTimeout(fetchData, delay);
+      const delayMs = Math.max(0, delay - elapsed);
+      console.info("Polling delay:", delayMs);
+      timeoutId = setTimeout(fetchData, delayMs);
     }
 
     fetchData();

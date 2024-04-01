@@ -4,10 +4,12 @@ import { useSetRecoilState } from "recoil";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
 import { client } from "../flopClient";
+import cn from "~/utils/cn";
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
   const [name, setname] = React.useState<string>("");
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const { setPlayerDetails } = usePlayerDetails();
 
@@ -21,6 +23,7 @@ export default function Index() {
       navigate(`/game`);
       return;
     }
+    setLoading(true);
     client
       .POST("/api/v1/join", { body: { name } })
       .then((res) => {
@@ -29,29 +32,35 @@ export default function Index() {
             name,
             id: res.data.id,
           });
-          navigate(`/game`);
+          setTimeout(() => navigate(`/game`), 250);
         }
       })
       .catch((err) => {
+        setLoading(false);
         console.error(err);
-      });
+      })
+      .finally(() => {});
   }
 
   return (
     <div
-      className="bg-slate-200 min-h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr]"
+      className="bg-slate-200 min-h-screen grid grid-flow-row grid-rows-[3fr,auto,1fr]"
       style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
     >
-      <h1 className="text-4xl font-bold my-6 shadow-sm text-center">flop.</h1>
+      <div className="flex justify-center items-center">
+        <h1 className="text-4xl font-bold my-6 shadow-sm text-center">flop.</h1>
+      </div>
       <form
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
+          if (loading) return;
           join();
         }}
-        className="grid grid-cols-2 items-center justify-center space-y-4 gap-4 px-8"
+        autoComplete="off"
+        className="grid grid-cols-1 items-center justify-center space-y-4 gap-4 px-8"
       >
         <input
-          className="col-span-2 px-4 py-2 bg-slate-300 text-black rounded hover:bg-slate-400 transition duration-150 ease-in-out"
+          className="px-6 py-4 bg-slate-300 text-black text-xl font-normal rounded hover:bg-slate-50 transition duration-150 ease-in-out"
           type="text"
           id="name"
           name="name"
@@ -60,22 +69,32 @@ export default function Index() {
             setname(e.target.value);
           }}
         />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-french_gray-300 text-white rounded hover:bg-cerulean-500 transition duration-150 ease-in-out"
-        >
-          Join
-        </button>
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="submit"
+            className={cn(
+              "px-4 py-2 bg-french_gray-300 text-white rounded-lg shadow-sm shadow-black/20 hover:bg-cerulean-500 hover:shadow-xl transition duration-150 ease-in-out",
+              "disabled:opacity-50"
+            )}
+            disabled={loading}
+          >
+            Join
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            client.POST("/api/v1/room/reset");
-          }}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition duration-150 ease-in-out"
-        >
-          Reset
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              client.POST("/api/v1/room/reset");
+            }}
+            className={cn(
+              "px-4 py-2 bg-red-500 text-white rounded-lg shadow-sm shadow-black/20 hover:bg-red-700 hover:shadow-xl transition duration-150 ease-in-out",
+              "disabled:opacity-50"
+            )}
+            disabled={loading}
+          >
+            Reset
+          </button>
+        </div>
       </form>
     </div>
   );
