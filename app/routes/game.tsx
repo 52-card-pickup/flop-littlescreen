@@ -60,13 +60,16 @@ export default function Game() {
         <div className={cn("grid justify-center items-center h-screen")}>
           <div className={cn("flex flex-col justify-center items-center")}>
             {hasErrored && (
-              <div className="h-40">
-                <h2 className="text-black animate-pulse font-bold text-2xl p-8 text-center">
-                  Failed to start game, please try again
+              <div className="py-10 animate-pulse">
+                <h2 className="text-black font-bold text-2xl p-2 text-center">
+                  Failed to start game
                 </h2>
+                <p className="text-black text-center">
+                  Please try again in a moment
+                </p>
               </div>
             )}
-            <div className={cn(error ? "animate-ping" : "")}>
+            <div className={cn(error ? "animate-shake" : "")}>
               <FlopButton
                 onClick={() => {
                   setHasErrored(false);
