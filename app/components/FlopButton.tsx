@@ -35,7 +35,7 @@ export default function FlopButton(props: {
         ></span>
         <span
           className={cn(
-            "absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
+            "absolute left-0 w-64 h-64 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
             "-translate-x-full translate-y-12 group-hover:-rotate-180 ease",
             bg
           )}
@@ -85,14 +85,14 @@ function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
       return {
         bg:
           variant === "outline"
-            ? "bg-green-900"
+            ? "bg-green-800"
             : "bg-black group-hover:bg-green-50",
-        bgBase: variant === "outline" ? "bg-gray-50" : "bg-green-900",
-        border: "border-green-900",
+        bgBase: variant === "outline" ? "bg-gray-50" : "bg-green-800",
+        border: "border-green-800",
         text:
           variant === "outline"
             ? "text-gray-800"
-            : "text-green-50 group-hover:text-green-900",
+            : "text-green-50 group-hover:text-green-800",
       };
     case "red":
       return {

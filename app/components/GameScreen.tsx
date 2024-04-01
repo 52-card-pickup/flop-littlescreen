@@ -81,10 +81,10 @@ export default function GameScreen(props: Props) {
     <div
       className={cn(
         // "grid h-dvh transition-all duration-500 bg-[linear-gradient(329deg,#90cda3,#e6fff0)]",
-        "grid h-dvh transition-all duration-500",
+        "grid w-dvw h-dvh transition-all duration-500",
         mode === "yourturn"
           ? "grid-rows-[1fr,5fr,1fr,1fr,0.2fr] delay-0 bg-[linear-gradient(329deg,#52745c,#9fd19f)]"
-          : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#9fd19f)]"
+          : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
     >
       <div className={cn("place-self-center")}>
@@ -167,11 +167,17 @@ export default function GameScreen(props: Props) {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-[2fr,3fr] w-full">
-                <div className="place-self-center p-3 w-full flex flex-col">
-                  <FlopButton onClick={props.actions.fold}>Fold</FlopButton>
+              <div className="grid grid-cols-[2fr,5fr] w-full gap-4 p-3">
+                <div className="place-self-center w-full flex flex-col">
+                  <FlopButton
+                    onClick={props.actions.fold}
+                    color="red"
+                    variant="solid"
+                  >
+                    Fold
+                  </FlopButton>
                 </div>
-                <div className="place-self-center p-3 w-full flex flex-col">
+                <div className="place-self-center w-full flex flex-col">
                   <FlopButton
                     onClick={() => {
                       switch (betAction) {
@@ -186,6 +192,7 @@ export default function GameScreen(props: Props) {
                           break;
                       }
                     }}
+                    variant="outline"
                   >
                     {betAction === "check"
                       ? "Check"
