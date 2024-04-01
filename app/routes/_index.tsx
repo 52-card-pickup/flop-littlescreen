@@ -4,7 +4,7 @@ import { useSetRecoilState } from "recoil";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
 import { client } from "../flopClient";
-import cn from "~/utils/cn";
+import FlopButton from "~/components/FlopButton";
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
@@ -60,7 +60,7 @@ export default function Index() {
         className="grid grid-cols-1 items-center justify-center space-y-4 gap-4 px-8"
       >
         <input
-          className="px-6 py-4 bg-slate-300 text-black text-xl font-normal rounded hover:bg-slate-50 transition duration-150 ease-in-out"
+          className="px-6 py-4 bg-slate-300 text-black text-xl font-normal rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
           type="text"
           id="name"
           name="name"
@@ -70,30 +70,21 @@ export default function Index() {
           }}
         />
         <div className="grid grid-cols-2 gap-4">
-          <button
-            type="submit"
-            className={cn(
-              "px-4 py-2 bg-french_gray-300 text-white rounded-lg shadow-sm shadow-black/20 hover:bg-cerulean-500 hover:shadow-xl transition duration-150 ease-in-out",
-              "disabled:opacity-50"
-            )}
-            disabled={loading}
-          >
+          <FlopButton type="submit" color="gray" disabled={loading}>
             Join
-          </button>
+          </FlopButton>
 
-          <button
+          <FlopButton
             type="button"
             onClick={() => {
               client.POST("/api/v1/room/reset");
             }}
-            className={cn(
-              "px-4 py-2 bg-red-500 text-white rounded-lg shadow-sm shadow-black/20 hover:bg-red-700 hover:shadow-xl transition duration-150 ease-in-out",
-              "disabled:opacity-50"
-            )}
+            color="red"
+            variant="solid"
             disabled={loading}
           >
             Reset
-          </button>
+          </FlopButton>
         </div>
       </form>
     </div>
