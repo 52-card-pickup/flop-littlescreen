@@ -57,7 +57,7 @@ export function useGoogleCastContext() {
     return () => {
       clearInterval(timeout);
     };
-  });
+  }, [castContext]);
 }
 
 function loadCastFramework(): cast.framework.CastContext | null {
