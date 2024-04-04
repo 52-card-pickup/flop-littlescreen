@@ -49,46 +49,49 @@ export default function Game() {
   }
 
   return (
-    <GameScreen
-      state={player}
-      actions={{
-        fold: () => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "fold",
-              playerId: playerDetails.id,
-              stake: 0, // placeholder
-            },
-          });
-        },
-        bet: (stake: number) => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "raise",
-              stake: stake,
-              playerId: playerDetails.id,
-            },
-          });
-        },
-        check: () => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "check",
-              playerId: playerDetails.id,
-              stake: 0, // placeholder
-            },
-          });
-        },
-        call: () => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "call",
-              playerId: playerDetails.id,
-              stake: 0, // placeholder
-            },
-          });
-        },
-      }}
-    />
+    <div className="w-screen h-screen overflow-hidden">
+      <GameScreen
+        state={player}
+        actions={{
+          fold: () => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "fold",
+                playerId: playerDetails.id,
+                stake: 0, // placeholder
+              },
+            });
+          },
+          bet: (stake: number) => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "raise",
+                stake: stake,
+                playerId: playerDetails.id,
+              },
+            });
+          },
+          check: () => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "check",
+                playerId: playerDetails.id,
+                stake: 0, // placeholder
+              },
+            });
+          },
+          call: () => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "call",
+                playerId: playerDetails.id,
+                stake: 0, // placeholder
+              },
+            });
+          },
+        }}
+      />
+      <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
+    </div>
   );
 }
