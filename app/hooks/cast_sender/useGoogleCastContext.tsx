@@ -4,6 +4,11 @@ import { type GlobalCastContext } from "./types";
 export function useGoogleCastContext() {
   const [castContext, setCastContext] =
     useState<cast.framework.CastSession | null>(null);
+
+  function start() {
+    loadCastFramework((session) => setCastContext(session));
+  }
+
   useEffect(() => {
     const w = window as unknown as GlobalCastContext;
 
@@ -14,27 +19,23 @@ export function useGoogleCastContext() {
 
     if (w.gCastReady) {
       console.log("cast ready");
-      const context = loadCastFramework();
-      context?.requestSession().then(() => {
-        setCastContext(context.getCurrentSession());
-      });
+      start();
       return;
     }
 
     w["__onGCastApiAvailable"] = function (isAvailable: boolean) {
       if (isAvailable) {
         console.log("cast now available");
-        const context = loadCastFramework();
-        context?.requestSession().then(() => {
-          setCastContext(context.getCurrentSession());
-        });
+        start();
       }
     };
   }, []);
 
   useEffect(() => {
+    console.log("cast context changed", castContext);
     if (!castContext) return;
     const timeout = setInterval(() => {
+      // castContext.sendMessage("urn:x-cast:com.google.cast.tp.heartbeat", {});
       // send dummy keepalive message to receiver
       // https://stackoverflow.com/questions/50414540/keep-chromecast-caf-receiver-alive-after-sender-disconnect
       const message = new chrome.cast.media.LoadRequest({
@@ -52,7 +53,7 @@ export function useGoogleCastContext() {
         .finally(() => {
           console.log("cast receiver keepalive message sent");
         });
-    }, 90_000);
+    }, 9_000);
 
     return () => {
       clearInterval(timeout);
@@ -60,7 +61,9 @@ export function useGoogleCastContext() {
   }, [castContext]);
 }
 
-function loadCastFramework(): cast.framework.CastContext | null {
+function loadCastFramework(
+  onSession: (session: cast.framework.CastSession | null) => void
+): cast.framework.CastContext | null {
   console.log("loading cast framework");
   const options: cast.framework.CastOptions = {
     receiverApplicationId: "9AF17368",
@@ -77,8 +80,14 @@ function loadCastFramework(): cast.framework.CastContext | null {
   remotePlayerController.addEventListener(
     cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
     (event: cast.framework.RemotePlayerChangedEvent) => {
+      if (event.value === true) {
+        console.log("remote player connected");
+        onSession(context.getCurrentSession());
+        return;
+      }
       if (event.value === false) {
         console.log("remote player disconnected");
+        onSession(null);
         return;
       }
     }
