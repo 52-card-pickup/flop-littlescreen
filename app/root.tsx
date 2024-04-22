@@ -14,8 +14,11 @@ export const links: LinksFunction = () => [
 ];
 
 import { RecoilRoot } from "recoil";
+import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
 
 export default function App() {
+  useGoogleCastScripts();
+
   return (
     <html lang="en">
       <head>
