@@ -3,8 +3,10 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { client } from "~/flopClient";
 import { devState, playerState } from "~/state";
 import usePlayerDetails from "./usePlayerDetails";
+import { useDocumentVisibility } from "./useDocumentVisibility";
 
 export function usePlayerPolling() {
+  const { lastVisibleEvent } = useDocumentVisibility();
   const setPlayerState = useSetRecoilState(playerState);
   const { setPlayerDetails } = usePlayerDetails();
   const { playerDetails, loading } = usePlayerDetails();
@@ -42,7 +44,7 @@ export function usePlayerPolling() {
               lastUpdate === null
                 ? {}
                 : {
-                    timeout: "15000",
+                    timeout: 15000,
                     since: lastUpdate,
                   },
           },
@@ -95,5 +97,5 @@ export function usePlayerPolling() {
       cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, playerDetails.id]);
+  }, [loading, playerDetails.id, lastVisibleEvent]);
 }
