@@ -18,5 +18,5 @@ npx openapi-typescript /path/to/spec.json -o /path/to/spec.ts
 
 If you already have the server running locally, you can use the following command:
 ```sh
-npx openapi-typescript http://127.0.0.1:5000/docs/private/api.json ./app/flopClient/spec.ts
+npx openapi-typescript http://127.0.0.1:5000/docs/private/api.json -o ./app/flopClient/spec.ts
 ```
