@@ -6,6 +6,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  json,
+  useLoaderData,
 } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
 
@@ -15,7 +17,17 @@ export const links: LinksFunction = () => [
 
 import { RecoilRoot } from "recoil";
 
+export async function loader() {
+  return json({
+    FLOP_CONFIG: {
+      API_URL: process.env.API_URL,
+    },
+  });
+}
+
 export default function App() {
+  const data = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -28,6 +40,11 @@ export default function App() {
       <body>
         <RecoilRoot>
           <Outlet />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify(data.FLOP_CONFIG)}`,
+            }}
+          />
         </RecoilRoot>
         <ScrollRestoration />
         <Scripts />
