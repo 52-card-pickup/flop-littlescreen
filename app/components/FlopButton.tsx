@@ -10,6 +10,8 @@ export default function FlopButton(props: {
   children?: React.ReactNode;
   color?: ButtonColor;
   variant?: ButtonVariant;
+  slim?: boolean;
+  className?: string;
 }) {
   const { bg, bgBase, border, text } = colorClassNames(
     props.color || "gray",
@@ -24,8 +26,9 @@ export default function FlopButton(props: {
     >
       <span
         className={cn(
-          "relative z-10 block px-2 py-3 overflow-hidden font-medium leading-tight",
-          "transition-colors duration-300 ease-out border-2 rounded-lg group-hover:text-white",
+          "relative z-10 block overflow-hidden font-medium leading-tight",
+          "transition-colors duration-300 ease-out border-2 rounded-lg",
+          props.slim ? "" : "px-6 py-3",
           border,
           text
         )}
@@ -35,8 +38,9 @@ export default function FlopButton(props: {
         ></span>
         <span
           className={cn(
-            "absolute left-0 w-64 h-64 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
-            "-translate-x-full translate-y-12 group-hover:-rotate-180 ease",
+            "absolute left-0 w-72 h-72 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
+            "-translate-x-full translate-y-12 ease",
+            props.disabled ? "" : "group-hover:-rotate-180",
             bg
           )}
         ></span>
