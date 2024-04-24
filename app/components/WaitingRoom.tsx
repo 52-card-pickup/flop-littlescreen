@@ -59,6 +59,9 @@ text-white place-self-center bg-slate-200"
           </div>
         </div>
       </div>
+      <div className="fixed left-0 bottom-8 w-full grid justify-center items-center">
+        <PlayerPhotoCamera className="m-8" />
+      </div>
     </div>
   );
 }
