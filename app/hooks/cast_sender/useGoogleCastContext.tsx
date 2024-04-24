@@ -6,7 +6,11 @@ export function useGoogleCastContext() {
     useState<cast.framework.CastSession | null>(null);
 
   function start() {
-    loadCastFramework((session) => setCastContext(session));
+    try {
+      loadCastFramework((session) => setCastContext(session));
+    } catch (e) {
+      console.error("error loading cast framework", e);
+    }
   }
 
   useEffect(() => {
@@ -67,7 +71,7 @@ function loadCastFramework(
   console.log("loading cast framework");
   const options: cast.framework.CastOptions = {
     receiverApplicationId: "9AF17368",
-    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+    autoJoinPolicy: "origin_scoped" as chrome.cast.AutoJoinPolicy,
   };
 
   const context = cast.framework.CastContext.getInstance();
