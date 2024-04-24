@@ -7,6 +7,7 @@ import { client } from "../flopClient";
 import FlopButton from "~/components/FlopButton";
 import { ShareButton } from "~/components/ShareButton";
 import cn from "~/utils/cn";
+import { useSearchParams } from "@remix-run/react";
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
@@ -17,6 +18,7 @@ export default function Index() {
     "playing" | "joinable" | null
   >(null);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   function join() {
     if (name === "dev") {
@@ -25,10 +27,6 @@ export default function Index() {
         name: "dev",
         id: "dev",
       });
-      navigate(`/game`);
-      return;
-    }
-    if (name && name === playerDetails.name) {
       navigate(`/game`);
       return;
     }
@@ -65,6 +63,17 @@ export default function Index() {
   }, [knockResult]);
 
   useEffect(() => {
+    if (searchParams.has("z")) {
+      return;
+    }
+    const sessionId = Math.random().toString(36).substring(2, 5);
+    sessionStorage.setItem("z", sessionId);
+    setSearchParams({ z: sessionId });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (!playerDetails.id) return;
     const abortController = new AbortController();
     client
@@ -83,7 +92,7 @@ export default function Index() {
     return () => {
       abortController.abort();
     };
-  }, [playerDetails]);
+  }, [playerDetails, navigate]);
 
   return (
     <div
