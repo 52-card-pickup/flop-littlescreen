@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
 export function useDocumentVisibility() {
-  const [visibility, setVisibility] = useState(document.visibilityState);
+  const [visibility, setVisibility] =
+    useState<DocumentVisibilityState>("visible");
   const [lastVisibleEvent, setLastVisibleEvent] = useState<number | null>(null);
   const [lastHiddenEvent, setLastHiddenEvent] = useState<number | null>(null);
 
