@@ -87,6 +87,24 @@ export interface paths {
       };
     };
   };
+  "/api/v1/player/{player_id}/photo": {
+    /** @description Upload a photo for a player. */
+    post: {
+      /** @description multipart form data */
+      requestBody: {
+        content: {
+          "multipart/form-data": unknown[];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
   "/api/v1/join": {
     /** @description Join the game room. */
     post: {
