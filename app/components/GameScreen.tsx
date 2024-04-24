@@ -12,10 +12,10 @@ const modes = ["yourturn", "waiting", "complete"] as const;
 interface Props {
   state: GamePlayerState;
   actions: {
-    fold: () => void;
-    raiseTo: (stake: number) => void;
-    check: () => void;
-    call: (amount: number) => void;
+    fold: () => Promise<void>;
+    raiseTo: (stake: number) => Promise<void>;
+    check: () => Promise<void>;
+    call: (amount: number) => Promise<void>;
   };
 }
 
@@ -23,6 +23,7 @@ export default function GameScreen(props: Props) {
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -193,29 +194,19 @@ export default function GameScreen(props: Props) {
               <div className="grid grid-cols-[2fr,5fr] w-full gap-4 p-3">
                 <div className="place-self-center w-full flex flex-col">
                   <FlopButton
-                    onClick={props.actions.fold}
+                    onClick={() => handleFoldClick()}
                     color="red"
                     variant="solid"
+                    disabled={loading}
                   >
                     Fold
                   </FlopButton>
                 </div>
                 <div className="place-self-center w-full flex flex-col">
                   <FlopButton
-                    onClick={() => {
-                      switch (betAction) {
-                        case "bet":
-                          props.actions.raiseTo(stake);
-                          break;
-                        case "check":
-                          props.actions.check();
-                          break;
-                        case "call":
-                          props.actions.call(props.state.callAmount);
-                          break;
-                      }
-                    }}
+                    onClick={() => handleBetActionClick()}
                     variant="outline"
+                    disabled={loading}
                   >
                     {betAction === "check"
                       ? "Check"
@@ -248,6 +239,34 @@ export default function GameScreen(props: Props) {
       )}
     </div>
   );
+
+  function handleBetActionClick() {
+    setLoading(true);
+    switch (betAction) {
+      case "bet":
+        props.actions.raiseTo(stake).finally(() => {
+          setLoading(false);
+        });
+        break;
+      case "check":
+        props.actions.check().finally(() => {
+          setLoading(false);
+        });
+        break;
+      case "call":
+        props.actions.call(props.state.callAmount).finally(() => {
+          setLoading(false);
+        });
+        break;
+    }
+  }
+
+  function handleFoldClick() {
+    setLoading(true);
+    props.actions.fold().finally(() => {
+      setLoading(false);
+    });
+  }
 }
 
 function calculateBetAction(
