@@ -1,10 +1,12 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SVGAttributes, useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
 import { client } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import FlopButton from "./FlopButton";
 import { createPortal } from "react-dom";
+import cn from "~/utils/cn";
 
 export function PlayerPhotoCamera(
   props: React.DetailedHTMLProps<
@@ -104,10 +106,6 @@ function PlayerPhotoCameraOverlay(props: { onCompleted?: () => void }) {
           onPhotoTaken={(file) => {
             upload(file);
           }}
-          onError={(err) => {
-            console.error(err);
-            setShowInstructions(true);
-          }}
         />
       )}
       {(loading || playerDetailsLoading) && (
@@ -120,123 +118,51 @@ function PlayerPhotoCameraOverlay(props: { onCompleted?: () => void }) {
   );
 }
 
-function CameraPreview(props: {
-  onPhotoTaken: (file: File) => void;
-  onError?: (error: Error) => void;
-}) {
-  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [shuttingDown, setShuttingDown] = useState(false);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+function CameraPreview(props: { onPhotoTaken: (file: File) => void }) {
+  const videoRef = useRef<Webcam>(null);
 
   const onPhotoTaken = props.onPhotoTaken;
-  const onError = props.onError;
-
-  useEffect(() => {
-    if (!videoRef.current || shuttingDown) return;
-    let video: HTMLVideoElement | null = videoRef.current;
-    let mediaStream: MediaStream | null = null;
-
-    function start() {
-      navigator.mediaDevices
-        .getUserMedia({ video: { facingMode: "user" }, audio: false })
-        .then((stream) => {
-          mediaStream = stream;
-
-          stream.addEventListener("removetrack", (e) => {
-            console.log("track removed", e);
-          });
-
-          if (!video) return;
-          video.srcObject = mediaStream;
-          console.log("playing video stream");
-          video.play();
-          video.addEventListener(
-            "canplay",
-            () => {
-              if (!video) return;
-              const aspectRatio = video.videoWidth / video.videoHeight;
-              setAspectRatio((prev) => prev || aspectRatio);
-            },
-            false
-          );
-        })
-        .catch((err) => {
-          console.error(`An error occurred: ${err}`);
-          onError &&
-            onError(err instanceof Error ? err : new Error("Unknown error"));
-        });
-    }
-
-    function stop() {
-      console.log("stopping video stream");
-      // (video?.srcObject as MediaStream | null)
-      //   ?.getTracks()
-      //   .forEach((track) => track.stop());
-      mediaStream?.getTracks().forEach((track) => {
-        track.stop();
-        mediaStream?.removeTrack(track);
-      });
-      video = null;
-    }
-
-    start();
-
-    return () => {
-      stop();
-    };
-  }, [onError, shuttingDown]);
-
-  useEffect(() => {
-    if (!photo) return;
-    setShuttingDown(true);
-  }, [photo]);
-
-  useEffect(() => {
-    if (!shuttingDown || !photo) return;
-    onPhotoTaken(photo);
-    setPhoto(null);
-  }, [shuttingDown, photo, onPhotoTaken]);
 
   function takePhoto() {
-    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current?.video;
+    const canvas = videoRef.current?.getCanvas();
+    if (!video || !canvas) return;
 
-    const context = canvasRef.current.getContext("2d");
+    const context = canvas.getContext("2d");
     if (!context) return;
 
-    const { videoWidth, videoHeight } = videoRef.current;
-    canvasRef.current.width = videoWidth;
-    canvasRef.current.height = videoHeight;
-    context.drawImage(videoRef.current, 0, 0, videoWidth, videoHeight);
+    const { videoWidth, videoHeight } = video;
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+    context.drawImage(video, 0, 0, videoWidth, videoHeight);
 
     const type = "image/jpeg";
 
-    canvasRef.current.toBlob((blob) => {
+    canvas.toBlob((blob) => {
       if (!blob) return;
       const file = new File([blob], "photo.jpg", { type });
-      setPhoto(file);
+      onPhotoTaken(file);
     }, type);
   }
 
   return (
     <div className="bg-white p-4 rounded-lg grid grid-rows-[1fr, auto] gap-4 justify-center items-center">
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video
+      <Webcam
         ref={videoRef}
-        className="h-full rounded-xl shadow-md shadow-slate-800/20"
-        style={{ aspectRatio: aspectRatio || "16/9" }}
-      >
-        Video stream not available.
-      </video>
-      <FlopButton
-        disabled={!aspectRatio || shuttingDown}
-        onClick={() => takePhoto()}
-      >
-        Take photo
-      </FlopButton>
-      <canvas ref={canvasRef} className="hidden"></canvas>
+        className={cn(
+          "h-full rounded-xl shadow-md shadow-slate-800/20",
+          (videoRef.current?.video?.height || 0) >
+            (videoRef.current?.video?.width || 0)
+            ? "aspect-[9/16]"
+            : "aspect-[16/9]"
+        )}
+        videoConstraints={{
+          facingMode: "user",
+        }}
+        audio={false}
+      />
+      <FlopButton onClick={() => takePhoto()}>Take photo</FlopButton>
     </div>
   );
 }
