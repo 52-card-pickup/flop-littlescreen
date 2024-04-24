@@ -16,6 +16,7 @@ export const links: LinksFunction = () => [
 ];
 
 import { RecoilRoot } from "recoil";
+import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
 
 export async function loader() {
   return json({
@@ -27,6 +28,7 @@ export async function loader() {
 
 export default function App() {
   const data = useLoaderData<typeof loader>();
+  useGoogleCastScripts();
 
   return (
     <html lang="en">
