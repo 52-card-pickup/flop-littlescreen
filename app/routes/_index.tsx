@@ -10,13 +10,13 @@ import cn from "~/utils/cn";
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
-  const [name, setname] = React.useState<string>("");
+  const { playerDetails, setPlayerDetails } = usePlayerDetails();
+  const [name, setName] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
   const [knockResult, setKnockResult] = React.useState<
     "playing" | "joinable" | null
   >(null);
   const navigate = useNavigate();
-  const { setPlayerDetails } = usePlayerDetails();
 
   function join() {
     if (name === "dev") {
@@ -25,6 +25,10 @@ export default function Index() {
         name: "dev",
         id: "dev",
       });
+      navigate(`/game`);
+      return;
+    }
+    if (name && name === playerDetails.name) {
       navigate(`/game`);
       return;
     }
@@ -59,6 +63,27 @@ export default function Index() {
       clearTimeout(timeout);
     };
   }, [knockResult]);
+
+  useEffect(() => {
+    if (!playerDetails.id) return;
+    const abortController = new AbortController();
+    client
+      .GET(`/api/v1/player/{player_id}`, {
+        params: {
+          path: { player_id: playerDetails.id },
+          query: {},
+        },
+        signal: abortController.signal,
+      })
+      .then((res) => {
+        if (res.error) return;
+        navigate(`/game`);
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [playerDetails]);
 
   return (
     <div
@@ -104,7 +129,7 @@ export default function Index() {
           name="name"
           placeholder="Enter your name"
           onChange={(e) => {
-            setname(e.target.value);
+            setName(e.target.value);
           }}
         />
         <div
