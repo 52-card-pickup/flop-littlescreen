@@ -1,10 +1,11 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import Cards from "~/components/Cards";
 import { client } from "~/flopClient";
-import { useCountdown } from "~/routes/useCountdown";
+import { useCountdown } from "~/hooks/useCountdown";
 import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
 import FlopButton from "./FlopButton";
+import { RulesHelpButton } from "./RulesHelpButton";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
@@ -44,11 +45,32 @@ export default function GameScreen(props: Props) {
     if (!props.state.yourTurn) setMode("waiting");
   }, [props.state]);
 
-  useEffect(() => {
-    setShowCards(props.state.yourTurn);
-    if (props.state.yourTurn) {
-      setStake(0);
+  function vibrate() {
+    try {
+      if (typeof window !== "undefined" && "vibrate" in window.navigator) {
+        const didVibrateWithPattern = window.navigator.vibrate([
+          20, 20, 40, 20, 60,
+        ]);
+        if (didVibrateWithPattern) return;
+
+        const didVibrate = window.navigator.vibrate(100);
+        if (!didVibrate) {
+          console.warn("Failed to vibrate with pattern or single vibrate");
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to vibrate, unknown error", e);
     }
+  }
+
+  useEffect(() => {
+    if (props.state.yourTurn) {
+      vibrate();
+      setStake(0);
+      return;
+    }
+
+    setShowCards(false);
   }, [props.state.yourTurn]);
 
   const timer = useCountdown({
@@ -81,12 +103,13 @@ export default function GameScreen(props: Props) {
     <div
       className={cn(
         // "grid h-dvh transition-all duration-500 bg-[linear-gradient(329deg,#90cda3,#e6fff0)]",
-        "grid w-dvw h-dvh transition-all duration-500",
+        "fixed grid w-dvw h-dvh transition-all duration-500",
         mode === "yourturn"
           ? "grid-rows-[1fr,5fr,1fr,1fr,0.2fr] delay-0 bg-[linear-gradient(329deg,#52745c,#9fd19f)]"
           : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
     >
+      <RulesHelpButton className="fixed top-8 left-8 w-8 h-8 z-50" />
       <div className={cn("place-self-center")}>
         {timeLeftToPlay && (
           <div

@@ -13,6 +13,12 @@ export interface paths {
   "/api/v1/room": {
     /** @description Get the current state of the game room. */
     get: {
+      parameters: {
+        query?: {
+          since?: number | null;
+          timeout?: number | null;
+        };
+      };
       responses: {
         200: {
           content: {
@@ -46,9 +52,32 @@ export interface paths {
       };
     };
   };
+  "/api/v1/room/knock": {
+    /** @description Knock on the game room - peek in, nudge players, or kick them out. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["KnockRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": components["schemas"]["KnockResponse"];
+          };
+        };
+      };
+    };
+  };
   "/api/v1/player/{player_id}": {
     /** @description Get the current state of a player. */
     get: {
+      parameters: {
+        query?: {
+          since?: number | null;
+          timeout?: number | null;
+        };
+      };
       responses: {
         200: {
           content: {
@@ -326,6 +355,20 @@ export interface components {
     };
     JoinResponse: {
       id: string;
+    };
+    /** @enum {string} */
+    KnockAction: "peek" | "nudge" | "kick";
+    KnockRequest: {
+      which: components["schemas"]["KnockAction"];
+    };
+    KnockResponse: {
+      /** Format: uint */
+      cardsOnTable: number;
+      /** Format: uint */
+      players: number;
+      /** Format: uint64 */
+      retryAt?: number | null;
+      state: components["schemas"]["GamePhase"];
     };
     /** @description License information for the exposed API. */
     License: {
@@ -644,6 +687,12 @@ export interface components {
       playerId: string;
       /** Format: uint64 */
       stake: number;
+    };
+    PollQuery: {
+      /** Format: uint64 */
+      since?: number | null;
+      /** Format: uint64 */
+      timeout?: number | null;
     };
     /** @enum {string} */
     QueryStyle: "form" | "spaceDelimited" | "pipeDelimited" | "deepObject";
