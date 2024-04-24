@@ -4,13 +4,16 @@ import { useRecoilState } from "recoil";
 import FlopButton from "~/components/FlopButton";
 import GameScreen from "~/components/GameScreen";
 import { client } from "~/flopClient";
+import { useGoogleCastContext } from "~/hooks/cast_sender/useGoogleCastContext";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { usePlayerPolling } from "~/hooks/usePlayerPolling";
 import { playerState } from "~/state";
 import cn from "~/utils/cn";
+import { GoogleCastButton } from "../components/GoogleCastButton";
 
 export default function Game() {
   usePlayerPolling();
+  useGoogleCastContext();
 
   const [player] = useRecoilState(playerState);
   const { playerDetails, loading } = usePlayerDetails();
@@ -57,6 +60,7 @@ export default function Game() {
         className="min-h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr,1fr] 
       text-white place-self-center bg-slate-200"
       >
+        <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
         <div className={cn("grid justify-center items-center h-screen")}>
           <div className={cn("flex flex-col justify-center items-center")}>
             {hasErrored && (
@@ -97,46 +101,49 @@ export default function Game() {
   }
 
   return (
-    <GameScreen
-      state={player}
-      actions={{
-        fold: () => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "fold",
-              playerId: playerDetails.id,
-              stake: 0, // placeholder
-            },
-          });
-        },
-        raiseTo: (stake: number) => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "raiseTo",
-              stake: stake,
-              playerId: playerDetails.id,
-            },
-          });
-        },
-        check: () => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "check",
-              playerId: playerDetails.id,
-              stake: 0, // placeholder
-            },
-          });
-        },
-        call: () => {
-          client.POST("/api/v1/play", {
-            body: {
-              action: "call",
-              playerId: playerDetails.id,
-              stake: 0, // placeholder
-            },
-          });
-        },
-      }}
-    />
+    <div className="w-screen h-screen overflow-hidden">
+      <GameScreen
+        state={player}
+        actions={{
+          fold: () => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "fold",
+                playerId: playerDetails.id,
+                stake: 0, // placeholder
+              },
+            });
+          },
+          raiseTo: (stake: number) => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "raiseTo",
+                stake: stake,
+                playerId: playerDetails.id,
+              },
+            });
+          },
+          check: () => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "check",
+                playerId: playerDetails.id,
+                stake: 0, // placeholder
+              },
+            });
+          },
+          call: () => {
+            client.POST("/api/v1/play", {
+              body: {
+                action: "call",
+                playerId: playerDetails.id,
+                stake: 0, // placeholder
+              },
+            });
+          },
+        }}
+      />
+      <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
+    </div>
   );
 }
