@@ -234,6 +234,7 @@ export interface components {
     GameClientPlayer: {
       /** Format: uint64 */
       balance: number;
+      folded: boolean;
       name: string;
       /** Format: uint64 */
       turnExpiresDt?: number | null;
@@ -261,7 +262,7 @@ export interface components {
       /** Format: uint64 */
       lastUpdate: number;
       /** Format: uint64 */
-      minRaiseBy: number;
+      minRaiseTo: number;
       state: components["schemas"]["GamePhase"];
       /** Format: uint64 */
       turnExpiresDt?: number | null;
@@ -637,7 +638,7 @@ export interface components {
       [key: string]: unknown;
     };
     /** @enum {string} */
-    PlayAction: "check" | "call" | "raise" | "fold";
+    PlayAction: "check" | "call" | "raiseTo" | "fold";
     PlayRequest: {
       action: components["schemas"]["PlayAction"];
       playerId: string;

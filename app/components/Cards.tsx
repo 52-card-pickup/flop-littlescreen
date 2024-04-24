@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import cn from "~/utils/cn";
 import { components } from "../flopClient/spec";
 
 export type PlayingCards = components["schemas"]["GamePlayerState"]["cards"];
@@ -5,10 +7,17 @@ export type PlayingCards = components["schemas"]["GamePlayerState"]["cards"];
 export default function Cards(props: {
   cards: PlayingCards;
   showCards?: boolean;
+  showHideCardsHint?: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <div className="flex justify-center items-center h-full w-full">
-      <div className="relative w-5/6 h-5/6 flex justify-center items-center">
+    <div
+      className="flex justify-center items-center h-full w-full"
+      onClick={props.onClick}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="relative w-full h-full flex justify-center items-center">
         {/* This div serves as a centered container for the absolutely positioned cards */}
         {props.cards.map((card, idx) => (
           <img
@@ -20,13 +29,35 @@ export default function Cards(props: {
             }
             alt={`${card[0]}-${card[1]}`}
             style={{ zIndex: 10 - idx, width: "auto", height: "80%" }}
-            className={`absolute shadow-md drop-shadow-lg transform ${
-              idx === 0
-                ? "translate-x-10 rotate-12"
-                : "-translate-x-10 -rotate-3"
-            }`}
+            className={cn(
+              "absolute shadow-md drop-shadow-lg transform",
+              "transition-transform duration-500 ease-out",
+              idx === (props.showCards ? 0 : 1)
+                ? "translate-x-8 -translate-y-1 rotate-[10deg]"
+                : "-translate-x-8 translate-y-2 rotate-[-6deg]"
+            )}
           />
         ))}
+        {!props.showCards && (
+          <div
+            className="absolute flex justify-center items-center w-full h-full"
+            style={{ zIndex: 100 }}
+          >
+            <div className="text-black text-2xl font-bold bg-white/90 p-2 rounded-lg border-2 border-white shadow-lg shadow-slate-800/60">
+              Tap to reveal cards
+            </div>
+          </div>
+        )}
+        {props.showHideCardsHint && props.showCards && (
+          <div
+            className="absolute flex justify-center items-center w-full h-full mt-32"
+            style={{ zIndex: 100 }}
+          >
+            <div className="text-black text-2xl font-bold bg-white/90 p-2 rounded-lg border-2 border-white shadow-lg shadow-slate-800/30">
+              Tap to hide cards
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
