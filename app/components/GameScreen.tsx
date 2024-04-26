@@ -233,8 +233,9 @@ function calculateBetAction(
   currentRoundStake: number
 ) {
   if (callAmount > 0) {
+    // The current stake can only match the call amount as the big blind
     if (currentRoundStake === callAmount) {
-      return "check";
+      return stake >= callAmount ? "bet" : "check";
     }
     return stake >= callAmount ? "bet" : "call";
   }
