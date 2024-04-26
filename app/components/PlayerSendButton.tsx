@@ -83,10 +83,9 @@ export default function PlayerSendButton() {
             </div>
             <div className="py-1">
               <Menu.Item disabled>
-                <a
-                  href="#"
+                <span
                   className={cn(
-                    "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
+                    "flex items-center px-4 py-2 font-medium text-xl text-gray-700 bg-zinc-50"
                   )}
                 >
                   <ArrowRightCircleIcon
@@ -94,11 +93,11 @@ export default function PlayerSendButton() {
                     aria-hidden="true"
                   />
                   Send a reaction
-                </a>
+                </span>
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <div className="grid grid-cols-4 gap-1 divide-x divide-gray-100 px-2 py-1">
+                  <div className="grid grid-cols-4 gap-1 divide-x divide-gray-100 px-2 py-1 bg-zinc-50">
                     <EmojiButton
                       payload=":+1:"
                       active={active}
@@ -257,7 +256,10 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
       leaveFrom="transform origin-center scale-100 opacity-100"
       leaveTo="transform origin-center scale-0 opacity-0"
     >
-      <div className="fixed w-screen h-screen left-0 top-0 inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center">
+      <div
+        className="fixed w-screen h-screen left-0 top-0 inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center"
+        onClick={(e) => e.target === e.currentTarget && props.onClose()}
+      >
         <div className="bg-white p-6 rounded-lg grid grid-rows-[auto,auto,auto] gap-6 justify-center items-center justify-items-center shadow-xl shadow-black/20">
           <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
             Who do you want to send money to?
