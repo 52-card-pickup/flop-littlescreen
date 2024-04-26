@@ -13,6 +13,7 @@ import { client } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { createPortal } from "react-dom";
+import FlopButton from "./FlopButton";
 
 export default function PlayerSendButton() {
   const { playerDetails } = usePlayerDetails();
@@ -257,11 +258,11 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
       leaveTo="transform origin-center scale-0 opacity-0"
     >
       <div className="fixed w-screen h-screen left-0 top-0 inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center">
-        <div className="bg-white p-6 rounded-lg grid grid-rows-[auto,auto] gap-6 justify-center items-center justify-items-center shadow-xl shadow-black/20">
-          <h2 className="text-xl font-bold max-w-[50vw] text-center">
+        <div className="bg-white p-6 rounded-lg grid grid-rows-[auto,auto,auto] gap-6 justify-center items-center justify-items-center shadow-xl shadow-black/20">
+          <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
             Who do you want to send money to?
           </h2>
-          <div className="grid justify-center items-center gap-4">
+          <div className="grid justify-center items-center gap-2">
             <select
               value={selectedAccountId || ""}
               onChange={(e) => setSelectedAccountId(e.target.value)}
@@ -283,26 +284,24 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
               placeholder="Amount"
               className="w-full px-3 py-2 text-xl border border-gray-300 rounded-lg"
             />
-            <div className="flex justify-center items-center gap-4">
-              <button
-                onClick={sendMoney}
-                disabled={sending || amount <= 0 || !selectedAccountId}
-                className={cn(
-                  "px-4 py-2 text-xl font-bold text-white bg-blue-500 rounded-lg disabled:opacity-50"
-                )}
-              >
-                Send
-              </button>
-              <button
-                onClick={cancel}
-                disabled={sending}
-                className={cn(
-                  "px-4 py-2 text-xl font-bold text-white bg-red-500 rounded-lg disabled:opacity-50"
-                )}
-              >
-                Cancel
-              </button>
-            </div>
+          </div>
+          <div className="grid grid-cols-2 justify-center items-center gap-4">
+            <FlopButton
+              onClick={cancel}
+              disabled={sending}
+              color="gray"
+              variant="outline"
+            >
+              Cancel
+            </FlopButton>
+            <FlopButton
+              onClick={sendMoney}
+              disabled={sending || amount <= 0 || !selectedAccountId}
+              color="blue"
+              variant="solid"
+            >
+              Send
+            </FlopButton>
           </div>
         </div>
       </div>
