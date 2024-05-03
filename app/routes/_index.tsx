@@ -8,6 +8,7 @@ import FlopButton from "~/components/FlopButton";
 import { ShareButton } from "~/components/ShareButton";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
+import { useVibrate } from "~/hooks/useVibrate";
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
@@ -18,6 +19,8 @@ export default function Index() {
     "playing" | "joinable" | null
   >(null);
   const navigate = useNavigate();
+  const knockVibrate = useVibrate([15, 150, 15], 50);
+  const submitVibrate = useVibrate([5], 5);
   const [searchParams, setSearchParams] = useSearchParams();
 
   function join() {
@@ -126,6 +129,7 @@ export default function Index() {
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
           if (loading) return;
+          submitVibrate();
           join();
         }}
         autoComplete="off"
@@ -154,6 +158,7 @@ export default function Index() {
               type="button"
               onClick={(e) => {
                 e.currentTarget.blur();
+                knockVibrate();
                 client
                   .POST("/api/v1/room/knock", { body: { which: "peek" } })
                   .then((res) => {

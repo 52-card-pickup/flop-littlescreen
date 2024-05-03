@@ -6,6 +6,7 @@ import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
 import FlopButton from "./FlopButton";
 import { RulesHelpButton } from "./RulesHelpButton";
+import { useVibrate } from "../hooks/useVibrate";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
@@ -24,6 +25,7 @@ export default function GameScreen(props: Props) {
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
   const [loading, setLoading] = useState(false);
+  const vibrate = useVibrate([20, 20, 40, 20, 60]);
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -46,24 +48,6 @@ export default function GameScreen(props: Props) {
     if (!props.state.yourTurn) setMode("waiting");
   }, [props.state]);
 
-  function vibrate() {
-    try {
-      if (typeof window !== "undefined" && "vibrate" in window.navigator) {
-        const didVibrateWithPattern = window.navigator.vibrate([
-          20, 20, 40, 20, 60,
-        ]);
-        if (didVibrateWithPattern) return;
-
-        const didVibrate = window.navigator.vibrate(100);
-        if (!didVibrate) {
-          console.warn("Failed to vibrate with pattern or single vibrate");
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to vibrate, unknown error", e);
-    }
-  }
-
   useEffect(() => {
     if (props.state.yourTurn) {
       vibrate();
@@ -72,7 +56,7 @@ export default function GameScreen(props: Props) {
     }
 
     setShowCards(false);
-  }, [props.state.yourTurn]);
+  }, [props.state.yourTurn, vibrate]);
 
   const timer = useCountdown({
     turnExpiresDt: props.state.turnExpiresDt || 0,
