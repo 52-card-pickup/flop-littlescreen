@@ -79,8 +79,14 @@ export default function GameScreen(props: Props) {
           duration: 10000,
         },
       );
+      setStartBallotMenuOpen(false);
+    }
+    if (!props.state.ballotDetails) {
+      toast.dismiss();
+      setCastVoteMenuOpen(false);
     }
   }, [props.state.ballotDetails]);
+
 
   function vibrate() {
     try {
