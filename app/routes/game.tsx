@@ -9,6 +9,10 @@ import { usePlayerPolling } from "~/hooks/usePlayerPolling";
 import { playerState } from "~/state";
 import { GoogleCastButton } from "../components/GoogleCastButton";
 import { WaitingRoom } from "../components/WaitingRoom";
+import { components } from "~/flopClient/spec";
+
+export type BallotAction = components["schemas"]["BallotAction"]
+
 
 export default function Game() {
   usePlayerPolling();
@@ -130,6 +134,26 @@ export default function Game() {
                 return Promise.resolve();
               });
           },
+          castVote: (vote: boolean) => {
+            client.POST("/api/v1/ballot/cast", {
+              body: {
+                vote,
+                playerId: playerDetails.id,
+              },
+            })
+              .catch((e) => {
+                console.error(e);
+              });
+          },
+          startVote: (action: BallotAction) => {
+            client.POST("/api/v1/ballot/start", {
+              body: {
+                action,
+              }
+            }).catch((e) => {
+              console.error(e);
+            });
+          }
         }}
       />
       <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />

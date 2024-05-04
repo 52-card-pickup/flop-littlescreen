@@ -24,6 +24,47 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
   { playState: "Waiting", yourTurn: false, state: "playing" },
   { playState: "setBalance", balance: 1000 },
   { playState: "complete", state: "complete" },
+  {
+    playState: "double-blinds-vote",
+    ballotDetails: {
+      action: "doubleBlinds",
+      expiresDt: new Date().getTime() + 15000,
+    },
+    startBallotOptions: undefined
+  },
+  {
+    playState: "kick-vote", state: "playing",
+
+    startBallotOptions: undefined,
+    ballotDetails: {
+      action: {
+        kickPlayer: "Player 1",
+      },
+      expiresDt: new Date().getTime() + 15000,
+    }
+  },
+  {
+    playState: "start-ballot",
+    ballotDetails: undefined,
+    startBallotOptions: {
+      double_blinds: true,
+      kick_player: [
+        {
+          id: "Player 1",
+          name: "Player 1",
+        },
+        {
+          id: "Player 2",
+          name: "Player 2",
+        },
+        {
+          id: "Player 3",
+          name: "Player 3",
+        },
+      ]
+    }
+  }
+
 ];
 
 export default function Develop() {
@@ -51,10 +92,12 @@ export default function Develop() {
       <GameScreen
         state={player}
         actions={{
-          raiseTo: () => { },
-          call: () => { },
-          check: () => { },
-          fold: () => { },
+          fold: () => { console.log("fold"); return Promise.resolve() },
+          call: () => { console.log("call"); return Promise.resolve() },
+          raiseTo: () => { console.log("raise"); return Promise.resolve() },
+          check: () => { console.log("check"); return Promise.resolve() },
+          castVote: () => { console.log("vote"); return Promise.resolve() },
+          startVote: () => { console.log("start vote"); return Promise.resolve() },
         }}
       />
     </>
