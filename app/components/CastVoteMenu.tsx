@@ -33,7 +33,7 @@ export function CastVoteMenu({
                             onClose();
                         }}
                     >
-                        Kick &apos;em
+                        {ballotAction === "doubleBlinds" ? "Double" : "Kick"} &apos;em
                     </FlopButton>
                     <FlopButton
                         onClick={() => {
