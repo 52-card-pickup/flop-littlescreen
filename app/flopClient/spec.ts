@@ -70,6 +70,50 @@ export interface paths {
       };
     };
   };
+  "/api/v1/player/{player_id}/send": {
+    /** @description Send a message to the game room. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PlayerSendRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/player/{player_id}/transfer": {
+    /** @description Get the account details of other players. */
+    get: {
+      responses: {
+        200: {
+          content: {
+            "application/json": components["schemas"]["PlayerAccountsResponse"];
+          };
+        };
+      };
+    };
+    /** @description Transfer funds to another player. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["TransferRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
   "/api/v1/player/{player_id}/photo": {
     /** @description Get a photo for a player. */
     get: {
@@ -731,6 +775,16 @@ export interface components {
       /** Format: uint64 */
       stake: number;
     };
+    PlayerAccount: {
+      accountId: string;
+      name: string;
+    };
+    PlayerAccountsResponse: {
+      accounts: components["schemas"]["PlayerAccount"][];
+    };
+    PlayerSendRequest: {
+      message: string;
+    };
     PollQuery: {
       /** Format: uint64 */
       since?: number | null;
@@ -1203,6 +1257,11 @@ export interface components {
       /** @description REQUIRED. The name of the tag. */
       name: string;
       [key: string]: unknown;
+    };
+    TransferRequest: {
+      /** Format: uint64 */
+      amount: number;
+      to: string;
     };
   };
   responses: never;

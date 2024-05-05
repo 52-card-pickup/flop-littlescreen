@@ -12,6 +12,8 @@
     "generate-types": "npx openapi-typescript http://127.0.0.1:5000/docs/private/api.json -o ./app/flopClient/spec.ts"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.19",
+    "@heroicons/react": "^2.1.3",
     "@remix-run/css-bundle": "^2.8.1",
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",

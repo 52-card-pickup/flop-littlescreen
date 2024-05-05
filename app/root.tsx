@@ -37,6 +37,18 @@ export default function App() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>flop - the mobile game</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&family=Sono:wght,MONO@200..800,0..1&display=swap"
+          rel="stylesheet"
+        />
+
         <Meta />
         <Links />
       </head>
