@@ -138,7 +138,6 @@ text-white place-self-center bg-slate-200"
         return await Promise.resolve();
       }
     },
-
     castVote: (vote: boolean) => {
       client.POST("/api/v1/ballot/cast", {
         body: {

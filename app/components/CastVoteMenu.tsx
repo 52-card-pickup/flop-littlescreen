@@ -1,6 +1,6 @@
-import FlopButton from "./FlopButton";
 import { BallotAction } from "~/routes/game";
 import { XMarkIcon } from "../icons/XMarkIcon";
+import FlopButton from "./FlopButton";
 
 
 interface VoteMenuProps {
@@ -21,7 +21,9 @@ export function CastVoteMenu({
         >
             <div className="grid gap-3">
                 <div className="grid grid-cols-[1fr,auto]">
-                    Vote to {ballotAction === "doubleBlinds" ? "double blinds" : `kick ${ballotAction.kickPlayer}`}
+                    <span className="text-lg font-medium">
+                        Vote to {ballotAction === "doubleBlinds" ? "double blinds" : `kick ${ballotAction.kickPlayer}`}
+                    </span>
                     <button onClick={onClose} className="justify-self-end">
                         <XMarkIcon className="w-6 h-6" />
                     </button>
