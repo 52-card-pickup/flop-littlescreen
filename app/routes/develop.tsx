@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRecoilState } from "recoil";
 import GameScreen from "~/components/GameScreen";
 import { GamePlayerState, playerState } from "~/state";
@@ -22,10 +23,10 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
     balance: 1000
   },
   { playState: "Waiting", yourTurn: false, state: "playing" },
-  { playState: "setBalance", balance: 1000 },
-  { playState: "complete", state: "complete" },
+  { playState: "Set balance to 1000", balance: 1000 },
+  { playState: "Completed round", state: "complete" },
   {
-    playState: "double-blinds-vote",
+    playState: "Vote for double blinds",
     ballotDetails: {
       action: "doubleBlinds",
       expiresDt: new Date().getTime() + 15000,
@@ -33,7 +34,7 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
     startBallotOptions: undefined
   },
   {
-    playState: "kick-vote", state: "playing",
+    playState: "Vote to kick player", state: "playing",
 
     startBallotOptions: undefined,
     ballotDetails: {
@@ -44,7 +45,7 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
     }
   },
   {
-    playState: "start-ballot",
+    playState: "Start a ballot",
     ballotDetails: undefined,
     startBallotOptions: {
       double_blinds: true,
@@ -69,20 +70,33 @@ const modes: (Partial<GamePlayerState> & { playState: string })[] = [
 
 export default function Develop() {
   const [player, setPlayer] = useRecoilState(playerState);
+  const [hidden, setHidden] = useState(true);
+
 
   return (
     <>
+      <button
+        onClick={() => setHidden(!hidden)}
+        className="absolute z-50 top-0 rounded-r-md p-1 left-0 bg-charcoal-900 bg-opacity-50 "
+      >
+        {hidden ? "Show" : "Hide"} dev
+      </button>
+
       <div
         className={cn(
-          "absolute top-20 left-0 w-full h-10 bg-charcoal-900 bg-opacity-50",
-          "transition-all duration-300 grid grid-cols-4 gap-4 z-50"
+          "absolute top-20 left-0 h-10 bg-charcoal-900 bg-opacity-50",
+          "transition-all duration-300 grid gap-4 z-50 w-1/6 bg-opacity-0 hover:bg-opacity-100",
+          hidden ? "hidden" : "",
         )}
       >
         {modes.map((mode, idx) => (
           <button
             key={idx}
-            onClick={() => setPlayer({ ...player, ...mode })}
-            className="text-white bg-charcoal-700 hover:bg-charcoal-600 transition-all duration-300"
+            onClick={() => {
+              setHidden(true);
+              return setPlayer({ ...player, ...mode });
+            }}
+            className="text-white bg-charcoal-500 p-1 rounded-md hover:bg-charcoal-600 transition-all duration-300"
           >
             {mode.playState}
           </button>
