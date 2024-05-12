@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
@@ -68,6 +69,9 @@ export default {
       },
       animation: {
         shake: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
+      },
+      fontFamily: {
+        emoji: ['"Noto Emoji"', ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
         shake: {

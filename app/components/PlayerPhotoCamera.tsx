@@ -68,6 +68,7 @@ function PlayerPhotoCameraOverlay(props: { onCompleted?: () => void }) {
       formData.append("file", file);
       const res = await client.POST("/api/v1/player/{player_id}/photo", {
         params: {
+          // @ts-expect-error - required for player_id path param
           path: { player_id: playerDetails.id },
         },
         body: [formData],
