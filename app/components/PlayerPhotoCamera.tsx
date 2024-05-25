@@ -57,7 +57,7 @@ export function PlayerPhotoCamera(
   );
 }
 
-function PlayerPhotoCameraOverlay(props: { onCompleted?: () => void }) {
+export function PlayerPhotoCameraOverlay(props: { onCompleted?: () => void }) {
   const { playerDetails, loading: playerDetailsLoading } = usePlayerDetails();
   const [showInstructions, setShowInstructions] = useState(true);
   const [loading, setLoading] = useState(false);

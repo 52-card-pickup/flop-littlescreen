@@ -5,6 +5,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
   ArrowRightCircleIcon,
+  CameraIcon,
   CurrencyPoundIcon,
   PaperAirplaneIcon,
 } from "@heroicons/react/20/solid";
@@ -14,11 +15,13 @@ import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { createPortal } from "react-dom";
 import FlopButton from "./FlopButton";
+import { PlayerPhotoCameraOverlay } from "./PlayerPhotoCamera";
 
 export default function PlayerSendButton() {
   const { playerDetails } = usePlayerDetails();
   const [preview, setPreview] = useTimeoutState<string | null>(null, 750);
   const [sendMoneyModalOpen, setSendMoneyModalOpen] = useState(false);
+  const [showCameraOverlay, setShowCameraOverlay] = useState(false);
 
   function sendEmoji(payload: string, preview: string) {
     console.log("Sending emoji", payload);
@@ -44,6 +47,11 @@ export default function PlayerSendButton() {
         open={sendMoneyModalOpen}
         onClose={() => setSendMoneyModalOpen(false)}
       />
+      {showCameraOverlay && (
+        <PlayerPhotoCameraOverlay
+          onCompleted={() => setShowCameraOverlay(false)}
+        />
+      )}
       <FullScreenEmojiPreview hidden={!preview} emoji={preview || ""} />
       <Menu as="div" className="relative inline-block text-left">
         <div>
@@ -65,6 +73,22 @@ export default function PlayerSendButton() {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="absolute bottom-14 right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="py-1">
+              <Menu.Item>
+                <a
+                  onClick={() => setShowCameraOverlay(true)}
+                  className={cn(
+                    "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
+                  )}
+                >
+                  <CameraIcon
+                    className="mr-3 h-6 w-6 text-gray-600"
+                    aria-hidden="true"
+                  />
+                  Take a picture
+                </a>
+              </Menu.Item>
+            </div>
             <div className="py-1">
               <Menu.Item>
                 <a
@@ -203,6 +227,8 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
   const amount = isNaN(parsed) ? 0 : parsed;
 
   useEffect(() => {
+    if (!playerDetails.id) return;
+    if (!props.open) return;
     client
       .GET("/api/v1/player/{player_id}/transfer", {
         params: {
@@ -214,7 +240,7 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
         if (!data.data) return;
         setPlayers(data.data?.accounts);
       });
-  }, [playerDetails.id]);
+  }, [playerDetails.id, props.open]);
 
   function sendMoney() {
     if (!selectedAccountId || amount <= 0) return;
