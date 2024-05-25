@@ -1,18 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { components } from "~/flopClient/spec";
 
 type CardValue = components["schemas"]["CardValue"];
 type CardSuite = components["schemas"]["CardSuite"];
 
-export function RulesHelpButton(props: React.HTMLProps<HTMLDivElement>) {
-  const [open, setOpen] = useState(false);
+export function RulesHelpButton(
+  props: React.HTMLProps<HTMLDivElement> & {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+  }
+) {
+  const [open, setOpen] = useState(props.open ?? false);
+  useEffect(() => {
+    setOpen(props.open ?? false);
+  }, [props.open]);
   const [handStrengthsVisible, setHandStrengthsVisible] = useState(false);
   return (
     <div {...props}>
       <button
         className="flex justify-center items-center h-full w-full max-w-[48px] max-h-[48px]"
         onClick={() => {
-          setOpen(!open);
+          props.onOpenChange
+            ? props.onOpenChange(!open)
+            : setOpen((prev) => !prev);
         }}
       >
         <svg

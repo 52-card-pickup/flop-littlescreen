@@ -23,7 +23,9 @@ export default function GameScreen(props: Props) {
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
+  const [showRules, setShowRules] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasCompletedGame, setHasCompletedGame] = useState(false);
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -39,12 +41,23 @@ export default function GameScreen(props: Props) {
     if (props.state.state === "complete") {
       setMode("complete");
       setShowCards(true);
+      setHasCompletedGame(true);
       return;
     }
-    if (props.state.state === "offline") setMode("waiting");
-    if (props.state.yourTurn) setMode("yourturn");
-    if (!props.state.yourTurn) setMode("waiting");
-  }, [props.state]);
+    if (props.state.state === "offline") {
+      setMode("waiting");
+      return;
+    }
+    if (hasCompletedGame && props.state.state === "playing") {
+      setShowCards(false);
+    }
+    if (props.state.yourTurn) {
+      setShowRules(false);
+      setMode("yourturn");
+      return;
+    }
+    setMode("waiting");
+  }, [props.state.state, props.state.yourTurn]);
 
   function vibrate() {
     try {
@@ -110,7 +123,11 @@ export default function GameScreen(props: Props) {
           : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
     >
-      <RulesHelpButton className="fixed top-8 left-8 w-8 h-8 z-50" />
+      <RulesHelpButton
+        className="fixed top-8 left-8 w-8 h-8 z-50"
+        open={showRules}
+        onOpenChange={setShowRules}
+      />
       <div className={cn("place-self-center")}>
         {timeLeftToPlay && (
           <div
