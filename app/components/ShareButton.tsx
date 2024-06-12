@@ -6,8 +6,9 @@ type ShareButtonProps = React.HTMLProps<HTMLDivElement> & {
   url: string;
 };
 
-export function ShareButton(props: ShareButtonProps) {
-  const [shareData, setShareData] = React.useState<ShareData | null>(null);
+let hasWarnedAboutCanShare = false;
+export function useShare() {
+  const [canShare, setCanShare] = React.useState<boolean | null>(null);
 
   React.useEffect(() => {
     const canShare: typeof navigator.canShare | null =
@@ -25,38 +26,54 @@ export function ShareButton(props: ShareButtonProps) {
         : null;
 
     if (!canShare) {
+      if (hasWarnedAboutCanShare) return;
       console.log("Unable to share, canShare is not supported");
+      hasWarnedAboutCanShare = true;
       return;
     }
 
-    const shareData = {
-      title: props.title, // "Flop Poker",
-      text: props.text, // "Play Flop Poker with your friends",
-      url: props.url,
+    const exampleShareData = {
+      title: "Flop Poker",
+      text: "Play Flop Poker with your friends",
+      url: "https://flop.party",
     };
-    if (!canShare(shareData)) {
-      console.log("Unable to share", shareData);
-      return;
+
+    const shareEnabled = canShare(exampleShareData);
+    if (!shareEnabled) {
+      console.log("Unable to share", exampleShareData);
     }
 
-    setShareData(shareData);
-  }, [props.title, props.text, props.url]);
+    setCanShare(shareEnabled);
+  }, []);
 
-  function share() {
-    if (!shareData) {
+  function share(data: ShareData) {
+    if (!canShare) {
+      console.log("Unable to share, share is not supported");
       return;
     }
-
-    window.navigator.share(shareData);
+    window.navigator.share(data);
   }
+
+  share.isSupported = canShare || false;
+  return share;
+}
+
+export function ShareButton(props: ShareButtonProps) {
+  const share = useShare();
 
   return (
     <div {...props}>
       <button
         className="flex justify-center items-center h-full w-full max-w-[48px] max-h-[48px] border-none"
-        onClick={share}
+        onClick={() =>
+          share({
+            title: props.title,
+            text: props.text,
+            url: props.url,
+          })
+        }
       >
-        {shareData && (
+        {share.isSupported && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
