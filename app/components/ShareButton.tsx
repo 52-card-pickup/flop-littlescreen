@@ -1,4 +1,5 @@
 import React from "react";
+import { useShare } from "../hooks/useShare";
 
 type ShareButtonProps = React.HTMLProps<HTMLDivElement> & {
   title: string;
@@ -7,56 +8,21 @@ type ShareButtonProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 export function ShareButton(props: ShareButtonProps) {
-  const [shareData, setShareData] = React.useState<ShareData | null>(null);
-
-  React.useEffect(() => {
-    const canShare: typeof navigator.canShare | null =
-      typeof window !== "undefined" &&
-      "navigator" in window &&
-      "canShare" in window.navigator
-        ? (data?: ShareData | undefined) => {
-            try {
-              return window.navigator.canShare(data);
-            } catch (e) {
-              console.error(e);
-              return false;
-            }
-          }
-        : null;
-
-    if (!canShare) {
-      console.log("Unable to share, canShare is not supported");
-      return;
-    }
-
-    const shareData = {
-      title: props.title, // "Flop Poker",
-      text: props.text, // "Play Flop Poker with your friends",
-      url: props.url,
-    };
-    if (!canShare(shareData)) {
-      console.log("Unable to share", shareData);
-      return;
-    }
-
-    setShareData(shareData);
-  }, [props.title, props.text, props.url]);
-
-  function share() {
-    if (!shareData) {
-      return;
-    }
-
-    window.navigator.share(shareData);
-  }
+  const share = useShare();
 
   return (
     <div {...props}>
       <button
         className="flex justify-center items-center h-full w-full max-w-[48px] max-h-[48px] border-none"
-        onClick={share}
+        onClick={() =>
+          share({
+            title: props.title,
+            text: props.text,
+            url: props.url,
+          })
+        }
       >
-        {shareData && (
+        {share.isSupported && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
