@@ -7,7 +7,8 @@ import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
 import { client } from "../flopClient";
 import FlopButton from "~/components/FlopButton";
-import { ShareButton, useShare } from "~/components/ShareButton";
+import { ShareButton } from "~/components/ShareButton";
+import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
 
@@ -120,7 +121,7 @@ export default function Index() {
         </h2>
         <p
           className={cn(
-            "text-lg font-semibold m-0 text-center text-slate-600",
+            "text-lg font-semibold m-0 text-center text-slate-600 select-none",
             share.isSupported ? "cursor-pointer" : "cursor-default"
           )}
           onClick={() =>
