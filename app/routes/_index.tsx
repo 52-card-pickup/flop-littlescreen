@@ -11,6 +11,7 @@ import { ShareButton } from "~/components/ShareButton";
 import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
+import { useVibrate } from "~/hooks/useVibrate";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -29,6 +30,8 @@ export default function Index() {
     "playing" | "joinable" | null
   >(null);
   const navigate = useNavigate();
+  const knockVibrate = useVibrate([15, 150, 15], 50);
+  const submitVibrate = useVibrate([5], 5);
   const [searchParams, setSearchParams] = useSearchParams();
   const document = useDocument();
   const share = useShare();
@@ -155,6 +158,7 @@ export default function Index() {
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
           if (loading) return;
+          submitVibrate();
           join();
         }}
         autoComplete="off"
@@ -183,6 +187,7 @@ export default function Index() {
               type="button"
               onClick={(e) => {
                 e.currentTarget.blur();
+                knockVibrate();
                 client
                   .POST("/api/v1/room/knock", { body: { which: "peek" } })
                   .then((res) => {
