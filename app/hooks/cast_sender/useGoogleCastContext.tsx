@@ -5,9 +5,11 @@ export function useGoogleCastContext() {
   const [castContext, setCastContext] =
     useState<cast.framework.CastSession | null>(null);
 
-  function start() {
+  function start(receiverApplicationId: string) {
     try {
-      loadCastFramework((session) => setCastContext(session));
+      loadCastFramework(receiverApplicationId, (session) =>
+        setCastContext(session)
+      );
     } catch (e) {
       console.error("error loading cast framework", e);
     }
@@ -15,22 +17,25 @@ export function useGoogleCastContext() {
 
   useEffect(() => {
     const w = window as unknown as GlobalCastContext;
+    const mode: "prod" | "beta" = document.location.hostname.includes("beta.")
+      ? "beta"
+      : "prod";
 
-    console.log("checking cast ready", w.gCastReady);
-
+    console.log(`checking cast ready [mode=${mode}]: ${w.gCastReady}`);
+    const receiverApplicationId = mode === "beta" ? "1C493AEF" : "9AF17368";
     // w.gCastReady = true;
     // console.log("cast ready set to true for testing");
 
     if (w.gCastReady) {
       console.log("cast ready");
-      start();
+      start(receiverApplicationId);
       return;
     }
 
     w["__onGCastApiAvailable"] = function (isAvailable: boolean) {
       if (isAvailable) {
         console.log("cast now available");
-        start();
+        start(receiverApplicationId);
       }
     };
   }, []);
@@ -66,11 +71,12 @@ export function useGoogleCastContext() {
 }
 
 function loadCastFramework(
+  receiverApplicationId: string,
   onSession: (session: cast.framework.CastSession | null) => void
 ): cast.framework.CastContext | null {
   console.log("loading cast framework");
   const options: cast.framework.CastOptions = {
-    receiverApplicationId: "9AF17368",
+    receiverApplicationId: receiverApplicationId,
     autoJoinPolicy: "origin_scoped" as chrome.cast.AutoJoinPolicy,
   };
 
