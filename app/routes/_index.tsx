@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/no-access-key */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
@@ -6,8 +9,18 @@ import { devState } from "~/state";
 import { client } from "../flopClient";
 import FlopButton from "~/components/FlopButton";
 import { ShareButton } from "~/components/ShareButton";
+import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
+import { useVibrate } from "~/hooks/useVibrate";
+
+function useDocument() {
+  const [document, setDocument] = React.useState<Document | null>(null);
+  useEffect(() => {
+    setDocument(window.document);
+  }, []);
+  return document;
+}
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
@@ -18,7 +31,11 @@ export default function Index() {
     "playing" | "joinable" | null
   >(null);
   const navigate = useNavigate();
+  const knockVibrate = useVibrate([15, 150, 15], 50);
+  const submitVibrate = useVibrate([5], 5);
   const [searchParams, setSearchParams] = useSearchParams();
+  const document = useDocument();
+  const share = useShare();
 
   function join() {
     if (name === "dev") {
@@ -94,6 +111,9 @@ export default function Index() {
     };
   }, [playerDetails, navigate]);
 
+  const bigScreenUrl = document?.location.host.startsWith("beta.")
+    ? "beta.flop.party/big-screen"
+    : "tv.flop.party";
   return (
     <div
       className="bg-slate-200 min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto,1fr]"
@@ -103,8 +123,21 @@ export default function Index() {
         <h2 className="text-base font-bold m-0 text-center">
           Not got a Chromecast? Grab a big screen and go to:
         </h2>
-        <p className="text-lg font-semibold m-0 text-center text-slate-600">
-          tv.flop.party
+        <p
+          className={cn(
+            "text-lg font-semibold m-0 text-center text-slate-600 select-none",
+            share.isSupported ? "cursor-pointer" : "cursor-default"
+          )}
+          onClick={() =>
+            share.isSupported &&
+            share({
+              title: "Flop Poker",
+              text: "Host a game of Flop Poker on the big screen",
+              url: `https://${bigScreenUrl}`,
+            })
+          }
+        >
+          {bigScreenUrl}
         </p>
       </div>
       <div className="flex flex-col justify-center items-center">
@@ -126,6 +159,7 @@ export default function Index() {
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
           if (loading) return;
+          submitVibrate();
           join();
         }}
         autoComplete="off"
@@ -137,6 +171,7 @@ export default function Index() {
           id="name"
           name="name"
           placeholder="Enter your name"
+          accessKey="n"
           onChange={(e) => {
             setName(e.target.value);
           }}
@@ -154,6 +189,7 @@ export default function Index() {
               type="button"
               onClick={(e) => {
                 e.currentTarget.blur();
+                knockVibrate();
                 client
                   .POST("/api/v1/room/knock", { body: { which: "peek" } })
                   .then((res) => {

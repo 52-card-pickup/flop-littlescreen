@@ -6,10 +6,11 @@ import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
 import FlopButton from "./FlopButton";
 import { RulesHelpButton } from "./RulesHelpButton";
+import { useVibrate } from "../hooks/useVibrate";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
-interface Props {
+export interface GameScreenProps {
   state: GamePlayerState;
   actions: {
     fold: () => Promise<void>;
@@ -19,13 +20,14 @@ interface Props {
   };
 }
 
-export default function GameScreen(props: Props) {
+export default function GameScreen(props: GameScreenProps) {
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
   const [showRules, setShowRules] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasCompletedGame, setHasCompletedGame] = useState(false);
+  const vibrate = useVibrate([20, 20, 40, 20, 60]);
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -59,24 +61,6 @@ export default function GameScreen(props: Props) {
     setMode("waiting");
   }, [props.state.state, props.state.yourTurn]);
 
-  function vibrate() {
-    try {
-      if (typeof window !== "undefined" && "vibrate" in window.navigator) {
-        const didVibrateWithPattern = window.navigator.vibrate([
-          20, 20, 40, 20, 60,
-        ]);
-        if (didVibrateWithPattern) return;
-
-        const didVibrate = window.navigator.vibrate(100);
-        if (!didVibrate) {
-          console.warn("Failed to vibrate with pattern or single vibrate");
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to vibrate, unknown error", e);
-    }
-  }
-
   useEffect(() => {
     if (props.state.yourTurn) {
       vibrate();
@@ -85,7 +69,7 @@ export default function GameScreen(props: Props) {
     }
 
     setShowCards(false);
-  }, [props.state.yourTurn]);
+  }, [props.state.yourTurn, vibrate]);
 
   const timer = useCountdown({
     turnExpiresDt: props.state.turnExpiresDt || 0,
@@ -292,10 +276,9 @@ function calculateBetAction(
   currentRoundStake: number
 ) {
   if (callAmount > 0) {
-    if (currentRoundStake === callAmount) {
-      return "check";
-    }
-    return stake >= callAmount ? "bet" : "call";
+    // The current stake can only match the call amount as the big blind
+    const checkOrCall = currentRoundStake === callAmount ? "check" : "call";
+    return stake >= callAmount ? "bet" : checkOrCall;
   }
   return stake > 0 ? "bet" : "check";
 }
