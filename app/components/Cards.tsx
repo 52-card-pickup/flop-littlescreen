@@ -41,7 +41,7 @@ export default function Cards(props: {
         {!props.showCards && (
           <div
             className="absolute flex justify-center items-center w-full h-full"
-            style={{ zIndex: 100 }}
+            style={{ zIndex: 15 }}
           >
             <div className="text-black text-2xl font-bold bg-white/90 p-2 rounded-lg border-2 border-white shadow-lg shadow-slate-800/60">
               Tap to reveal cards
@@ -51,7 +51,7 @@ export default function Cards(props: {
         {props.showHideCardsHint && props.showCards && (
           <div
             className="absolute flex justify-center items-center w-full h-full mt-32"
-            style={{ zIndex: 100 }}
+            style={{ zIndex: 15 }}
           >
             <div className="text-black text-2xl font-bold bg-white/90 p-2 rounded-lg border-2 border-white shadow-lg shadow-slate-800/30">
               Tap to hide cards

@@ -13,6 +13,12 @@ export interface paths {
   "/api/v1/room": {
     /** @description Get the current state of the game room. */
     get: {
+      parameters: {
+        query?: {
+          since?: number | null;
+          timeout?: number | null;
+        };
+      };
       responses: {
         200: {
           content: {
@@ -46,13 +52,101 @@ export interface paths {
       };
     };
   };
+  "/api/v1/room/knock": {
+    /** @description Knock on the game room - peek in, nudge players, or kick them out. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["KnockRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": components["schemas"]["KnockResponse"];
+          };
+        };
+      };
+    };
+  };
   "/api/v1/player/{player_id}": {
     /** @description Get the current state of a player. */
     get: {
+      parameters: {
+        query?: {
+          since?: number | null;
+          timeout?: number | null;
+        };
+      };
       responses: {
         200: {
           content: {
             "application/json": components["schemas"]["GamePlayerState"];
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/player/{player_id}/send": {
+    /** @description Send a message to the game room. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PlayerSendRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/player/{player_id}/transfer": {
+    /** @description Get the account details of other players. */
+    get: {
+      responses: {
+        200: {
+          content: {
+            "application/json": components["schemas"]["PlayerAccountsResponse"];
+          };
+        };
+      };
+    };
+    /** @description Transfer funds to another player. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["TransferRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/player/{player_id}/photo": {
+    /** @description Get a photo for a player. */
+    get: {
+    };
+    /** @description Upload a photo for a player. */
+    post: {
+      /** @description multipart form data */
+      requestBody: {
+        content: {
+          "multipart/form-data": unknown[];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
           };
         };
       };
@@ -132,9 +226,8 @@ export interface components {
     CardValue: "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king" | "ace";
     CompletedGame: {
       playerCards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]][];
-      /** Format: uint */
-      winnerIdx: number;
-      winningHand: string;
+      winnerName?: string | null;
+      winningHand?: string | null;
     };
     /** @description Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object. */
     Components: {
@@ -236,6 +329,7 @@ export interface components {
       balance: number;
       folded: boolean;
       name: string;
+      photo?: string | null;
       /** Format: uint64 */
       turnExpiresDt?: number | null;
     };
@@ -248,6 +342,7 @@ export interface components {
       /** Format: uint64 */
       pot: number;
       state: components["schemas"]["GamePhase"];
+      ticker?: string | null;
     };
     /** @enum {string} */
     GamePhase: "offline" | "idle" | "waiting" | "playing" | "complete";
@@ -326,6 +421,20 @@ export interface components {
     };
     JoinResponse: {
       id: string;
+    };
+    /** @enum {string} */
+    KnockAction: "peek" | "nudge" | "kick";
+    KnockRequest: {
+      which: components["schemas"]["KnockAction"];
+    };
+    KnockResponse: {
+      /** Format: uint */
+      cardsOnTable: number;
+      /** Format: uint */
+      players: number;
+      /** Format: uint64 */
+      retryAt?: number | null;
+      state: components["schemas"]["GamePhase"];
     };
     /** @description License information for the exposed API. */
     License: {
@@ -644,6 +753,22 @@ export interface components {
       playerId: string;
       /** Format: uint64 */
       stake: number;
+    };
+    PlayerAccount: {
+      accountId: string;
+      name: string;
+    };
+    PlayerAccountsResponse: {
+      accounts: components["schemas"]["PlayerAccount"][];
+    };
+    PlayerSendRequest: {
+      message: string;
+    };
+    PollQuery: {
+      /** Format: uint64 */
+      since?: number | null;
+      /** Format: uint64 */
+      timeout?: number | null;
     };
     /** @enum {string} */
     QueryStyle: "form" | "spaceDelimited" | "pipeDelimited" | "deepObject";
@@ -1104,6 +1229,11 @@ export interface components {
       /** @description REQUIRED. The name of the tag. */
       name: string;
       [key: string]: unknown;
+    };
+    TransferRequest: {
+      /** Format: uint64 */
+      amount: number;
+      to: string;
     };
   };
   responses: never;

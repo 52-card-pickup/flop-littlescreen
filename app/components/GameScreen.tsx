@@ -1,20 +1,22 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import Cards from "~/components/Cards";
 import { client } from "~/flopClient";
-import { useCountdown } from "~/routes/useCountdown";
+import { useCountdown } from "~/hooks/useCountdown";
 import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
 import FlopButton from "./FlopButton";
+import { RulesHelpButton } from "./RulesHelpButton";
+import { useVibrate } from "../hooks/useVibrate";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
 interface Props {
   state: GamePlayerState;
   actions: {
-    fold: () => void;
-    raiseTo: (stake: number) => void;
-    check: () => void;
-    call: (amount: number) => void;
+    fold: () => Promise<void>;
+    raiseTo: (stake: number) => Promise<void>;
+    check: () => Promise<void>;
+    call: (amount: number) => Promise<void>;
   };
 }
 
@@ -22,6 +24,8 @@ export default function GameScreen(props: Props) {
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const vibrate = useVibrate([20, 20, 40, 20, 60]);
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -45,11 +49,14 @@ export default function GameScreen(props: Props) {
   }, [props.state]);
 
   useEffect(() => {
-    setShowCards(props.state.yourTurn);
     if (props.state.yourTurn) {
+      vibrate();
       setStake(0);
+      return;
     }
-  }, [props.state.yourTurn]);
+
+    setShowCards(false);
+  }, [props.state.yourTurn, vibrate]);
 
   const timer = useCountdown({
     turnExpiresDt: props.state.turnExpiresDt || 0,
@@ -81,12 +88,13 @@ export default function GameScreen(props: Props) {
     <div
       className={cn(
         // "grid h-dvh transition-all duration-500 bg-[linear-gradient(329deg,#90cda3,#e6fff0)]",
-        "grid w-dvw h-dvh transition-all duration-500",
+        "fixed grid w-dvw h-dvh transition-all duration-500",
         mode === "yourturn"
           ? "grid-rows-[1fr,5fr,1fr,1fr,0.2fr] delay-0 bg-[linear-gradient(329deg,#52745c,#9fd19f)]"
           : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
     >
+      <RulesHelpButton className="fixed top-8 left-8 w-8 h-8 z-50" />
       <div className={cn("place-self-center")}>
         {timeLeftToPlay && (
           <div
@@ -170,29 +178,19 @@ export default function GameScreen(props: Props) {
               <div className="grid grid-cols-[2fr,5fr] w-full gap-4 p-3">
                 <div className="place-self-center w-full flex flex-col">
                   <FlopButton
-                    onClick={props.actions.fold}
+                    onClick={() => handleFoldClick()}
                     color="red"
                     variant="solid"
+                    disabled={loading}
                   >
                     Fold
                   </FlopButton>
                 </div>
                 <div className="place-self-center w-full flex flex-col">
                   <FlopButton
-                    onClick={() => {
-                      switch (betAction) {
-                        case "bet":
-                          props.actions.raiseTo(stake);
-                          break;
-                        case "check":
-                          props.actions.check();
-                          break;
-                        case "call":
-                          props.actions.call(props.state.callAmount);
-                          break;
-                      }
-                    }}
+                    onClick={() => handleBetActionClick()}
                     variant="outline"
+                    disabled={loading}
                   >
                     {betAction === "check"
                       ? "Check"
@@ -225,6 +223,34 @@ export default function GameScreen(props: Props) {
       )}
     </div>
   );
+
+  function handleBetActionClick() {
+    setLoading(true);
+    switch (betAction) {
+      case "bet":
+        props.actions.raiseTo(stake).finally(() => {
+          setLoading(false);
+        });
+        break;
+      case "check":
+        props.actions.check().finally(() => {
+          setLoading(false);
+        });
+        break;
+      case "call":
+        props.actions.call(props.state.callAmount).finally(() => {
+          setLoading(false);
+        });
+        break;
+    }
+  }
+
+  function handleFoldClick() {
+    setLoading(true);
+    props.actions.fold().finally(() => {
+      setLoading(false);
+    });
+  }
 }
 
 function calculateBetAction(
