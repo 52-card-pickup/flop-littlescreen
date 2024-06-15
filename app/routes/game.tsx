@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
 import GameScreen, { GameScreenProps } from "~/components/GameScreen";
 import { client } from "~/flopClient";
-import { useGoogleCastContext } from "~/hooks/cast_sender/useGoogleCastContext";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { usePlayerPolling } from "~/hooks/usePlayerPolling";
 import { playerState } from "~/state";
@@ -14,7 +13,6 @@ import PlayerSendButton from "~/components/PlayerSendButton";
 
 export default function Game() {
   usePlayerPolling();
-  useGoogleCastContext();
 
   const [player] = useRecoilState(playerState);
   const { playerDetails, loading } = usePlayerDetails();
