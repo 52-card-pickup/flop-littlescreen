@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-access-key */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useEffect } from "react";
@@ -170,6 +171,7 @@ export default function Index() {
           id="name"
           name="name"
           placeholder="Enter your name"
+          accessKey="n"
           onChange={(e) => {
             setName(e.target.value);
           }}

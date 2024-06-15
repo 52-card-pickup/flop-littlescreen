@@ -10,7 +10,7 @@ import { useVibrate } from "../hooks/useVibrate";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
-interface Props {
+export interface GameScreenProps {
   state: GamePlayerState;
   actions: {
     fold: () => Promise<void>;
@@ -20,7 +20,7 @@ interface Props {
   };
 }
 
-export default function GameScreen(props: Props) {
+export default function GameScreen(props: GameScreenProps) {
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
@@ -259,10 +259,9 @@ function calculateBetAction(
   currentRoundStake: number
 ) {
   if (callAmount > 0) {
-    if (currentRoundStake === callAmount) {
-      return "check";
-    }
-    return stake >= callAmount ? "bet" : "call";
+    // The current stake can only match the call amount as the big blind
+    const checkOrCall = currentRoundStake === callAmount ? "check" : "call";
+    return stake >= callAmount ? "bet" : checkOrCall;
   }
   return stake > 0 ? "bet" : "check";
 }

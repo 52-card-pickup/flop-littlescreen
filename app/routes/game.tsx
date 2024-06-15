@@ -1,7 +1,7 @@
 import { useNavigate } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
-import GameScreen from "~/components/GameScreen";
+import GameScreen, { GameScreenProps } from "~/components/GameScreen";
 import { client } from "~/flopClient";
 import { useGoogleCastContext } from "~/hooks/cast_sender/useGoogleCastContext";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
@@ -62,77 +62,65 @@ text-white place-self-center bg-slate-200"
     );
   }
 
-  const actions = {
+  const actions: GameScreenProps["actions"] = {
     fold: async () => {
       try {
-        await client.POST("/api/v1/play", {
-          body: {
-            action: "fold",
-            playerId: playerDetails.id,
-            stake: 0, // placeholder
-          },
-        });
-        const promise = new Promise<void>((resolve) => {
-          resolvers.current.push(resolve);
-        });
-        return await promise;
+        await client
+          .POST("/api/v1/play", {
+            body: {
+              action: "fold",
+              playerId: playerDetails.id,
+              stake: 0, // placeholder
+            },
+          })
+          .then(createResolver(() => player.lastUpdate, resolvers));
       } catch (e) {
         console.error(e);
-        return await Promise.resolve();
       }
     },
     raiseTo: async (stake: number) => {
       try {
-        await client.POST("/api/v1/play", {
-          body: {
-            action: "raiseTo",
-            stake: stake,
-            playerId: playerDetails.id,
-          },
-        });
-        const promise = new Promise<void>((resolve) => {
-          resolvers.current.push(resolve);
-        });
-        return await promise;
+        await client
+          .POST("/api/v1/play", {
+            body: {
+              action: "raiseTo",
+              stake: stake,
+              playerId: playerDetails.id,
+            },
+          })
+          .then(createResolver(() => player.lastUpdate, resolvers));
       } catch (e) {
         console.error(e);
-        return await Promise.resolve();
       }
     },
     check: async () => {
       try {
-        await client.POST("/api/v1/play", {
-          body: {
-            action: "check",
-            playerId: playerDetails.id,
-            stake: 0, // placeholder
-          },
-        });
-        const promise = new Promise<void>((resolve) => {
-          resolvers.current.push(resolve);
-        });
-        return await promise;
+        await client
+          .POST("/api/v1/play", {
+            body: {
+              action: "check",
+              playerId: playerDetails.id,
+              stake: 0, // placeholder
+            },
+          })
+          .then(createResolver(() => player.lastUpdate, resolvers));
       } catch (e) {
         console.error(e);
-        return await Promise.resolve();
       }
     },
     call: async () => {
       try {
-        await client.POST("/api/v1/play", {
-          body: {
-            action: "call",
-            playerId: playerDetails.id,
-            stake: 0, // placeholder
-          },
-        });
-        const promise = new Promise<void>((resolve) => {
-          resolvers.current.push(resolve);
-        });
-        return await promise;
+        await client
+          .POST("/api/v1/play", {
+            body: {
+              action: "call",
+              playerId: playerDetails.id,
+              stake: 0, // placeholder
+            },
+          })
+          .then(createResolver(() => player.lastUpdate, resolvers));
       } catch (e) {
         console.error(e);
-        return await Promise.resolve();
       }
     },
   };
@@ -146,4 +134,37 @@ text-white place-self-center bg-slate-200"
       </div>
     </div>
   );
+}
+
+function createResolver(
+  lastUpdate: () => number,
+  resolvers: React.MutableRefObject<(() => void)[]>
+) {
+  const prevUpdateAt = lastUpdate();
+
+  return async () => {
+    const updateAt = lastUpdate();
+    if (updateAt !== prevUpdateAt) {
+      console.log("update received before action completed");
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      const timeout = setTimeout(() => {
+        console.log("no update received after action completed, timeout");
+        resolve();
+        const idx = resolvers.current.indexOf(resolver);
+        if (idx !== -1) {
+          resolvers.current.splice(idx, 1);
+        }
+      }, 5000);
+
+      function resolver() {
+        clearTimeout(timeout);
+        resolve();
+      }
+
+      resolvers.current.push(resolver);
+    });
+  };
 }
