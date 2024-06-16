@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
 import GameScreen, { GameScreenProps } from "~/components/GameScreen";
 import { client } from "~/flopClient";
+import { components } from "~/flopClient/spec";
 import { useGoogleCastContext } from "~/hooks/cast_sender/useGoogleCastContext";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { usePlayerPolling } from "~/hooks/usePlayerPolling";
@@ -11,6 +12,8 @@ import { GoogleCastButton } from "../components/GoogleCastButton";
 import { WaitingRoom } from "../components/WaitingRoom";
 import { PlayerPhotoCamera } from "~/components/PlayerPhotoCamera";
 import PlayerSendButton from "~/components/PlayerSendButton";
+
+export type BallotAction = components["schemas"]["BallotAction"]
 
 export default function Game() {
   usePlayerPolling();
@@ -123,6 +126,26 @@ text-white place-self-center bg-slate-200"
         console.error(e);
       }
     },
+    castVote: (vote: boolean) => {
+      client.POST("/api/v1/ballot/cast", {
+        body: {
+          vote,
+          playerId: playerDetails.id,
+        },
+      })
+        .catch((e) => {
+          console.error(e);
+        });
+    },
+    startVote: (action: BallotAction) => {
+      client.POST("/api/v1/ballot/start", {
+        body: {
+          action,
+        }
+      }).catch((e) => {
+        console.error(e);
+      });
+    }
   };
   return (
     <div className="w-screen h-screen overflow-hidden">
@@ -132,7 +155,7 @@ text-white place-self-center bg-slate-200"
       <div className="fixed right-8 bottom-1/3 w-8 h-8 grid justify-center items-center z-50">
         <PlayerSendButton />
       </div>
-    </div>
+    </div >
   );
 }
 

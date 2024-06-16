@@ -6,6 +6,12 @@ import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
 import FlopButton from "./FlopButton";
 import { RulesHelpButton } from "./RulesHelpButton";
+import { createPortal } from "react-dom";
+import { BallotAction } from "~/routes/game";
+import { StartBallotMenu } from "./StartBallotMenu";
+import { CastVoteMenu } from "./CastVoteMenu";
+import toast from "react-hot-toast";
+import { XMarkIcon } from "~/icons/XMarkIcon";
 import { useVibrate } from "../hooks/useVibrate";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
@@ -17,6 +23,8 @@ export interface GameScreenProps {
     raiseTo: (stake: number) => Promise<void>;
     check: () => Promise<void>;
     call: (amount: number) => Promise<void>;
+    startVote: (ballotAction: BallotAction) => void;
+    castVote: (vote: boolean) => void;
   };
 }
 
@@ -26,6 +34,8 @@ export default function GameScreen(props: GameScreenProps) {
   const [showCards, setShowCards] = useState(true);
   const [showRules, setShowRules] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [startBallotMenuOpen, setStartBallotMenuOpen] = useState(false);
+  const [castVoteMenuOpen, setCastVoteMenuOpen] = useState(false);
   const [hasCompletedGame, setHasCompletedGame] = useState(false);
   const vibrate = useVibrate([20, 20, 40, 20, 60]);
 
@@ -60,6 +70,37 @@ export default function GameScreen(props: GameScreenProps) {
     }
     setMode("waiting");
   }, [props.state.state, props.state.yourTurn]);
+
+  useEffect(() => {
+    if (props.state.ballotDetails) {
+      toast(
+        (t) => (
+          <span className="grid grid-cols-[1fr,auto] gap-3">
+            <button onClick={() => {
+              setCastVoteMenuOpen(true);
+              toast.dismiss(t.id);
+            }}>
+              Click here to vote!{" "}</button>
+            <button
+              className="justify-self-end w-4"
+              onClick={() => toast.dismiss(t.id)}>
+              <XMarkIcon />
+            </button>
+          </span>
+        ),
+        {
+          icon: "🗳️",
+          position: "bottom-right",
+          duration: 10000,
+        },
+      );
+      setStartBallotMenuOpen(false);
+    }
+    if (!props.state.ballotDetails) {
+      toast.dismiss();
+      setCastVoteMenuOpen(false);
+    }
+  }, [props.state.ballotDetails]);
 
   useEffect(() => {
     if (props.state.yourTurn) {
@@ -212,8 +253,8 @@ export default function GameScreen(props: GameScreenProps) {
                     {betAction === "check"
                       ? "Check"
                       : betAction === "call"
-                      ? `Call (£${stakeToCall})`
-                      : `Raise to £${stake}`}
+                        ? `Call (£${stakeToCall})`
+                        : `Raise to £${stake}`}
                   </FlopButton>
                 </div>
               </div>
@@ -238,7 +279,41 @@ export default function GameScreen(props: GameScreenProps) {
           </div>
         </div>
       )}
-    </div>
+
+      {startBallotMenuOpen && props.state.startBallotOptions &&
+        createPortal(
+          <StartBallotMenu
+            startBallotOptions={props.state.startBallotOptions}
+            onClose={() => setStartBallotMenuOpen(false)}
+            onStartBallot={props.actions.startVote}
+          />, document.body
+        )
+      }
+      <div className="absolute top-2 right-3">
+        {props.state.startBallotOptions && <FlopButton
+          onClick={() => setStartBallotMenuOpen(!startBallotMenuOpen)}
+          variant="solid"
+        >
+          Open ballot
+        </FlopButton>}
+        {props.state.ballotDetails && <FlopButton
+          onClick={() => setCastVoteMenuOpen(!castVoteMenuOpen)}
+          variant="solid"
+        >
+          Cast vote
+        </FlopButton>}
+      </div>
+      {
+        castVoteMenuOpen && props.state.ballotDetails &&
+        createPortal(
+          <CastVoteMenu
+            onClose={() => setCastVoteMenuOpen(false)}
+            castVote={props.actions.castVote}
+            ballotAction={props.state.ballotDetails.action}
+          />, document.body
+        )
+      }
+    </div >
   );
 
   function handleBetActionClick() {

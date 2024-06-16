@@ -17,6 +17,7 @@ export const links: LinksFunction = () => [
 
 import { RecoilRoot } from "recoil";
 import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
+import { Toaster } from "react-hot-toast";
 
 export async function loader() {
   return json({
@@ -63,6 +64,7 @@ export default function App() {
         <Links />
       </head>
       <body className="font-sans antialiased bg-gray-900">
+        <Toaster />
         <RecoilRoot>
           <Outlet />
           <script

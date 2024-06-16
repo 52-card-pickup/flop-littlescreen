@@ -52,23 +52,6 @@ export interface paths {
       };
     };
   };
-  "/api/v1/room/knock": {
-    /** @description Knock on the game room - peek in, nudge players, or kick them out. */
-    post: {
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["KnockRequest"];
-        };
-      };
-      responses: {
-        200: {
-          content: {
-            "application/json": components["schemas"]["KnockResponse"];
-          };
-        };
-      };
-    };
-  };
   "/api/v1/player/{player_id}": {
     /** @description Get the current state of a player. */
     get: {
@@ -186,6 +169,40 @@ export interface paths {
       };
     };
   };
+  "/api/v1/ballot/start": {
+    /** @description Start a new vote. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["StartBallot"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
+  "/api/v1/ballot/cast": {
+    /** @description Vote on a motion. */
+    post: {
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["CastVoteRequest"];
+        };
+      };
+      responses: {
+        200: {
+          content: {
+            "application/json": null;
+          };
+        };
+      };
+    };
+  };
   "/docs/": {
     /** @description This documentation page. */
     get: {
@@ -220,10 +237,22 @@ export interface components {
   schemas: {
     /** @enum {string} */
     ApiKeyLocation: "query" | "header" | "cookie";
+    BallotAction: OneOf<["doubleBlinds", {
+      kickPlayer: string;
+    }]>;
+    BallotDetails: {
+      action: components["schemas"]["BallotAction"];
+      /** Format: uint64 */
+      expiresDt: number;
+    };
     /** @enum {string} */
     CardSuite: "hearts" | "diamonds" | "clubs" | "spades";
     /** @enum {string} */
     CardValue: "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king" | "ace";
+    CastVoteRequest: {
+      playerId: string;
+      vote: boolean;
+    };
     CompletedGame: {
       playerCards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]][];
       winnerName?: string | null;
@@ -349,6 +378,7 @@ export interface components {
     GamePlayerState: {
       /** Format: uint64 */
       balance: number;
+      ballotDetails?: components["schemas"]["BallotDetails"] | null;
       /** Format: uint64 */
       callAmount: number;
       cards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]];
@@ -358,6 +388,7 @@ export interface components {
       lastUpdate: number;
       /** Format: uint64 */
       minRaiseTo: number;
+      startBallotOptions?: components["schemas"]["StartBallotChoices"] | null;
       state: components["schemas"]["GamePhase"];
       /** Format: uint64 */
       turnExpiresDt?: number | null;
@@ -422,19 +453,9 @@ export interface components {
     JoinResponse: {
       id: string;
     };
-    /** @enum {string} */
-    KnockAction: "peek" | "nudge" | "kick";
-    KnockRequest: {
-      which: components["schemas"]["KnockAction"];
-    };
-    KnockResponse: {
-      /** Format: uint */
-      cardsOnTable: number;
-      /** Format: uint */
-      players: number;
-      /** Format: uint64 */
-      retryAt?: number | null;
-      state: components["schemas"]["GamePhase"];
+    KickPlayerOption: {
+      id: string;
+      name: string;
     };
     /** @description License information for the exposed API. */
     License: {
@@ -1220,6 +1241,13 @@ export interface components {
      * In some contexts, a `Single` may be semantically distinct from a `Vec` containing only item.
      */
     SingleOrVec_for_Schema: components["schemas"]["Schema"] | components["schemas"]["Schema"][];
+    StartBallot: {
+      action: components["schemas"]["BallotAction"];
+    };
+    StartBallotChoices: {
+      double_blinds: boolean;
+      kick_player: components["schemas"]["KickPlayerOption"][];
+    };
     /** @description Adds metadata to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag defined in the Operation Object instances. */
     Tag: {
       /** @description A description for the tag. CommonMark syntax MAY be used for rich text representation. */
