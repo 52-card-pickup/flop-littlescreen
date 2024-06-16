@@ -4,11 +4,13 @@ import { client } from "~/flopClient";
 import cn from "~/utils/cn";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
+import { useVibrate } from "~/hooks/useVibrate";
 
 export function WaitingRoom() {
   const [error, setError] = useTimeoutState(false, 1000);
   const [hasErrored, setHasErrored] = useState(false);
   const { playerDetails } = usePlayerDetails();
+  const failedToJoinVibrate = useVibrate([5, 150, 10, 150, 5, 150, 10], 50);
 
   return (
     <div className={cn("grid justify-center items-center h-screen")}>
@@ -43,6 +45,7 @@ export function WaitingRoom() {
                     console.warn("error starting game");
                     setError(true);
                     setHasErrored(true);
+                    failedToJoinVibrate();
                   }
                 });
             }}

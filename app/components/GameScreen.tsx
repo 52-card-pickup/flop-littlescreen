@@ -12,10 +12,11 @@ import { StartBallotMenu } from "./StartBallotMenu";
 import { CastVoteMenu } from "./CastVoteMenu";
 import toast from "react-hot-toast";
 import { XMarkIcon } from "~/icons/XMarkIcon";
+import { useVibrate } from "../hooks/useVibrate";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
-interface Props {
+export interface GameScreenProps {
   state: GamePlayerState;
   actions: {
     fold: () => Promise<void>;
@@ -27,13 +28,16 @@ interface Props {
   };
 }
 
-export default function GameScreen(props: Props) {
+export default function GameScreen(props: GameScreenProps) {
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
+  const [showRules, setShowRules] = useState(false);
   const [loading, setLoading] = useState(false);
   const [startBallotMenuOpen, setStartBallotMenuOpen] = useState(false);
   const [castVoteMenuOpen, setCastVoteMenuOpen] = useState(false);
+  const [hasCompletedGame, setHasCompletedGame] = useState(false);
+  const vibrate = useVibrate([20, 20, 40, 20, 60]);
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -49,12 +53,23 @@ export default function GameScreen(props: Props) {
     if (props.state.state === "complete") {
       setMode("complete");
       setShowCards(true);
+      setHasCompletedGame(true);
       return;
     }
-    if (props.state.state === "offline") setMode("waiting");
-    if (props.state.yourTurn) setMode("yourturn");
-    if (!props.state.yourTurn) setMode("waiting");
-  }, [props.state]);
+    if (props.state.state === "offline") {
+      setMode("waiting");
+      return;
+    }
+    if (hasCompletedGame && props.state.state === "playing") {
+      setShowCards(false);
+    }
+    if (props.state.yourTurn) {
+      setShowRules(false);
+      setMode("yourturn");
+      return;
+    }
+    setMode("waiting");
+  }, [props.state.state, props.state.yourTurn]);
 
   useEffect(() => {
     if (props.state.ballotDetails) {
@@ -87,25 +102,6 @@ export default function GameScreen(props: Props) {
     }
   }, [props.state.ballotDetails]);
 
-
-  function vibrate() {
-    try {
-      if (typeof window !== "undefined" && "vibrate" in window.navigator) {
-        const didVibrateWithPattern = window.navigator.vibrate([
-          20, 20, 40, 20, 60,
-        ]);
-        if (didVibrateWithPattern) return;
-
-        const didVibrate = window.navigator.vibrate(100);
-        if (!didVibrate) {
-          console.warn("Failed to vibrate with pattern or single vibrate");
-        }
-      }
-    } catch (e) {
-      console.warn("Failed to vibrate, unknown error", e);
-    }
-  }
-
   useEffect(() => {
     if (props.state.yourTurn) {
       vibrate();
@@ -114,7 +110,7 @@ export default function GameScreen(props: Props) {
     }
 
     setShowCards(false);
-  }, [props.state.yourTurn]);
+  }, [props.state.yourTurn, vibrate]);
 
   const timer = useCountdown({
     turnExpiresDt: props.state.turnExpiresDt || 0,
@@ -152,7 +148,11 @@ export default function GameScreen(props: Props) {
           : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
     >
-      <RulesHelpButton className="fixed top-8 left-8 w-8 h-8 z-50" />
+      <RulesHelpButton
+        className="fixed top-8 left-8 w-8 h-8 z-50"
+        open={showRules}
+        onOpenChange={setShowRules}
+      />
       <div className={cn("place-self-center")}>
         {timeLeftToPlay && (
           <div
@@ -351,10 +351,9 @@ function calculateBetAction(
   currentRoundStake: number
 ) {
   if (callAmount > 0) {
-    if (currentRoundStake === callAmount) {
-      return "check";
-    }
-    return stake >= callAmount ? "bet" : "call";
+    // The current stake can only match the call amount as the big blind
+    const checkOrCall = currentRoundStake === callAmount ? "check" : "call";
+    return stake >= callAmount ? "bet" : checkOrCall;
   }
   return stake > 0 ? "bet" : "check";
 }
