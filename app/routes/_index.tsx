@@ -27,11 +27,7 @@ export default function Index() {
   const { playerDetails, setPlayerDetails } = usePlayerDetails();
   const [name, setName] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
-  const [knockResult, setKnockResult] = React.useState<
-    "playing" | "joinable" | null
-  >(null);
   const navigate = useNavigate();
-  const knockVibrate = useVibrate([15, 150, 15], 50);
   const submitVibrate = useVibrate([5], 5);
   const [searchParams, setSearchParams] = useSearchParams();
   const document = useDocument();
@@ -65,19 +61,8 @@ export default function Index() {
       .catch((err) => {
         setLoading(false);
         console.error(err);
-      })
-      .finally(() => {});
+      });
   }
-
-  useEffect(() => {
-    if (knockResult === null || knockResult === "joinable") return;
-    const timeout = setTimeout(() => {
-      setKnockResult(null);
-    }, 500);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [knockResult]);
 
   useEffect(() => {
     if (searchParams.has("z")) {
@@ -116,7 +101,7 @@ export default function Index() {
     : "tv.flop.party";
   return (
     <div
-      className="bg-slate-200 min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto,1fr]"
+      className="bg-mystic-100 min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto,1fr]"
       style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
     >
       <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500">
@@ -166,7 +151,7 @@ export default function Index() {
         className="grid grid-cols-1 items-center justify-center space-y-4 gap-4 px-8"
       >
         <input
-          className="px-6 py-4 bg-slate-300 text-black text-xl font-normal rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
+          className="px-6 py-4 bg-mystic-50 text-black text-xl font-normal rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
           type="text"
           id="name"
           name="name"
@@ -176,53 +161,15 @@ export default function Index() {
             setName(e.target.value);
           }}
         />
-        <div
-          className={cn(
-            "grid gap-4",
-            knockResult === "joinable"
-              ? "grid-cols-[1fr]"
-              : "grid-cols-[1fr,5fr]"
-          )}
-        >
-          {knockResult !== "joinable" && (
-            <FlopButton
-              type="button"
-              onClick={(e) => {
-                e.currentTarget.blur();
-                knockVibrate();
-                client
-                  .POST("/api/v1/room/knock", { body: { which: "peek" } })
-                  .then((res) => {
-                    if (res.data?.state === "playing") {
-                      setKnockResult("playing");
-                    } else {
-                      setKnockResult("joinable");
-                    }
-                  })
-                  .finally(() => {
-                    setLoading(false);
-                  });
-              }}
-              color="gray"
-              variant="outline"
-              className={cn(
-                "opacity-80 transition-all duration-300 ease-in-out",
-                knockResult === "playing" ? "animate-shake" : ""
-              )}
-              disabled={loading || !!knockResult}
-            >
-              Knock
-            </FlopButton>
-          )}
-
+        <div className={cn("grid gap-4")}>
           <FlopButton
             type="submit"
-            color="blue"
+            color="watercourse"
             variant="solid"
             className="transition-all duration-300 ease-in-out"
             disabled={loading}
           >
-            Join
+            <span className="font-semibold">Join</span>
           </FlopButton>
         </div>
       </form>
