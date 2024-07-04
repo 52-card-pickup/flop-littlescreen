@@ -39,13 +39,13 @@ export function PlayerPhotoCamera(
     <div {...props}>
       <div className="relative w-full h-full flex justify-center items-center">
         <FlopButton
-          color="blue"
+          color="watercourse"
           variant="solid"
           slim={true}
           disabled={!isCameraAvailable}
           onClick={() => setShowCameraOverlay(true)}
         >
-          <CameraIcon className="w-full h-full max-w-8 max-h-8 mx-3 my-2" />
+          <CameraIcon className="w-full h-full max-w-8 max-h-8 mx-3 my-2 text-watercourse-950" />
         </FlopButton>
       </div>
       {showCameraOverlay && (

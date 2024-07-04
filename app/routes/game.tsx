@@ -47,7 +47,7 @@ export default function Game() {
     return (
       <div
         className="fixed w-screen h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr,1fr] 
-text-white place-self-center bg-slate-200"
+text-white place-self-center"
       >
         <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
         <WaitingRoom />

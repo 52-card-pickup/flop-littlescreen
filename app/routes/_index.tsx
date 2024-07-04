@@ -101,7 +101,7 @@ export default function Index() {
     : "tv.flop.party";
   return (
     <div
-      className="bg-mystic-100 min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto,1fr]"
+      className="min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto]"
       style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
     >
       <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500">
@@ -148,7 +148,7 @@ export default function Index() {
           join();
         }}
         autoComplete="off"
-        className="grid grid-cols-1 items-center justify-center space-y-4 gap-4 px-8"
+        className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16"
       >
         <input
           className="px-6 py-4 bg-mystic-50 text-black text-xl font-normal rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
