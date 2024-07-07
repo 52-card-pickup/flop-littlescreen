@@ -102,9 +102,11 @@ export default function GameScreen(props: GameScreenProps) {
       className={cn(
         // "grid h-dvh transition-all duration-500 bg-[linear-gradient(329deg,#90cda3,#e6fff0)]",
         "fixed grid w-dvw h-dvh transition-all duration-500",
-        mode === "yourturn"
+        mode === "complete"
+          ? "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(239deg,#52745c,#74907c)]"
+          : mode === "yourturn"
           ? "grid-rows-[1fr,5fr,1fr,1fr,0.2fr] delay-0 bg-[linear-gradient(329deg,#52745c,#9fd19f)]"
-          : "grid-rows-[0fr,5fr,1fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
+          : "grid-rows-[0fr,5fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
     >
       <RulesHelpButton

@@ -45,7 +45,7 @@ export function PlayerPhotoCamera(
           disabled={!isCameraAvailable}
           onClick={() => setShowCameraOverlay(true)}
         >
-          <CameraIcon className="w-full h-full max-w-8 max-h-8 mx-3 my-2 text-watercourse-950" />
+          <CameraIcon className="w-full h-full max-w-8 max-h-8 mx-3 my-2 text-watercourse-50 group-hover:text-watercourse-800" />
         </FlopButton>
       </div>
       {showCameraOverlay && (

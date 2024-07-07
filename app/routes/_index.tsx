@@ -13,6 +13,7 @@ import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
 import { useVibrate } from "~/hooks/useVibrate";
+import FlopBrandLogoText from "~/components/FlopBrandLogoText";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -101,37 +102,42 @@ export default function Index() {
     : "tv.flop.party";
   return (
     <div
-      className="min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto]"
+      className="w-screen h-screen grid grid-flow-row grid-rows-[auto,5fr,auto] overflow-hidden"
       style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
     >
-      <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500">
-        <h2 className="text-base font-bold m-0 text-center">
-          Not got a Chromecast? Grab a big screen and go to:
+      <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500 animate-fadeInFromTop">
+        <h2 className="text-lg font-medium m-0 text-center">
+          grab a chromecast-enabled big screen, or go to:
         </h2>
         <p
           className={cn(
-            "text-lg font-semibold m-0 text-center text-slate-600 select-none",
-            share.isSupported ? "cursor-pointer" : "cursor-default"
+            "text-lg font-semibold m-0 text-center text-slate-600 select-none cursor-pointer"
           )}
           onClick={() =>
-            share.isSupported &&
-            share({
-              title: "Flop Poker",
-              text: "Host a game of Flop Poker on the big screen",
-              url: `https://${bigScreenUrl}`,
-            })
+            share.isSupported
+              ? share({
+                  title: "Flop Poker",
+                  text: "Host a game of Flop Poker on the big screen",
+                  url: `https://${bigScreenUrl}`,
+                })
+              : window.open(`https://${bigScreenUrl}`)
           }
         >
           {bigScreenUrl}
         </p>
       </div>
-      <div className="flex flex-col justify-center items-center">
-        <h1 className="text-4xl font-bold my-12 text-center">flop.</h1>
-        <h2 className="text-base font-semibold my-1 text-center">
-          No chips, no cards, no table?
+      <div className="flex flex-col justify-center items-center animate-scaleIn">
+        <>
+          <FlopBrandLogoText
+            className="w-40 h-40 mb-8 animate-scaleIn"
+            aria-label="flop."
+          />
+        </>
+        <h2 className="text-2xl font-medium my-1 text-center text-watercourse-900/80 animate-fadeIn">
+          no chips, no cards, no table?
         </h2>
-        <h2 className="text-base font-semibold my-1 text-center">
-          No problem.
+        <h2 className="text-2xl font-medium my-1 text-center text-watercourse-900/80 animate-fadeIn">
+          no problem.
         </h2>
       </div>
       <ShareButton
@@ -148,10 +154,10 @@ export default function Index() {
           join();
         }}
         autoComplete="off"
-        className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16"
+        className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16 animate-fadeInFromBottom"
       >
         <input
-          className="px-6 py-4 bg-mystic-50 text-black text-xl font-normal rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
+          className="px-6 py-4 bg-mystic-50 text-black text-xl font-medium rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
           type="text"
           id="name"
           name="name"
