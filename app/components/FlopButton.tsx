@@ -105,10 +105,13 @@ function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
       return {
         bg:
           variant === "outline"
-            ? "bg-watercourse-600"
+            ? "bg-watercourse-700 group-hover:bg-watercourse-950"
             : "bg-black group-hover:bg-watercourse-50",
         bgBase: variant === "outline" ? "bg-gray-50" : "bg-watercourse-600",
-        border: "border-black group-hover:border-watercourse-900",
+        border:
+          variant === "outline"
+            ? "border-watercourse-800"
+            : "border-black group-hover:border-watercourse-900",
         text:
           variant === "outline"
             ? "text-gray-800 group-hover:text-white"
