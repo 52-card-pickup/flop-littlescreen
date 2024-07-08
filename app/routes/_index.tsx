@@ -28,6 +28,8 @@ export default function Index() {
   const { playerDetails, setPlayerDetails } = usePlayerDetails();
   const [name, setName] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
+  const [hasJoinError, setHasJoinError] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const submitVibrate = useVibrate([5], 5);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -48,9 +50,8 @@ export default function Index() {
     client
       .POST("/api/v1/join", { body: { name } })
       .then((res) => {
-        if (!res.data) {
-          setLoading(false);
-          return;
+        if (res.error) {
+          return Promise.reject();
         }
 
         setPlayerDetails({
@@ -60,8 +61,9 @@ export default function Index() {
         setTimeout(() => navigate(`/game`), 250);
       })
       .catch((err) => {
+        inputRef.current?.focus();
+        setHasJoinError(true);
         setLoading(false);
-        console.error(err);
       });
   }
 
@@ -157,7 +159,13 @@ export default function Index() {
         className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16 animate-fadeInFromBottom"
       >
         <input
-          className="px-6 py-4 bg-mystic-50 text-black text-xl font-medium rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
+          ref={inputRef}
+          className={cn(
+            "px-6 py-4 bg-mystic-50 text-black text-xl font-medium rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg",
+            hasJoinError
+              ? "ring-2 ring-red-500 ring-offset-1 focus:ring-red-500"
+              : ""
+          )}
           type="text"
           id="name"
           name="name"

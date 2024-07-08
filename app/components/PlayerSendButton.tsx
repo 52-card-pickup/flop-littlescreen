@@ -195,7 +195,7 @@ function EmojiButton(props: {
         props.active
           ? "bg-gray-100 text-gray-900 hover:bg-gray-200 hover:border-gray-200"
           : "text-gray-700",
-        "group flex items-center justify-center border border-transparent px-1 py-1 font-medium text-2xl cursor-pointer select-none font-emoji"
+        "group flex items-center justify-center border border-transparent px-1 py-1 font-bold text-2xl cursor-pointer select-none font-openemoji"
       )}
     >
       {props.children}

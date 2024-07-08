@@ -6,6 +6,10 @@ import { components } from "./flopClient/spec";
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
 export type GamePlayerState = components["schemas"]["GamePlayerState"];
+export type PlayerDetails = {
+  name: string;
+  id: string;
+};
 
 const initialPlayerState: GamePlayerState = {
   balance: 0,
@@ -22,6 +26,11 @@ const initialPlayerState: GamePlayerState = {
   lastUpdate: new Date().getTime(),
 };
 
+const defaultPlayerDetails: PlayerDetails = {
+  name: "",
+  id: "",
+};
+
 export const playerState = atom({
   key: "playerState",
   default: initialPlayerState,
@@ -29,10 +38,7 @@ export const playerState = atom({
 
 export const playerDetailsState = atom({
   key: "playerDetails",
-  default: {
-    name: "",
-    id: "",
-  },
+  default: defaultPlayerDetails,
 });
 
 export const devState = atom({

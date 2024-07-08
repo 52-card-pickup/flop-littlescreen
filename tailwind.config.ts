@@ -95,6 +95,12 @@ export default {
       },
       animation: {
         shake: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
+        scaleIn: "scaleIn 3s ease-in-out",
+        fadeIn: "fadeIn 1s ease-in-out",
+        fadeInFromTop:
+          "hidden 1s linear, fadeIn 1s 1s ease-in-out, fromTop 2s ease-in-out",
+        fadeInFromBottom:
+          "hidden 1s linear, fadeIn 1s 1s ease-in-out, fromBottom 2s ease-in-out",
       },
       fontFamily: {
         emoji: ['"Noto Emoji"', ...defaultTheme.fontFamily.sans],
@@ -112,6 +118,46 @@ export default {
           },
           "40%, 60%": {
             transform: "translate3d(4px, 0, 0)",
+          },
+        },
+        hidden: {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "0",
+          },
+        },
+        scaleIn: {
+          "0%": {
+            transform: "scale(1.1)",
+          },
+          "100%": {
+            transform: "scale(1)",
+          },
+        },
+        fadeIn: {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "1",
+          },
+        },
+        fromTop: {
+          "0%": {
+            transform: "translateY(-33%)",
+          },
+          "100%": {
+            transform: "translateY(0)",
+          },
+        },
+        fromBottom: {
+          "0%": {
+            transform: "translateY(33%)",
+          },
+          "100%": {
+            transform: "translateY(0)",
           },
         },
       },
