@@ -8,12 +8,11 @@ import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
 import { client } from "../flopClient";
 import FlopButton from "~/components/FlopButton";
-import { ShareButton } from "~/components/ShareButton";
 import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
 import { useVibrate } from "~/hooks/useVibrate";
-import FlopBrandLogoText from "~/components/FlopBrandLogoText";
+import FlopLandingLayout from "~/components/FlopLandingLayout";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -102,11 +101,9 @@ export default function Index() {
   const bigScreenUrl = document?.location.host.startsWith("beta.")
     ? "beta.flop.party/big-screen"
     : "tv.flop.party";
+
   return (
-    <div
-      className="w-screen h-screen grid grid-flow-row grid-rows-[auto,5fr,auto] overflow-hidden"
-      style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
-    >
+    <FlopLandingLayout>
       <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500 animate-fadeInFromTop">
         <h2 className="text-lg font-medium m-0 text-center">
           grab a chromecast-enabled big screen, or go to:
@@ -128,26 +125,6 @@ export default function Index() {
           {bigScreenUrl}
         </p>
       </div>
-      <div className="flex flex-col justify-center items-center animate-scaleIn">
-        <>
-          <FlopBrandLogoText
-            className="w-40 h-40 mb-8 animate-scaleIn"
-            aria-label="flop."
-          />
-        </>
-        <h2 className="text-2xl font-medium my-1 text-center text-watercourse-900/80 animate-fadeIn">
-          no chips, no cards, no table?
-        </h2>
-        <h2 className="text-2xl font-medium my-1 text-center text-watercourse-900/80 animate-fadeIn">
-          no problem.
-        </h2>
-      </div>
-      <ShareButton
-        className="fixed top-8 right-8 w-8 h-8"
-        title="Flop Poker"
-        text="Play Flop Poker with your friends"
-        url="https://flop.poker"
-      />
       <form
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
@@ -187,6 +164,6 @@ export default function Index() {
           </FlopButton>
         </div>
       </form>
-    </div>
+    </FlopLandingLayout>
   );
 }
