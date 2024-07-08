@@ -9,8 +9,8 @@ import { usePlayerPolling } from "~/hooks/usePlayerPolling";
 import { playerState } from "~/state";
 import { GoogleCastButton } from "../components/GoogleCastButton";
 import { WaitingRoom } from "../components/WaitingRoom";
-import { PlayerPhotoCamera } from "~/components/PlayerPhotoCamera";
 import PlayerSendButton from "~/components/PlayerSendButton";
+import FlopLandingLayout from "~/components/FlopLandingLayout";
 
 export default function Game() {
   usePlayerPolling();
@@ -45,16 +45,12 @@ export default function Game() {
 
   if (showStartGameButton) {
     return (
-      <div
-        className="fixed w-screen h-screen grid grid-flow-row grid-rows-[1fr,1fr,1fr,1fr] 
-text-white place-self-center"
-      >
+      <div className="fixed w-screen h-screen">
+        <FlopLandingLayout animate={false}>
+          <div></div>
+          <WaitingRoom />
+        </FlopLandingLayout>
         <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
-        <WaitingRoom />
-        <div className="fixed left-0 bottom-8 w-full grid justify-center items-center">
-          <PlayerPhotoCamera className="m-8" />
-        </div>
-
         <div className="fixed right-8 bottom-12 w-8 h-8 grid justify-center items-center z-50">
           <PlayerSendButton />
         </div>

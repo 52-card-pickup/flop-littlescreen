@@ -5,6 +5,7 @@ import cn from "~/utils/cn";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { useVibrate } from "~/hooks/useVibrate";
+import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
 export function WaitingRoom() {
   const [error, setError] = useTimeoutState(false, 1000);
@@ -13,25 +14,29 @@ export function WaitingRoom() {
   const failedToJoinVibrate = useVibrate([5, 150, 10, 150, 5, 150, 10], 50);
 
   return (
-    <div className={cn("grid justify-center items-center h-screen")}>
-      <div className={cn("flex flex-col justify-center items-center")}>
-        {hasErrored && (
-          <div className="py-10 animate-pulse">
-            <h2 className="text-black font-bold text-2xl p-2 text-center">
-              Failed to start game
-            </h2>
-            <p className="text-black text-center">
-              Please try again in a moment
-            </p>
-          </div>
-        )}
-        <div className="grid justify-center items-center">
-          <h2 className="text-black font-bold text-2xl p-6 text-center">
-            Hello {playerDetails.name}, welcome to flop!
-          </h2>
+    <div className="grid justify-center items-center pb-32 gap-8 relative">
+      <div className="flex flex-col justify-center items-center gap-6">
+        <div className="flex flex-col h-20 w-full justify-end">
+          {hasErrored ? (
+            <>
+              <h2 className="text-watercourse-950 font-semibold text-2xl p-2 text-center animate-pulse">
+                your room is not ready yet
+              </h2>
+              <p className="text-watercourse-900 text-center">
+                has everyone joined?
+              </p>
+            </>
+          ) : (
+            playerDetails?.name && (
+              <h2 className="text-watercourse-900 font-medium text-xl text-center">
+                {playerDetails.name}, you're in the waiting room
+              </h2>
+            )
+          )}
         </div>
         <div className={cn(error ? "animate-shake" : "")}>
           <FlopButton
+            color="watercourse"
             onClick={() => {
               setHasErrored(false);
               client
@@ -50,7 +55,7 @@ export function WaitingRoom() {
                 });
             }}
           >
-            Start Game
+            Everyone's here
           </FlopButton>
         </div>
       </div>
