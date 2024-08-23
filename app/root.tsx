@@ -48,11 +48,29 @@ export default function App() {
           rel="stylesheet"
         />
 
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png?v=2"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png?v=2"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png?v=2"
+        />
         <link rel="manifest" href="/site.webmanifest?v=2" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#007357" />
+        <link
+          rel="mask-icon"
+          href="/safari-pinned-tab.svg?v=2"
+          color="#007357"
+        />
         <link rel="shortcut icon" href="/favicon.ico?v=2" />
         <meta name="apple-mobile-web-app-title" content="flop." />
         <meta name="application-name" content="flop." />
@@ -62,7 +80,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="font-sans antialiased bg-gray-900">
+      <body className="font-sans antialiased bg-mystic-100">
         <RecoilRoot>
           <Outlet />
           <script

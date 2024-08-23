@@ -1,9 +1,21 @@
 import { useSearchParams } from "@remix-run/react";
 import { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { playerDetailsState } from "~/state";
+import { PlayerDetails, playerDetailsState } from "~/state";
 
-const LOCAL_STORAGE_VERSION = "2";
+const LOCAL_STORAGE_VERSION = "2.1";
+
+interface StorageValue<T> {
+  version: string;
+  states: {
+    key: string;
+    value: T;
+  }[];
+  default?: {
+    key: string;
+    value: T;
+  };
+}
 
 // a hook which hides getting and setting of playerDetails behind a localstorage cache
 export default function usePlayerDetails() {
@@ -30,7 +42,7 @@ export default function usePlayerDetails() {
   }, [setPlayerDetailsRecoilState, searchReset, searchZ]);
 
   const setPlayerDetails = useCallback(
-    function setPlayerDetails(newPlayerDetails: typeof playerDetails) {
+    function setPlayerDetails(newPlayerDetails: PlayerDetails) {
       const z = searchZ ?? sessionStorage.getItem("z") ?? undefined;
       setPersistentState(newPlayerDetails, z);
       setPlayerDetailsRecoilState(newPlayerDetails);
@@ -38,9 +50,17 @@ export default function usePlayerDetails() {
     [setPlayerDetailsRecoilState, searchZ]
   );
 
+  const setCurrentDetailsToDefault = useCallback(
+    function setCurrentDetailsDefault() {
+      setPersistentState(playerDetails);
+    },
+    [playerDetails.id, playerDetails.name]
+  );
+
   return {
     playerDetails,
     setPlayerDetails,
+    setCurrentDetailsToDefault,
     loading,
   };
 }
@@ -52,13 +72,13 @@ function getPersistentState(
 
   try {
     const saved = window.localStorage.getItem("playerDetails");
-    const state = saved && JSON.parse(saved);
+    const state: StorageValue<any> | undefined = saved && JSON.parse(saved);
     if (state && "states" in state) {
       const obj = state.states.find((s: { key: string }) => s.key === key);
       const value = obj?.value;
       return typeof value === "object" && "id" in value && "name" in value
         ? value
-        : null;
+        : state.default?.value ?? null;
     }
     return null;
   } catch {
@@ -89,7 +109,7 @@ function setPersistentState<T>(payload: T, key: string = "default") {
         JSON.stringify({
           version: LOCAL_STORAGE_VERSION,
           states: [{ key, value: payload }],
-        })
+        } satisfies StorageValue<T>)
       );
       return;
     }

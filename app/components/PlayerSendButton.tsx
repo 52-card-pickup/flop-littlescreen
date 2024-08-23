@@ -7,7 +7,7 @@ import {
   ArrowRightCircleIcon,
   CameraIcon,
   CurrencyPoundIcon,
-  PaperAirplaneIcon,
+  EllipsisVerticalIcon,
 } from "@heroicons/react/20/solid";
 import cn from "~/utils/cn";
 import { client } from "~/flopClient";
@@ -55,11 +55,12 @@ export default function PlayerSendButton() {
       <FullScreenEmojiPreview hidden={!preview} emoji={preview || ""} />
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className="inline-flex justify-center items-center gap-x-1.5 rounded-full bg-white w-12 h-12 text-xl font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-            <PaperAirplaneIcon
-              className="h-6 w-6 text-gray-500"
-              aria-hidden="true"
-            />
+          <Menu.Button
+            className="inline-flex justify-center items-center gap-x-1.5 rounded-md bg-watercourse-950 w-12 h-12 text-xl
+            font-semibold text-watercourse-50 shadow-sm shadow-black/80 ring-1 ring-inset ring-gray-300 hover:bg-watercourse-900
+              focus:outline-none focus:ring-0"
+          >
+            <EllipsisVerticalIcon className="h-6 w-6" aria-hidden="true" />
           </Menu.Button>
         </div>
 
@@ -72,7 +73,10 @@ export default function PlayerSendButton() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute bottom-14 right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Menu.Items
+            className="absolute bottom-14 right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-300
+          rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-30 overflow-hidden opacity-95 focus:outline-none"
+          >
             <div className="py-1">
               <Menu.Item>
                 <a
@@ -82,7 +86,7 @@ export default function PlayerSendButton() {
                   )}
                 >
                   <CameraIcon
-                    className="mr-3 h-6 w-6 text-gray-600"
+                    className="mr-3 h-6 w-6 text-gray-700"
                     aria-hidden="true"
                   />
                   Take a picture
@@ -98,22 +102,22 @@ export default function PlayerSendButton() {
                   )}
                 >
                   <CurrencyPoundIcon
-                    className="mr-3 h-6 w-6 text-gray-600"
+                    className="mr-3 h-6 w-6 text-gray-700"
                     aria-hidden="true"
                   />
                   Send money
                 </a>
               </Menu.Item>
             </div>
-            <div className="py-1">
+            <div className="py-1 bg-watercourse-900 ring-t-4 ring-black">
               <Menu.Item disabled>
                 <span
                   className={cn(
-                    "flex items-center px-4 py-2 font-medium text-xl text-gray-700 bg-zinc-50"
+                    "flex items-center px-4 py-2 font-medium text-xl text-white"
                   )}
                 >
                   <ArrowRightCircleIcon
-                    className="mr-3 h-6 w-6 text-gray-600"
+                    className="mr-3 h-6 w-6"
                     aria-hidden="true"
                   />
                   Send a reaction
@@ -121,7 +125,7 @@ export default function PlayerSendButton() {
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <div className="grid grid-cols-4 gap-1 divide-x divide-gray-100 px-2 py-1 bg-zinc-50">
+                  <div className="grid grid-cols-4 gap-1 px-2 py-1 pb-2">
                     <EmojiButton
                       payload=":+1:"
                       active={active}
@@ -195,7 +199,8 @@ function EmojiButton(props: {
         props.active
           ? "bg-gray-100 text-gray-900 hover:bg-gray-200 hover:border-gray-200"
           : "text-gray-700",
-        "group flex items-center justify-center border border-transparent px-1 py-1 font-medium text-2xl cursor-pointer select-none font-emoji"
+        "group flex items-center justify-center px-1 py-1 border border-black/60 bg-white rounded-md shadow-md",
+        "font-bold text-2xl cursor-pointer select-none font-emoji"
       )}
     >
       {props.children}

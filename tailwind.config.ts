@@ -6,6 +6,32 @@ export default {
   theme: {
     extend: {
       colors: {
+        watercourse: {
+          "50": "#ebfef6",
+          "100": "#d0fbe7",
+          "200": "#a4f6d3",
+          "300": "#6aebbd",
+          "400": "#2fd8a1",
+          "500": "#0abf8a",
+          "600": "#009b71",
+          "700": "#007357",
+          "800": "#03624b",
+          "900": "#04503f",
+          "950": "#012d25",
+        },
+        mystic: {
+          "50": "#f5f9fa",
+          "100": "#e2ecf0",
+          "200": "#d0e2e7",
+          "300": "#a7c9d2",
+          "400": "#77adb9",
+          "500": "#5693a1",
+          "600": "#437786",
+          "700": "#37606d",
+          "800": "#31515b",
+          "900": "#2c454e",
+          "950": "#1d2e34",
+        },
         french_gray: {
           DEFAULT: "#d0ccd0",
           100: "#2b282b",
@@ -69,6 +95,12 @@ export default {
       },
       animation: {
         shake: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
+        scaleIn: "scaleIn 3s ease-in-out",
+        fadeIn: "fadeIn 1s ease-in-out",
+        fadeInFromTop:
+          "hidden 1s linear, fadeIn 1s 1s ease-in-out, fromTop 2s ease-in-out",
+        fadeInFromBottom:
+          "hidden 1s linear, fadeIn 1s 1s ease-in-out, fromBottom 2s ease-in-out",
       },
       fontFamily: {
         emoji: ['"Noto Emoji"', ...defaultTheme.fontFamily.sans],
@@ -86,6 +118,46 @@ export default {
           },
           "40%, 60%": {
             transform: "translate3d(4px, 0, 0)",
+          },
+        },
+        hidden: {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "0",
+          },
+        },
+        scaleIn: {
+          "0%": {
+            transform: "scale(1.1)",
+          },
+          "100%": {
+            transform: "scale(1)",
+          },
+        },
+        fadeIn: {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "1",
+          },
+        },
+        fromTop: {
+          "0%": {
+            transform: "translateY(-33%)",
+          },
+          "100%": {
+            transform: "translateY(0)",
+          },
+        },
+        fromBottom: {
+          "0%": {
+            transform: "translateY(33%)",
+          },
+          "100%": {
+            transform: "translateY(0)",
           },
         },
       },

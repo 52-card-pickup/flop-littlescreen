@@ -1,7 +1,7 @@
 import { MouseEventHandler } from "react";
 import cn from "~/utils/cn";
 
-export type ButtonColor = "gray" | "blue" | "green" | "red";
+export type ButtonColor = "gray" | "blue" | "green" | "watercourse" | "red";
 export type ButtonVariant = "solid" | "outline";
 
 export default function FlopButton(props: {
@@ -29,7 +29,7 @@ export default function FlopButton(props: {
         <span
           className={cn(
             "relative z-10 block overflow-hidden font-medium leading-tight",
-            "transition-colors duration-300 ease-out border-2 rounded-lg",
+            "transition-colors duration-300 ease-out border-2 rounded-md",
             props.slim ? "" : "px-6 py-3",
             border,
             text
@@ -40,7 +40,7 @@ export default function FlopButton(props: {
           ></span>
           <span
             className={cn(
-              "absolute left-0 w-72 h-72 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
+              "absolute left-0 w-96 h-96 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
               "-translate-x-full translate-y-12 group-hover:-rotate-180 ease",
               props.disabled ? "" : "group-hover:-rotate-180",
               bg
@@ -51,7 +51,7 @@ export default function FlopButton(props: {
         <span
           className={cn(
             "absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear",
-            "rounded-lg group-hover:mb-0 group-hover:mr-0",
+            "rounded-md group-hover:mb-0 group-hover:mr-0",
             bg
           )}
         ></span>
@@ -100,6 +100,22 @@ function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
           variant === "outline"
             ? "text-gray-800"
             : "text-green-50 group-hover:text-green-800",
+      };
+    case "watercourse":
+      return {
+        bg:
+          variant === "outline"
+            ? "bg-watercourse-700 group-hover:bg-watercourse-950"
+            : "bg-black group-hover:bg-watercourse-50",
+        bgBase: variant === "outline" ? "bg-gray-50" : "bg-watercourse-600",
+        border:
+          variant === "outline"
+            ? "border-watercourse-800"
+            : "border-black group-hover:border-watercourse-900",
+        text:
+          variant === "outline"
+            ? "text-gray-800 group-hover:text-white"
+            : "text-watercourse-50 group-hover:text-watercourse-900",
       };
     case "red":
       return {

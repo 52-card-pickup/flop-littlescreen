@@ -8,11 +8,11 @@ import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
 import { client } from "../flopClient";
 import FlopButton from "~/components/FlopButton";
-import { ShareButton } from "~/components/ShareButton";
 import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
 import { useVibrate } from "~/hooks/useVibrate";
+import FlopLandingLayout from "~/components/FlopLandingLayout";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -27,11 +27,9 @@ export default function Index() {
   const { playerDetails, setPlayerDetails } = usePlayerDetails();
   const [name, setName] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
-  const [knockResult, setKnockResult] = React.useState<
-    "playing" | "joinable" | null
-  >(null);
+  const [hasJoinError, setHasJoinError] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const knockVibrate = useVibrate([15, 150, 15], 50);
   const submitVibrate = useVibrate([5], 5);
   const [searchParams, setSearchParams] = useSearchParams();
   const document = useDocument();
@@ -51,9 +49,8 @@ export default function Index() {
     client
       .POST("/api/v1/join", { body: { name } })
       .then((res) => {
-        if (!res.data) {
-          setLoading(false);
-          return;
+        if (res.error) {
+          return Promise.reject();
         }
 
         setPlayerDetails({
@@ -63,21 +60,11 @@ export default function Index() {
         setTimeout(() => navigate(`/game`), 250);
       })
       .catch((err) => {
+        inputRef.current?.focus();
+        setHasJoinError(true);
         setLoading(false);
-        console.error(err);
-      })
-      .finally(() => {});
+      });
   }
-
-  useEffect(() => {
-    if (knockResult === null || knockResult === "joinable") return;
-    const timeout = setTimeout(() => {
-      setKnockResult(null);
-    }, 500);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [knockResult]);
 
   useEffect(() => {
     if (searchParams.has("z")) {
@@ -114,47 +101,30 @@ export default function Index() {
   const bigScreenUrl = document?.location.host.startsWith("beta.")
     ? "beta.flop.party/big-screen"
     : "tv.flop.party";
+
   return (
-    <div
-      className="bg-slate-200 min-h-screen grid grid-flow-row grid-rows-[auto,5fr,auto,1fr]"
-      style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
-    >
-      <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500">
-        <h2 className="text-base font-bold m-0 text-center">
-          Not got a Chromecast? Grab a big screen and go to:
+    <FlopLandingLayout>
+      <div className="grid grid-cols-1 items-center justify-center gap-4 px-16 py-16 pb-0 text-slate-500 animate-fadeInFromTop">
+        <h2 className="text-lg font-medium m-0 text-center">
+          grab a chromecast-enabled big screen, or go to:
         </h2>
         <p
           className={cn(
-            "text-lg font-semibold m-0 text-center text-slate-600 select-none",
-            share.isSupported ? "cursor-pointer" : "cursor-default"
+            "text-lg font-semibold m-0 text-center text-slate-600 select-none cursor-pointer"
           )}
           onClick={() =>
-            share.isSupported &&
-            share({
-              title: "Flop Poker",
-              text: "Host a game of Flop Poker on the big screen",
-              url: `https://${bigScreenUrl}`,
-            })
+            share.isSupported
+              ? share({
+                  title: "Flop Poker",
+                  text: "Host a game of Flop Poker on the big screen",
+                  url: `https://${bigScreenUrl}`,
+                })
+              : window.open(`https://${bigScreenUrl}`)
           }
         >
           {bigScreenUrl}
         </p>
       </div>
-      <div className="flex flex-col justify-center items-center">
-        <h1 className="text-4xl font-bold my-12 text-center">flop.</h1>
-        <h2 className="text-base font-semibold my-1 text-center">
-          No chips, no cards, no table?
-        </h2>
-        <h2 className="text-base font-semibold my-1 text-center">
-          No problem.
-        </h2>
-      </div>
-      <ShareButton
-        className="fixed top-8 right-8 w-8 h-8"
-        title="Flop Poker"
-        text="Play Flop Poker with your friends"
-        url="https://flop.poker"
-      />
       <form
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
@@ -163,10 +133,16 @@ export default function Index() {
           join();
         }}
         autoComplete="off"
-        className="grid grid-cols-1 items-center justify-center space-y-4 gap-4 px-8"
+        className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16 animate-fadeInFromBottom"
       >
         <input
-          className="px-6 py-4 bg-slate-300 text-black text-xl font-normal rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg"
+          ref={inputRef}
+          className={cn(
+            "px-6 py-4 bg-mystic-50 text-black text-xl font-medium rounded transition duration-150 ease-in-out hover:bg-slate-50 shadow-sm shadow-black/20 hover:shadow-lg",
+            hasJoinError
+              ? "ring-2 ring-red-500 ring-offset-1 focus:ring-red-500"
+              : ""
+          )}
           type="text"
           id="name"
           name="name"
@@ -176,56 +152,18 @@ export default function Index() {
             setName(e.target.value);
           }}
         />
-        <div
-          className={cn(
-            "grid gap-4",
-            knockResult === "joinable"
-              ? "grid-cols-[1fr]"
-              : "grid-cols-[1fr,5fr]"
-          )}
-        >
-          {knockResult !== "joinable" && (
-            <FlopButton
-              type="button"
-              onClick={(e) => {
-                e.currentTarget.blur();
-                knockVibrate();
-                client
-                  .POST("/api/v1/room/knock", { body: { which: "peek" } })
-                  .then((res) => {
-                    if (res.data?.state === "playing") {
-                      setKnockResult("playing");
-                    } else {
-                      setKnockResult("joinable");
-                    }
-                  })
-                  .finally(() => {
-                    setLoading(false);
-                  });
-              }}
-              color="gray"
-              variant="outline"
-              className={cn(
-                "opacity-80 transition-all duration-300 ease-in-out",
-                knockResult === "playing" ? "animate-shake" : ""
-              )}
-              disabled={loading || !!knockResult}
-            >
-              Knock
-            </FlopButton>
-          )}
-
+        <div className={cn("grid gap-4")}>
           <FlopButton
             type="submit"
-            color="blue"
+            color="watercourse"
             variant="solid"
             className="transition-all duration-300 ease-in-out"
             disabled={loading}
           >
-            Join
+            <span className="font-semibold">Join</span>
           </FlopButton>
         </div>
       </form>
-    </div>
+    </FlopLandingLayout>
   );
 }
