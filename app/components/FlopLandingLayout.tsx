@@ -27,7 +27,7 @@ export default function FlopLandingLayout(props: {
         </>
         <h2
           className={cn(
-            "text-2xl font-medium my-1 text-center text-watercourse-900/80",
+            "text-2xl font-medium px-2 my-1 text-center text-watercourse-900/80",
             animate ? "animate-fadeIn" : ""
           )}
         >
@@ -35,7 +35,7 @@ export default function FlopLandingLayout(props: {
         </h2>
         <h2
           className={cn(
-            "text-2xl font-medium my-1 text-center text-watercourse-900/80",
+            "text-2xl font-medium px-2 my-1 text-center text-watercourse-900/80",
             animate ? "animate-fadeIn" : ""
           )}
         >

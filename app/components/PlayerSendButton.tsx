@@ -66,7 +66,7 @@ export default function PlayerSendButton() {
 
         <Transition
           as={Fragment}
-          enter="transition ease-out duration-100"
+          enter="transition ease-out duration-300"
           enterFrom="transform opacity-0 scale-95"
           enterTo="transform opacity-100 scale-100"
           leave="transition ease-in duration-75"
@@ -74,7 +74,7 @@ export default function PlayerSendButton() {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items
-            className="absolute bottom-14 right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-300
+            className="absolute bottom-14 right-0 z-10 mt-2 w-56 origin-bottom-right divide-y divide-gray-300
           rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-30 overflow-hidden opacity-95 focus:outline-none"
           >
             <div className="py-1">
