@@ -9,6 +9,7 @@ export type GamePlayerState = components["schemas"]["GamePlayerState"];
 export type PlayerDetails = {
   name: string;
   id: string;
+  roomCode?: string;
 };
 
 const initialPlayerState: GamePlayerState = {
