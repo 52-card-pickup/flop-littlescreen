@@ -1,4 +1,3 @@
-import { useState } from "react";
 import FlopButton from "~/components/FlopButton";
 import { client } from "~/flopClient";
 import cn from "~/utils/cn";
@@ -6,17 +5,31 @@ import { useTimeoutState } from "~/hooks/useTimeoutState";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { useVibrate } from "~/hooks/useVibrate";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { GamePlayerState } from "~/state";
+import { useToast } from "../contexts/toaster";
 
-export function WaitingRoom() {
+export interface WaitingRoomProps {
+  state: GamePlayerState;
+}
+
+export function WaitingRoom({ state }: WaitingRoomProps) {
   const [error, setError] = useTimeoutState(false, 1000);
   const [hasErrored, setHasErrored] = useTimeoutState(false, 5000);
   const { playerDetails } = usePlayerDetails();
   const failedToJoinVibrate = useVibrate([5, 150, 10, 150, 5, 150, 10], 50);
+  const toast = useToast();
+
+  function copyRoomCode() {
+    if (!playerDetails.roomCode) return;
+
+    navigator.clipboard.writeText(playerDetails.roomCode);
+    toast.show("Room code copied to clipboard");
+  }
 
   return (
     <div className="grid justify-center items-center pb-32 gap-8 relative">
       <div className="flex flex-col justify-center items-center gap-6">
-        <div className="flex flex-col h-28 w-full justify-end">
+        <div className="flex flex-col justify-end">
           {hasErrored ? (
             <>
               <h2 className="text-watercourse-950 font-semibold text-2xl p-2 text-center animate-pulse">
@@ -30,26 +43,32 @@ export function WaitingRoom() {
             </>
           ) : (
             playerDetails?.name && (
-              <>
-                <h2 className="text-watercourse-900 font-medium text-xl text-center px-12">
+              <div onClick={copyRoomCode}>
+                <h3 className="text-watercourse-900 font-medium text-xl text-center px-12">
                   <span className="text-watercourse-800 font-semibold">
                     {playerDetails.name},
                   </span>{" "}
                   you're in the waiting room
+                  {state.playersCount > 2
+                    ? ` with ${state.playersCount - 1} other players`
+                    : state.playersCount === 2
+                    ? " with 1 other player"
+                    : ""}
                   {playerDetails.roomCode ? " for room: " : "."}
-                </h2>
+                </h3>
                 {playerDetails.roomCode && (
                   <h2 className="text-watercourse-950 font-semibold text-2xl p-2 text-center animate-pulse">
                     {playerDetails.roomCode}
                   </h2>
                 )}
-              </>
+              </div>
             )
           )}
         </div>
         <div className={cn(error ? "animate-shake" : "")}>
           <FlopButton
             color="watercourse"
+            disabled={state.playersCount < 2}
             onClick={() => {
               setHasErrored(false);
               client

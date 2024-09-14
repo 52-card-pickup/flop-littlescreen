@@ -17,6 +17,7 @@ export const links: LinksFunction = () => [
 
 import { RecoilRoot } from "recoil";
 import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
+import { ToasterProvider } from "./contexts/toaster";
 
 export async function loader() {
   return json({
@@ -82,7 +83,9 @@ export default function App() {
       </head>
       <body className="font-sans antialiased bg-mystic-100">
         <RecoilRoot>
-          <Outlet />
+          <ToasterProvider>
+            <Outlet />
+          </ToasterProvider>
           <script
             dangerouslySetInnerHTML={{
               __html: `window.ENV = ${JSON.stringify(data.FLOP_CONFIG)}`,
