@@ -94,6 +94,8 @@ export default {
         },
       },
       animation: {
+        pop: "pop 1.5s cubic-bezier(.36,.07,.19,.97) 1",
+        float: "float .5s cubic-bezier(.36,.07,.19,.97) 5",
         shake: "shake 0.82s cubic-bezier(.36,.07,.19,.97) both",
         scaleIn: "scaleIn 3s ease-in-out",
         fadeIn: "fadeIn 1s ease-in-out",
@@ -106,6 +108,26 @@ export default {
         emoji: ['"Noto Emoji"', ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
+        pop: {
+          "0%": {
+            transform: "scale(1)",
+          },
+          "20%": {
+            transform: "scale(1.1)",
+          },
+          "40%": {
+            transform: "scale(.9)",
+          },
+          "60%": {
+            transform: "scale(1.05)",
+          },
+          "80%": {
+            transform: "scale(.95)",
+          },
+          "100%": {
+            transform: "scale(1)",
+          },
+        },
         shake: {
           "10%, 90%": {
             transform: "translate3d(-1px, 0, 0)",
@@ -118,6 +140,23 @@ export default {
           },
           "40%, 60%": {
             transform: "translate3d(4px, 0, 0)",
+          },
+        },
+        float: {
+          "0%": {
+            transform: "translateY(0)",
+          },
+          "25%": {
+            transform: "translateY(-5px)",
+          },
+          "50%": {
+            transform: "translateY(0)",
+          },
+          "75%": {
+            transform: "translateY(5px)",
+          },
+          "100%": {
+            transform: "translateY(0)",
           },
         },
         hidden: {
@@ -163,5 +202,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
