@@ -408,6 +408,8 @@ export interface components {
       lastUpdate: number;
       /** Format: uint64 */
       minRaiseTo: number;
+      /** Format: uint */
+      playersCount: number;
       state: components["schemas"]["GamePhase"];
       /** Format: uint64 */
       turnExpiresDt?: unknown;
@@ -799,7 +801,7 @@ export interface components {
     };
     PeekRoomResponse: {
       /** Format: uint */
-      playerCount: number;
+      playersCount: number;
       state: components["schemas"]["GamePhase"];
     };
     /** @enum {string} */

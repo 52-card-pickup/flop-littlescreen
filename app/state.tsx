@@ -23,6 +23,7 @@ const initialPlayerState: GamePlayerState = {
   callAmount: 0,
   minRaiseTo: 0,
   currentRoundStake: 0,
+  playersCount: 0,
   turnExpiresDt: new Date().getTime(),
   lastUpdate: new Date().getTime(),
 };

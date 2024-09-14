@@ -7,6 +7,7 @@ import cn from "~/utils/cn";
 import FlopButton from "./FlopButton";
 import { RulesHelpButton } from "./RulesHelpButton";
 import { useVibrate } from "../hooks/useVibrate";
+import { useRoomCode } from "~/hooks/usePlayerDetails";
 
 const modes = ["yourturn", "waiting", "complete"] as const;
 
@@ -28,6 +29,7 @@ export default function GameScreen(props: GameScreenProps) {
   const [loading, setLoading] = useState(false);
   const [hasCompletedGame, setHasCompletedGame] = useState(false);
   const vibrate = useVibrate([20, 20, 40, 20, 60]);
+  const roomCode = useRoomCode();
 
   function setStake(newStake: number) {
     if (newStake > 0 && newStake < props.state.minRaiseTo) {
@@ -72,7 +74,7 @@ export default function GameScreen(props: GameScreenProps) {
   }, [props.state.yourTurn, vibrate]);
 
   const timer = useCountdown({
-    turnExpiresDt: props.state.turnExpiresDt || 0,
+    turnExpiresDt: (props.state.turnExpiresDt as number | undefined) || 0,
   });
 
   const stakeToCall = Math.min(
@@ -232,7 +234,11 @@ export default function GameScreen(props: GameScreenProps) {
           >
             <FlopButton
               onClick={() => {
-                client.POST("/api/v1/room/close");
+                client.POST("/api/v1/room/close", {
+                  body: {
+                    roomCode: roomCode,
+                  },
+                });
               }}
             >
               Next Round
