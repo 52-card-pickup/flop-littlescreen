@@ -291,7 +291,7 @@ export default function Index() {
             </div> */}
           </div>
         ) : state === "new" || state === "join" ? (
-          <form onSubmit={roomCode ? onSubmit : onNewRoom} autoComplete="off">
+          <form onSubmit={state === "new" ? onSubmit : onNewRoom} autoComplete="off">
             <div className="grid gap-4 grid-cols-1 pt-14 relative animate-fadeIn">
               <CloseButton onClick={() => returnToDefaultState()} />
               <input
