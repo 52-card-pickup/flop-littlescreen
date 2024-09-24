@@ -43,7 +43,7 @@ export default function FlopLandingLayout(props: {
         </h2>
       </div>
       <ShareButton
-        className="fixed top-8 right-8 w-8 h-8"
+        className="fixed top-8 left-8 w-8 h-8"
         title="Flop Poker"
         text="Play Flop Poker with your friends"
         url="https://flop.poker"
