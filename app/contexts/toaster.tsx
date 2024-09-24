@@ -47,7 +47,7 @@ export const Toaster = forwardRef<Toaster, ToasterProps>((props, ref) => {
         leaveTo="-translate-y-2 opacity-0"
       >
         <div className="fixed top-8 w-full flex justify-center">
-          <div className="bg-white text-black p-4 rounded-md shadow-md">
+          <div className="bg-white text-black p-4 rounded-md shadow-md text-center">
             {message}
           </div>
         </div>

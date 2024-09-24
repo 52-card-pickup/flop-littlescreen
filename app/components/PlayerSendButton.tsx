@@ -5,6 +5,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
   ArrowRightCircleIcon,
+  ArrowRightEndOnRectangleIcon,
   CameraIcon,
   CurrencyPoundIcon,
 } from "@heroicons/react/20/solid";
@@ -34,6 +35,15 @@ export default function PlayerSendButton() {
       },
       body: {
         message: payload,
+      },
+    });
+  }
+
+  function leaveGame() {
+    client.POST("/api/v1/player/{player_id}/leave", {
+      params: {
+        // @ts-expect-error - required for player_id path param
+        path: { player_id: playerDetails.id },
       },
     });
   }
@@ -78,6 +88,22 @@ export default function PlayerSendButton() {
                 className="absolute bottom-24 right-0 z-10 mt-2 w-56 origin-bottom-right divide-y divide-gray-300
           rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-30 overflow-hidden opacity-95 focus:outline-none"
               >
+                <div className="py-1 bg-red-700">
+                  <Menu.Item>
+                    <a
+                      onClick={leaveGame}
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-gray-100"
+                      )}
+                    >
+                      <ArrowRightEndOnRectangleIcon
+                        className="mr-3 h-6 w-6 text-red-50"
+                        aria-hidden="true"
+                      />
+                      Leave the game
+                    </a>
+                  </Menu.Item>
+                </div>
                 <div className="py-1">
                   <Menu.Item>
                     <a

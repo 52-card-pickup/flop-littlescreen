@@ -94,6 +94,18 @@ export interface paths {
       };
     };
   };
+  "/api/v1/player/{player_id}/leave": {
+    /** Leave the game room. */
+    post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
+    };
+  };
   "/api/v1/player/{player_id}/send": {
     /** Send a message to the game room. */
     post: {
@@ -190,6 +202,23 @@ export interface paths {
       requestBody: {
         content: {
           "application/json": components["schemas"]["JoinRequest"];
+        };
+      };
+    };
+  };
+  "/api/v1/resume": {
+    /** Resume previous session in the game room. */
+    post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": components["schemas"]["ResumeResponse"];
+          };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["ResumeRequest"];
         };
       };
     };
@@ -800,8 +829,10 @@ export interface components {
       roomCode: string;
     };
     PeekRoomResponse: {
+      canResume: boolean;
       /** Format: uint */
       playersCount: number;
+      resumePlayerName?: unknown;
       state: components["schemas"]["GamePhase"];
     };
     /** @enum {string} */
@@ -938,6 +969,13 @@ export interface components {
       default?: Partial<components["schemas"]["ReferenceOr_for_Response"]> &
         Partial<unknown>;
     } & { [key: string]: unknown };
+    ResumeRequest: {
+      roomCode?: unknown;
+    };
+    ResumeResponse: {
+      id: string;
+      name: string;
+    };
     /** @description A JSON Schema. */
     Schema: Partial<boolean> & Partial<components["schemas"]["SchemaObject2"]>;
     /** @description A JSON Schema. */
