@@ -326,15 +326,6 @@ export default function Index() {
                 </p>
               </div>
               <RoomCodeInput onSubmit={onRoomCodeSubmit} submitLabel="Join" />
-              {/* <div className="text-sm text-slate-500 mt-4">
-              Don't have a code?{" "}
-              <a
-                className="font-medium text-indigo-500 hover:text-indigo-600"
-                onClick={() => setState("new")}
-              >
-                Create a new Room
-              </a>
-            </div> */}
             </div>
           ) : state === "new" || state === "join" ? (
             <form
