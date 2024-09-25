@@ -3,20 +3,17 @@
  * Do not make direct changes to the file.
  */
 
-
-/** OneOf type helpers */
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-type XOR<T, U> = (T | U) extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
-type OneOf<T extends any[]> = T extends [infer Only] ? Only : T extends [infer A, infer B, ...infer Rest] ? OneOf<[XOR<A, B>, ...Rest]> : never;
-
 export interface paths {
   "/api/v1/room": {
-    /** @description Get the current state of the game room. */
+    /** Get the current state of the game room. */
     get: {
       parameters: {
-        query?: {
-          since?: number | null;
-          timeout?: number | null;
+        query: {
+          since?: unknown;
+          timeout?: unknown;
+        };
+        header: {
+          "room-code"?: string;
         };
       };
       responses: {
@@ -28,54 +25,64 @@ export interface paths {
       };
     };
   };
-  "/api/v1/room/close": {
-    /** @description Close the game room for new players to join and start the game. */
+  "/api/v1/room/peek": {
+    /** Peek at the game room from join code. */
     post: {
       responses: {
         200: {
           content: {
-            "application/json": null;
+            "application/json": components["schemas"]["PeekRoomResponse"];
           };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PeekRoomRequest"];
+        };
+      };
+    };
+  };
+  "/api/v1/room/close": {
+    /** Close the game room for new players to join and start the game. */
+    post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["CloseRoomRequest"];
         };
       };
     };
   };
   "/api/v1/room/reset": {
-    /** @description Reset the game room. */
+    /** Reset the game room. */
     post: {
-      responses: {
-        200: {
-          content: {
-            "application/json": null;
-          };
-        };
-      };
-    };
-  };
-  "/api/v1/room/knock": {
-    /** @description Knock on the game room - peek in, nudge players, or kick them out. */
-    post: {
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["KnockRequest"];
+      parameters: {
+        header: {
+          "room-code"?: string;
         };
       };
       responses: {
         200: {
           content: {
-            "application/json": components["schemas"]["KnockResponse"];
+            "application/json": unknown;
           };
         };
       };
     };
   };
   "/api/v1/player/{player_id}": {
-    /** @description Get the current state of a player. */
+    /** Get the current state of a player. */
     get: {
       parameters: {
-        query?: {
-          since?: number | null;
-          timeout?: number | null;
+        query: {
+          since?: unknown;
+          timeout?: unknown;
         };
       };
       responses: {
@@ -87,25 +94,37 @@ export interface paths {
       };
     };
   };
-  "/api/v1/player/{player_id}/send": {
-    /** @description Send a message to the game room. */
+  "/api/v1/player/{player_id}/leave": {
+    /** Leave the game room. */
     post: {
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["PlayerSendRequest"];
-        };
-      };
       responses: {
         200: {
           content: {
-            "application/json": null;
+            "application/json": unknown;
           };
         };
       };
     };
   };
+  "/api/v1/player/{player_id}/send": {
+    /** Send a message to the game room. */
+    post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PlayerSendRequest"];
+        };
+      };
+    };
+  };
   "/api/v1/player/{player_id}/transfer": {
-    /** @description Get the account details of other players. */
+    /** Get the account details of other players. */
     get: {
       responses: {
         200: {
@@ -115,51 +134,64 @@ export interface paths {
         };
       };
     };
-    /** @description Transfer funds to another player. */
+    /** Transfer funds to another player. */
     post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
       requestBody: {
         content: {
           "application/json": components["schemas"]["TransferRequest"];
         };
       };
-      responses: {
-        200: {
-          content: {
-            "application/json": null;
-          };
-        };
-      };
     };
   };
   "/api/v1/player/{player_id}/photo": {
-    /** @description Get a photo for a player. */
-    get: {
-    };
-    /** @description Upload a photo for a player. */
+    /** Upload a photo for a player. */
     post: {
-      /** @description multipart form data */
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
+      /** multipart form data */
       requestBody: {
         content: {
           "multipart/form-data": unknown[];
         };
       };
+    };
+  };
+  "/api/v1/player/photo/{token}": {
+    /** Get a photo for a player. */
+    get: {};
+  };
+  "/api/v1/new": {
+    /** Create and join a new game room. */
+    post: {
       responses: {
         200: {
           content: {
-            "application/json": null;
+            "application/json": components["schemas"]["NewRoomResponse"];
           };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["NewRoomRequest"];
         };
       };
     };
   };
   "/api/v1/join": {
-    /** @description Join the game room. */
+    /** Join the game room. */
     post: {
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["JoinRequest"];
-        };
-      };
       responses: {
         200: {
           content: {
@@ -167,43 +199,64 @@ export interface paths {
           };
         };
       };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["JoinRequest"];
+        };
+      };
+    };
+  };
+  "/api/v1/resume": {
+    /** Resume previous session in the game room. */
+    post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": components["schemas"]["ResumeResponse"];
+          };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["ResumeRequest"];
+        };
+      };
     };
   };
   "/api/v1/play": {
-    /** @description Play a round. */
+    /** Play a round. */
     post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
       requestBody: {
         content: {
           "application/json": components["schemas"]["PlayRequest"];
         };
       };
+    };
+  };
+  "/api/v1/dump": {
+    /** Dump all room game states. */
+    get: {
       responses: {
         200: {
           content: {
-            "application/json": null;
+            "application/json": { [key: string]: string };
           };
         };
       };
     };
   };
   "/docs/": {
-    /** @description This documentation page. */
+    /** This documentation page. */
     get: {
       responses: {
-        /** @description HTML content */
-        200: {
-          content: {
-            "text/html": string;
-          };
-        };
-      };
-    };
-  };
-  "/docs/redoc": {
-    /** @description This documentation page. */
-    get: {
-      responses: {
-        /** @description HTML content */
+        /** HTML content */
         200: {
           content: {
             "text/html": string;
@@ -214,8 +267,6 @@ export interface paths {
   };
 }
 
-export type webhooks = Record<string, never>;
-
 export interface components {
   schemas: {
     /** @enum {string} */
@@ -223,17 +274,41 @@ export interface components {
     /** @enum {string} */
     CardSuite: "hearts" | "diamonds" | "clubs" | "spades";
     /** @enum {string} */
-    CardValue: "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "jack" | "queen" | "king" | "ace";
+    CardValue:
+      | "2"
+      | "3"
+      | "4"
+      | "5"
+      | "6"
+      | "7"
+      | "8"
+      | "9"
+      | "10"
+      | "jack"
+      | "queen"
+      | "king"
+      | "ace";
+    CloseRoomRequest: {
+      roomCode?: unknown;
+    };
     CompletedGame: {
-      playerCards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]][];
-      winnerName?: string | null;
-      winningHand?: string | null;
+      playerCards: [
+        [
+          components["schemas"]["CardSuite"],
+          components["schemas"]["CardValue"]
+        ],
+        [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]
+      ][];
+      winnerName?: unknown;
+      winningHand?: unknown;
     };
     /** @description Holds a set of reusable objects for different aspects of the OAS. All objects defined within the components object will have no effect on the API unless they are explicitly referenced from properties outside the components object. */
     Components: {
       /** @description An object to hold reusable Callback Objects. */
       callbacks?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Map_of_ReferenceOr_for_PathItem"];
+        [
+          key: string
+        ]: components["schemas"]["ReferenceOr_for_Map_of_ReferenceOr_for_PathItem"];
       };
       /** @description An object to hold reusable Example Objects. */
       examples?: {
@@ -244,9 +319,7 @@ export interface components {
         [key: string]: components["schemas"]["ReferenceOr_for_Header"];
       };
       /** @description An object to hold reusable Link Objects. */
-      links?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Link"];
-      };
+      links?: { [key: string]: components["schemas"]["ReferenceOr_for_Link"] };
       /** @description An object to hold reusable Parameter Objects. */
       parameters?: {
         [key: string]: components["schemas"]["ReferenceOr_for_Parameter"];
@@ -264,25 +337,21 @@ export interface components {
         [key: string]: components["schemas"]["ReferenceOr_for_Response"];
       };
       /** @description An object to hold reusable Schema Objects. */
-      schemas?: {
-        [key: string]: components["schemas"]["SchemaObject"];
-      };
+      schemas?: { [key: string]: components["schemas"]["SchemaObject"] };
       /** @description An object to hold reusable Security Scheme Objects. */
       securitySchemes?: {
         [key: string]: components["schemas"]["ReferenceOr_for_SecurityScheme"];
       };
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     /** @description Contact information for the exposed API. */
     Contact: {
       /** @description The email address of the contact person/organization. This MUST be in the format of an email address. */
-      email?: string | null;
+      email?: unknown;
       /** @description The identifying name of the contact person/organization. */
-      name?: string | null;
+      name?: unknown;
       /** @description The URL pointing to the contact information. This MUST be in the format of a URL. */
-      url?: string | null;
-      [key: string]: unknown;
-    };
+      url?: unknown;
+    } & { [key: string]: unknown };
     /** @enum {string} */
     CookieStyle: "form";
     /** @description A single encoding definition applied to a single schema property. */
@@ -290,7 +359,7 @@ export interface components {
       /** @description Determines whether the parameter value SHOULD allow reserved characters, as defined by RFC3986 :/?#[]@!$&'()*+,;= to be included without percent-encoding. The default value is false. This property SHALL be ignored if the request body media type is not application/x-www-form-urlencoded or multipart/form-data. If a value is explicitly defined, then the value of `contentType` (implicit or explicit) SHALL be ignored. */
       allowReserved?: boolean;
       /** @description The Content-Type for encoding a specific property. Default value depends on the property type: for object - application/json; for array – the default is defined based on the inner type. for all other cases the default is `application/octet-stream`. The value can be a specific media type (e.g. application/json), a wildcard media type (e.g. image/*), or a comma-separated list of the two types. */
-      contentType?: string | null;
+      contentType?: unknown;
       /**
        * @description When this is true, property values of type array or object generate separate parameters for each value of the array, or key-value-pair of the map. For other types of properties this property has no effect. When style is form, the default value is true. For all other styles, the default value is false. This property SHALL be ignored if the request body media type is not application/x-www-form-urlencoded or multipart/form-data. If a value is explicitly defined, then the value of `contentType` (implicit or explicit) SHALL be ignored.
        *
@@ -302,47 +371,51 @@ export interface components {
         [key: string]: components["schemas"]["ReferenceOr_for_Header"];
       };
       /** @description Describes how a specific property value will be serialized depending on its type. See Parameter Object for details on the style property. The behavior follows the same values as query parameters, including default values. This property SHALL be ignored if the request body media type is not application/x-www-form-urlencoded  or multipart/form-data. If a value is explicitly defined, then the value of `contentType` (implicit or explicit) SHALL be ignored. */
-      style?: components["schemas"]["QueryStyle"] | null;
-      [key: string]: unknown;
-    };
+      style?: Partial<components["schemas"]["QueryStyle"]> & Partial<unknown>;
+    } & { [key: string]: unknown };
     Example: {
       /** @description Long description for the example. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description A URI that points to the literal example. This provides the capability to reference examples that cannot easily be included in JSON or YAML documents. The `value` field and `externalValue` field are mutually exclusive. See the rules for resolving Relative References. */
-      externalValue?: string | null;
+      externalValue?: unknown;
       /** @description Short description for the example. */
-      summary?: string | null;
+      summary?: unknown;
       /** @description Embedded literal example. The `value` field and `externalValue` field are mutually exclusive. To represent examples of media types that cannot naturally represented in JSON or YAML, use a string value to contain the example, escaping where necessary. */
       value?: unknown;
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     /** @description Allows referencing an external resource for extended documentation. */
     ExternalDocumentation: {
       /** @description A description of the target documentation. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description REQUIRED. The URL for the target documentation. This MUST be in the format of a URL. */
       url: string;
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     GameClientPlayer: {
       /** Format: uint64 */
       balance: number;
+      /** Format: uint16 */
+      colorHue: number;
       folded: boolean;
       name: string;
-      photo?: string | null;
+      photo?: unknown;
       /** Format: uint64 */
-      turnExpiresDt?: number | null;
+      turnExpiresDt?: unknown;
     };
     GameClientRoom: {
-      cards: [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]][];
-      completed?: components["schemas"]["CompletedGame"] | null;
+      cards: [
+        components["schemas"]["CardSuite"],
+        components["schemas"]["CardValue"]
+      ][];
+      completed?: Partial<components["schemas"]["CompletedGame"]> &
+        Partial<unknown>;
       /** Format: uint64 */
       lastUpdate: number;
       players: components["schemas"]["GameClientPlayer"][];
       /** Format: uint64 */
       pot: number;
+      roomCode?: unknown;
       state: components["schemas"]["GamePhase"];
-      ticker?: string | null;
+      ticker?: unknown;
     };
     /** @enum {string} */
     GamePhase: "offline" | "idle" | "waiting" | "playing" | "complete";
@@ -351,16 +424,24 @@ export interface components {
       balance: number;
       /** Format: uint64 */
       callAmount: number;
-      cards: [[components["schemas"]["CardSuite"], components["schemas"]["CardValue"]], [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]];
+      cards: [
+        [
+          components["schemas"]["CardSuite"],
+          components["schemas"]["CardValue"]
+        ],
+        [components["schemas"]["CardSuite"], components["schemas"]["CardValue"]]
+      ];
       /** Format: uint64 */
       currentRoundStake: number;
       /** Format: uint64 */
       lastUpdate: number;
       /** Format: uint64 */
       minRaiseTo: number;
+      /** Format: uint */
+      playersCount: number;
       state: components["schemas"]["GamePhase"];
       /** Format: uint64 */
-      turnExpiresDt?: number | null;
+      turnExpiresDt?: unknown;
       yourTurn: boolean;
     };
     /**
@@ -368,11 +449,18 @@ export interface components {
      *
      * 1) name MUST NOT be specified, it is given in the corresponding headers map. 2) in MUST NOT be specified, it is implicitly in header. 3) All traits that are affected by the location MUST be applicable to a location of header (for example, style).
      */
-    Header: ({
+    Header: (
+      | {
+          schema: components["schemas"]["SchemaObject"];
+        }
+      | {
+          content: { [key: string]: components["schemas"]["MediaType"] };
+        }
+    ) & {
       /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
-      deprecated?: boolean | null;
+      deprecated?: unknown;
       /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       example?: unknown;
       examples?: {
         [key: string]: components["schemas"]["ReferenceOr_for_Example"];
@@ -381,71 +469,57 @@ export interface components {
       required?: boolean;
       /** @default simple */
       style?: components["schemas"]["HeaderStyle"];
-      [key: string]: unknown;
-    }) & OneOf<[{
-      schema: components["schemas"]["SchemaObject"];
-    }, {
-      content: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
-    }]>;
+    } & { [key: string]: unknown };
     /** @enum {string} */
     HeaderStyle: "simple";
     /** @description The object provides metadata about the API. The metadata MAY be used by the clients if needed, and MAY be presented in editing or documentation generation tools for convenience. */
     Info: {
       /** @description The contact information for the exposed API. */
-      contact?: components["schemas"]["Contact"] | null;
+      contact?: Partial<components["schemas"]["Contact"]> & Partial<unknown>;
       /** @description A description of the API. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description The license information for the exposed API. */
-      license?: components["schemas"]["License"] | null;
+      license?: Partial<components["schemas"]["License"]> & Partial<unknown>;
       /** @description A short summary of the API. */
-      summary?: string | null;
+      summary?: unknown;
       /** @description A URL to the Terms of Service for the API. This MUST be in the format of a URL. */
-      termsOfService?: string | null;
+      termsOfService?: unknown;
       /** @description REQUIRED. The title of the application. */
       title: string;
       /** @description REQUIRED. The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version). */
       version: string;
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     /**
      * @description The possible types of values in JSON Schema documents.
      *
      * See [JSON Schema 4.2.1. Instance Data Model](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-4.2.1).
      * @enum {string}
      */
-    InstanceType: "null" | "boolean" | "object" | "array" | "number" | "string" | "integer";
+    InstanceType:
+      | "null"
+      | "boolean"
+      | "object"
+      | "array"
+      | "number"
+      | "string"
+      | "integer";
     JoinRequest: {
       name: string;
+      roomCode?: unknown;
     };
     JoinResponse: {
       id: string;
-    };
-    /** @enum {string} */
-    KnockAction: "peek" | "nudge" | "kick";
-    KnockRequest: {
-      which: components["schemas"]["KnockAction"];
-    };
-    KnockResponse: {
-      /** Format: uint */
-      cardsOnTable: number;
-      /** Format: uint */
-      players: number;
-      /** Format: uint64 */
-      retryAt?: number | null;
-      state: components["schemas"]["GamePhase"];
+      roomCode: string;
     };
     /** @description License information for the exposed API. */
     License: {
       /** @description An [SPDX](https://spdx.org/spdx-specification-21-web-version#h.jxpfx0ykyb60) license expression for the API. The `identifier` field is mutually exclusive of the `url` field. */
-      identifier?: string | null;
+      identifier?: unknown;
       /** @description REQUIRED. The license name used for the API. */
       name: string;
       /** @description A URL to the license used for the API. This MUST be in the form of a URL. The `url` field is mutually exclusive of the `identifier` field. */
-      url?: string | null;
-      [key: string]: unknown;
-    };
+      url?: unknown;
+    } & { [key: string]: unknown };
     /**
      * @description The Link object represents a possible design-time link for a response. The presence of a link does not guarantee the caller's ability to successfully invoke it, rather it provides a known relationship and traversal mechanism between responses and other operations.
      *
@@ -453,88 +527,89 @@ export interface components {
      *
      * For computing links, and providing instructions to execute them, a runtime expression is used for accessing values in an operation and using them as parameters while invoking the linked operation.
      */
-    Link: ({
+    Link: (
+      | {
+          operationRef: string;
+        }
+      | {
+          operationId: string;
+        }
+    ) & {
       /** @description A description of the link. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description A map representing parameters to pass to an operation as specified with operationId or identified via operationRef. The key is the parameter name to be used, whereas the value can be a constant or an expression to be evaluated and passed to the linked operation. The parameter name can be qualified using the parameter location [{in}.]{name} for operations that use the same parameter name in different locations (e.g. path.id). */
-      parameters?: {
-        [key: string]: unknown;
-      };
+      parameters?: { [key: string]: unknown };
       /** @description A literal value or {expression} to use as a request body when calling the target operation. */
       requestBody?: unknown;
       /** @description A server object to be used by the target operation. */
-      server?: components["schemas"]["Server"] | null;
-      [key: string]: unknown;
-    }) & OneOf<[{
-      operationRef: string;
-    }, {
-      operationId: string;
-    }]>;
+      server?: Partial<components["schemas"]["Server"]> & Partial<unknown>;
+    } & { [key: string]: unknown };
     MediaType: {
-      encoding?: {
-        [key: string]: components["schemas"]["Encoding"];
-      };
+      encoding?: { [key: string]: components["schemas"]["Encoding"] };
       example?: unknown;
       examples?: {
         [key: string]: components["schemas"]["ReferenceOr_for_Example"];
       };
-      schema?: components["schemas"]["SchemaObject"] | null;
-      [key: string]: unknown;
+      schema?: Partial<components["schemas"]["SchemaObject"]> &
+        Partial<unknown>;
+    } & { [key: string]: unknown };
+    NewRoomRequest: {
+      name: string;
     };
-    OAuth2Flows: OneOf<[{
-      implicit: {
-        authorizationUrl: string;
-        refreshUrl?: string | null;
-        /** @default {} */
-        scopes?: {
-          [key: string]: string;
+    NewRoomResponse: {
+      id: string;
+      roomCode: string;
+    };
+    OAuth2Flows:
+      | {
+          implicit: {
+            authorizationUrl: string;
+            refreshUrl?: unknown;
+            /** @default {} */
+            scopes?: { [key: string]: string };
+          };
+        }
+      | {
+          password: {
+            refreshUrl?: unknown;
+            /** @default {} */
+            scopes?: { [key: string]: string };
+            tokenUrl: string;
+          };
+        }
+      | {
+          clientCredentials: {
+            refreshUrl?: unknown;
+            /** @default {} */
+            scopes?: { [key: string]: string };
+            tokenUrl: string;
+          };
+        }
+      | {
+          authorizationCode: {
+            authorizationUrl: string;
+            refreshUrl?: unknown;
+            /** @default {} */
+            scopes?: { [key: string]: string };
+            tokenUrl: string;
+          };
         };
-      };
-    }, {
-      password: {
-        refreshUrl?: string | null;
-        /** @default {} */
-        scopes?: {
-          [key: string]: string;
-        };
-        tokenUrl: string;
-      };
-    }, {
-      clientCredentials: {
-        refreshUrl?: string | null;
-        /** @default {} */
-        scopes?: {
-          [key: string]: string;
-        };
-        tokenUrl: string;
-      };
-    }, {
-      authorizationCode: {
-        authorizationUrl: string;
-        refreshUrl?: string | null;
-        /** @default {} */
-        scopes?: {
-          [key: string]: string;
-        };
-        tokenUrl: string;
-      };
-    }]>;
     OpenApi: {
       /** @description An element to hold various schemas for the document. */
-      components?: components["schemas"]["Components"] | null;
+      components?: Partial<components["schemas"]["Components"]> &
+        Partial<unknown>;
       /** @description Additional external documentation. */
-      externalDocs?: components["schemas"]["ExternalDocumentation"] | null;
+      externalDocs?: Partial<components["schemas"]["ExternalDocumentation"]> &
+        Partial<unknown>;
       /** @description REQUIRED. Provides metadata about the API. The metadata MAY be used by tooling as required. */
       info: components["schemas"]["Info"];
       /** @description The default value for the `$schema` keyword within Schema Objects contained within this OAS document. This MUST be in the form of a URI. */
-      jsonSchemaDialect?: string | null;
+      jsonSchemaDialect?: unknown;
       openapi: string;
       /** @description The available paths and operations for the API. */
-      paths?: components["schemas"]["Paths"] | null;
+      paths?: Partial<components["schemas"]["Paths"]> & Partial<unknown>;
       /** @description A declaration of which security mechanisms can be used across the API. The list of values includes alternative security requirement objects that can be used. Only one of the security requirement objects need to be satisfied to authorize a request. Individual operations can override this definition. Global security settings may be overridden on a per-path basis. */
-      security?: {
-          [key: string]: string[];
-        }[];
+      security?: { [key: string]: string[] }[];
       /** @description An array of Server Objects, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a Server Object with a url value of /. */
       servers?: components["schemas"]["Server"][];
       /** @description A list of tags used by the document with additional metadata. The order of the tags can be used to reflect on their order by the parsing tools. Not all tags that are used by the Operation Object must be declared. The tags that are not declared MAY be organized randomly or based on the tool's logic. Each tag name in the list MUST be unique. */
@@ -543,208 +618,222 @@ export interface components {
       webhooks?: {
         [key: string]: components["schemas"]["ReferenceOr_for_PathItem"];
       };
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     /** @description Describes a single API operation on a path. */
     Operation: {
       /** @description Callbacks for the operation. */
       callbacks?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Map_of_ReferenceOr_for_PathItem"];
+        [
+          key: string
+        ]: components["schemas"]["ReferenceOr_for_Map_of_ReferenceOr_for_PathItem"];
       };
       /** @description Declares this operation to be deprecated.Default value is false. */
       deprecated?: boolean;
       /** @description A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description Additional external documentation for this operation. */
-      externalDocs?: components["schemas"]["ExternalDocumentation"] | null;
+      externalDocs?: Partial<components["schemas"]["ExternalDocumentation"]> &
+        Partial<unknown>;
       /** @description Unique string used to identify the operation. The id MUST be unique among all operations described in the API. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions. */
-      operationId?: string | null;
+      operationId?: unknown;
       /** @description A list of parameters that are applicable for this operation. If a parameter is already defined at the Path Item, the new definition will override it but can never remove it. The list MUST NOT include duplicated parameters. A unique parameter is defined by a combination of a name and location. The list can use the Reference Object to link to parameters that are defined at the OpenAPI Object's components/parameters. */
       parameters?: components["schemas"]["ReferenceOr_for_Parameter"][];
       /** @description The request body applicable for this operation. The requestBody is fully supported in HTTP methods where the HTTP 1.1 specification RFC7231 has explicitly defined semantics for request bodies. In other cases where the HTTP spec is vague (such as [GET](https://tools.ietf.org/html/rfc7231#section-4.3.1), [HEAD](https://tools.ietf.org/html/rfc7231#section-4.3.2) and [DELETE](https://tools.ietf.org/html/rfc7231#section-4.3.5)), requestBody is permitted but does not have well-defined semantics and SHOULD be avoided if possible. */
-      requestBody?: components["schemas"]["ReferenceOr_for_RequestBody"] | null;
+      requestBody?: Partial<
+        components["schemas"]["ReferenceOr_for_RequestBody"]
+      > &
+        Partial<unknown>;
       /** @description The list of possible responses as they are returned from executing this operation. */
-      responses?: components["schemas"]["Responses"] | null;
+      responses?: Partial<components["schemas"]["Responses"]> &
+        Partial<unknown>;
       /** @description A declaration of which security mechanisms can be used for this operation. The list of values includes alternative security requirement objects that can be used. Only one of the security requirement objects need to be satisfied to authorize a request. This definition overrides any declared top-level security. To remove a top-level security declaration, an empty array can be used. */
-      security?: {
-          [key: string]: string[];
-        }[];
+      security?: { [key: string]: string[] }[];
       /** @description An alternative server array to service this operation. If an alternative server object is specified at the Path Item Object or Root level, it will be overridden by this value. */
       servers?: components["schemas"]["Server"][];
       /** @description A short summary of what the operation does. */
-      summary?: string | null;
+      summary?: unknown;
       /** @description A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier. */
       tags?: string[];
-      [key: string]: unknown;
-    };
-    Parameter: OneOf<[({
-      /** @description Sets the ability to pass empty-valued parameters. This is valid only for query parameters and allows sending a parameter with an empty value. Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the value of allowEmptyValue SHALL be ignored. */
-      allow_empty_value?: boolean | null;
-      /** @description Determines whether the parameter value SHOULD allow reserved characters, as defined by RFC3986 :/?#[]@!$&'()*+,;= to be included without percent-encoding. This property only applies to parameters with an in value of query. The default value is false. */
-      allow_reserved?: boolean;
-      /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
-      deprecated?: boolean | null;
-      /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
-      example?: unknown;
-      examples?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Example"];
-      };
-      explode?: boolean | null;
-      /** @enum {string} */
-      in: "query";
-      /**
-       * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
-       *
-       * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
-       *
-       * For all other cases, the name corresponds to the parameter name used by the in property.
-       */
-      name: string;
-      /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
-      required?: boolean;
-      /**
-       * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
-       * @default form
-       */
-      style?: components["schemas"]["QueryStyle"];
-      [key: string]: unknown;
-    }) & OneOf<[{
-      schema: components["schemas"]["SchemaObject"];
-    }, {
-      content: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
-    }]>, ({
-      /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
-      deprecated?: boolean | null;
-      /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
-      example?: unknown;
-      examples?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Example"];
-      };
-      explode?: boolean | null;
-      /** @enum {string} */
-      in: "header";
-      /**
-       * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
-       *
-       * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
-       *
-       * For all other cases, the name corresponds to the parameter name used by the in property.
-       */
-      name: string;
-      /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
-      required?: boolean;
-      /**
-       * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
-       * @default simple
-       */
-      style?: components["schemas"]["HeaderStyle"];
-      [key: string]: unknown;
-    }) & OneOf<[{
-      schema: components["schemas"]["SchemaObject"];
-    }, {
-      content: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
-    }]>, ({
-      /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
-      deprecated?: boolean | null;
-      /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
-      example?: unknown;
-      examples?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Example"];
-      };
-      explode?: boolean | null;
-      /** @enum {string} */
-      in: "path";
-      /**
-       * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
-       *
-       * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
-       *
-       * For all other cases, the name corresponds to the parameter name used by the in property.
-       */
-      name: string;
-      /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
-      required?: boolean;
-      /**
-       * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
-       * @default simple
-       */
-      style?: components["schemas"]["PathStyle"];
-      [key: string]: unknown;
-    }) & OneOf<[{
-      schema: components["schemas"]["SchemaObject"];
-    }, {
-      content: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
-    }]>, ({
-      /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
-      deprecated?: boolean | null;
-      /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
-      example?: unknown;
-      examples?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Example"];
-      };
-      explode?: boolean | null;
-      /** @enum {string} */
-      in: "cookie";
-      /**
-       * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
-       *
-       * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
-       *
-       * For all other cases, the name corresponds to the parameter name used by the in property.
-       */
-      name: string;
-      /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
-      required?: boolean;
-      /**
-       * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
-       * @default form
-       */
-      style?: components["schemas"]["CookieStyle"];
-      [key: string]: unknown;
-    }) & OneOf<[{
-      schema: components["schemas"]["SchemaObject"];
-    }, {
-      content: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
-    }]>]>;
+    } & { [key: string]: unknown };
+    Parameter:
+      | ((
+          | {
+              schema: components["schemas"]["SchemaObject"];
+            }
+          | {
+              content: { [key: string]: components["schemas"]["MediaType"] };
+            }
+        ) & {
+          /** @description Sets the ability to pass empty-valued parameters. This is valid only for query parameters and allows sending a parameter with an empty value. Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the value of allowEmptyValue SHALL be ignored. */
+          allow_empty_value?: unknown;
+          /** @description Determines whether the parameter value SHOULD allow reserved characters, as defined by RFC3986 :/?#[]@!$&'()*+,;= to be included without percent-encoding. This property only applies to parameters with an in value of query. The default value is false. */
+          allow_reserved?: boolean;
+          /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
+          deprecated?: unknown;
+          /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
+          description?: unknown;
+          example?: unknown;
+          examples?: {
+            [key: string]: components["schemas"]["ReferenceOr_for_Example"];
+          };
+          explode?: unknown;
+          /** @enum {string} */
+          in: "query";
+          /**
+           * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
+           *
+           * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
+           *
+           * For all other cases, the name corresponds to the parameter name used by the in property.
+           */
+          name: string;
+          /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
+          required?: boolean;
+          /**
+           * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
+           * @default form
+           */
+          style?: components["schemas"]["QueryStyle"];
+        } & { [key: string]: unknown })
+      | ((
+          | {
+              schema: components["schemas"]["SchemaObject"];
+            }
+          | {
+              content: { [key: string]: components["schemas"]["MediaType"] };
+            }
+        ) & {
+          /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
+          deprecated?: unknown;
+          /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
+          description?: unknown;
+          example?: unknown;
+          examples?: {
+            [key: string]: components["schemas"]["ReferenceOr_for_Example"];
+          };
+          explode?: unknown;
+          /** @enum {string} */
+          in: "header";
+          /**
+           * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
+           *
+           * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
+           *
+           * For all other cases, the name corresponds to the parameter name used by the in property.
+           */
+          name: string;
+          /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
+          required?: boolean;
+          /**
+           * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
+           * @default simple
+           */
+          style?: components["schemas"]["HeaderStyle"];
+        } & { [key: string]: unknown })
+      | ((
+          | {
+              schema: components["schemas"]["SchemaObject"];
+            }
+          | {
+              content: { [key: string]: components["schemas"]["MediaType"] };
+            }
+        ) & {
+          /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
+          deprecated?: unknown;
+          /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
+          description?: unknown;
+          example?: unknown;
+          examples?: {
+            [key: string]: components["schemas"]["ReferenceOr_for_Example"];
+          };
+          explode?: unknown;
+          /** @enum {string} */
+          in: "path";
+          /**
+           * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
+           *
+           * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
+           *
+           * For all other cases, the name corresponds to the parameter name used by the in property.
+           */
+          name: string;
+          /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
+          required?: boolean;
+          /**
+           * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
+           * @default simple
+           */
+          style?: components["schemas"]["PathStyle"];
+        } & { [key: string]: unknown })
+      | ((
+          | {
+              schema: components["schemas"]["SchemaObject"];
+            }
+          | {
+              content: { [key: string]: components["schemas"]["MediaType"] };
+            }
+        ) & {
+          /** @description Specifies that a parameter is deprecated and SHOULD be transitioned out of usage. */
+          deprecated?: unknown;
+          /** @description A brief description of the parameter. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
+          description?: unknown;
+          example?: unknown;
+          examples?: {
+            [key: string]: components["schemas"]["ReferenceOr_for_Example"];
+          };
+          explode?: unknown;
+          /** @enum {string} */
+          in: "cookie";
+          /**
+           * @description REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object. See Path Templating for further information.
+           *
+           * If in is "header" and the name field is "Accept", "Content-Type" or "Authorization", the parameter definition SHALL be ignored.
+           *
+           * For all other cases, the name corresponds to the parameter name used by the in property.
+           */
+          name: string;
+          /** @description Determines whether this parameter is mandatory. If the parameter location is "path", this property is REQUIRED and its value MUST be true. Otherwise, the property MAY be included and its default value is false. */
+          required?: boolean;
+          /**
+           * @description Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
+           * @default form
+           */
+          style?: components["schemas"]["CookieStyle"];
+        } & { [key: string]: unknown });
     /** @description Describes the operations available on a single path. A Path Item MAY be empty, due to ACL constraints. The path itself is still exposed to the documentation viewer but they will not know which operations and parameters are available. */
     PathItem: {
       /** @description Allows for a referenced definition of this path item. The referenced structure MUST be in the form of a Path Item Object.  In case a Path Item Object field appears both in the defined object and the referenced object, the behavior is undefined. See the rules for resolving Relative References. */
-      $ref?: string | null;
-      delete?: components["schemas"]["Operation"] | null;
+      $ref?: unknown;
+      delete?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
       /** @description An optional, string description, intended to apply to all operations in this path. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
-      get?: components["schemas"]["Operation"] | null;
-      head?: components["schemas"]["Operation"] | null;
-      options?: components["schemas"]["Operation"] | null;
+      description?: unknown;
+      get?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
+      head?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
+      options?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
       /** @description A list of parameters that are applicable for all the operations described under this path. These parameters can be overridden at the operation level, but cannot be removed there. The list MUST NOT include duplicated parameters. A unique parameter is defined by a combination of a name and location. The list can use the Reference Object to link to parameters that are defined at the OpenAPI Object's components/parameters. */
       parameters?: components["schemas"]["ReferenceOr_for_Parameter"][];
-      patch?: components["schemas"]["Operation"] | null;
-      post?: components["schemas"]["Operation"] | null;
-      put?: components["schemas"]["Operation"] | null;
+      patch?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
+      post?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
+      put?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
       /** @description An alternative server array to service all operations in this path. */
       servers?: components["schemas"]["Server"][];
       /** @description An optional, string summary, intended to apply to all operations in this path. */
-      summary?: string | null;
-      trace?: components["schemas"]["Operation"] | null;
-      [key: string]: unknown;
-    };
+      summary?: unknown;
+      trace?: Partial<components["schemas"]["Operation"]> & Partial<unknown>;
+    } & { [key: string]: unknown };
     /** @enum {string} */
     PathStyle: "matrix" | "label" | "simple";
     /** @description Holds the relative paths to the individual endpoints and their operations. The path is appended to the URL from the Server Object in order to construct the full URL. The Paths MAY be empty, due to Access Control List (ACL) constraints. */
-    Paths: {
-      [key: string]: unknown;
+    Paths: { [key: string]: unknown };
+    PeekRoomRequest: {
+      roomCode: string;
+    };
+    PeekRoomResponse: {
+      canResume: boolean;
+      /** Format: uint */
+      playersCount: number;
+      resumePlayerName?: unknown;
+      state: components["schemas"]["GamePhase"];
     };
     /** @enum {string} */
     PlayAction: "check" | "call" | "raiseTo" | "fold";
@@ -766,102 +855,106 @@ export interface components {
     };
     PollQuery: {
       /** Format: uint64 */
-      since?: number | null;
+      since?: unknown;
       /** Format: uint64 */
-      timeout?: number | null;
+      timeout?: unknown;
     };
     /** @enum {string} */
     QueryStyle: "form" | "spaceDelimited" | "pipeDelimited" | "deepObject";
-    ReferenceOr_for_Example: ({
+    ReferenceOr_for_Example: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["Example"];
-    ReferenceOr_for_Header: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["Example"]>;
+    ReferenceOr_for_Header: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["Header"];
-    ReferenceOr_for_Link: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["Header"]>;
+    ReferenceOr_for_Link: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["Link"];
-    ReferenceOr_for_Map_of_ReferenceOr_for_PathItem: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["Link"]>;
+    ReferenceOr_for_Map_of_ReferenceOr_for_PathItem: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | {
-      [key: string]: components["schemas"]["ReferenceOr_for_PathItem"];
-    };
-    ReferenceOr_for_Parameter: ({
+      summary?: unknown;
+    }> &
+      Partial<{
+        [key: string]: components["schemas"]["ReferenceOr_for_PathItem"];
+      }>;
+    ReferenceOr_for_Parameter: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["Parameter"];
-    ReferenceOr_for_PathItem: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["Parameter"]>;
+    ReferenceOr_for_PathItem: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["PathItem"];
-    ReferenceOr_for_RequestBody: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["PathItem"]>;
+    ReferenceOr_for_RequestBody: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["RequestBody"];
-    ReferenceOr_for_Response: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["RequestBody"]>;
+    ReferenceOr_for_Response: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["Response"];
-    ReferenceOr_for_SecurityScheme: ({
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["Response"]>;
+    ReferenceOr_for_SecurityScheme: Partial<{
       /** @description REQUIRED. The reference identifier. This MUST be in the form of a URI. */
       $ref: string;
       /** @description A description which by default SHOULD override that of the referenced component. CommonMark syntax MAY be used for rich text representation. If the referenced object-type does not allow a `description` field, then this field has no effect. */
-      description?: string | null;
+      description?: unknown;
       /** @description A short summary which by default SHOULD override that of the referenced component. If the referenced object-type does not allow a `summary` field, then this field has no effect. */
-      summary?: string | null;
-    }) | components["schemas"]["SecurityScheme"];
+      summary?: unknown;
+    }> &
+      Partial<components["schemas"]["SecurityScheme"]>;
     RequestBody: {
       /** @description REQUIRED. The content of the request body. The key is a media type or media type range and the value describes it. For requests that match multiple keys, only the most specific key is applicable. e.g. text/plain overrides text/* */
-      content?: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
+      content?: { [key: string]: components["schemas"]["MediaType"] };
       /** @description A brief description of the request body. This could contain examples of use. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description Determines if the request body is required in the request. Defaults to false. */
       required?: boolean;
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     Response: {
       /** @description A map containing descriptions of potential response payloads. The key is a media type or media type range and the value describes it. For responses that match multiple keys, only the most specific key is applicable. e.g. text/plain overrides text/* */
-      content?: {
-        [key: string]: components["schemas"]["MediaType"];
-      };
+      content?: { [key: string]: components["schemas"]["MediaType"] };
       /** @description REQUIRED. A description of the response. CommonMark syntax MAY be used for rich text representation. */
       description: string;
       /** @description Maps a header name to its definition. RFC7230 states header names are case insensitive. If a response header is defined with the name "Content-Type", it SHALL be ignored. */
@@ -869,25 +962,31 @@ export interface components {
         [key: string]: components["schemas"]["ReferenceOr_for_Header"];
       };
       /** @description A map of operations links that can be followed from the response. The key of the map is a short name for the link, following the naming constraints of the names for Component Objects. */
-      links?: {
-        [key: string]: components["schemas"]["ReferenceOr_for_Link"];
-      };
-      [key: string]: unknown;
-    };
+      links?: { [key: string]: components["schemas"]["ReferenceOr_for_Link"] };
+    } & { [key: string]: unknown };
     Responses: {
       /** @description The documentation of responses other than the ones declared for specific HTTP response codes. Use this field to cover undeclared responses. */
-      default?: components["schemas"]["ReferenceOr_for_Response"] | null;
-      [key: string]: unknown;
+      default?: Partial<components["schemas"]["ReferenceOr_for_Response"]> &
+        Partial<unknown>;
+    } & { [key: string]: unknown };
+    ResumeRequest: {
+      roomCode?: unknown;
+    };
+    ResumeResponse: {
+      id: string;
+      name: string;
     };
     /** @description A JSON Schema. */
-    Schema: boolean | components["schemas"]["SchemaObject2"];
+    Schema: Partial<boolean> & Partial<components["schemas"]["SchemaObject2"]>;
     /** @description A JSON Schema. */
-    SchemaObject: ({
+    SchemaObject: (Partial<boolean> &
+      Partial<components["schemas"]["SchemaObject2"]>) & {
       /** @description A free-form property to include an example of an instance for this schema. To represent examples that cannot be naturally represented in JSON or YAML, a string value can be used to contain the example with escaping where necessary. **Deprecated:** The `example` property has been deprecated in favor of the JSON Schema `examples` keyword. Use of `example` is discouraged, and later versions of this specification may remove it. */
       example?: unknown;
       /** @description Additional external documentation for this schema. */
-      externalDocs?: components["schemas"]["ExternalDocumentation"] | null;
-    }) & (boolean | components["schemas"]["SchemaObject2"]);
+      externalDocs?: Partial<components["schemas"]["ExternalDocumentation"]> &
+        Partial<unknown>;
+    };
     /** @description A JSON Schema object. */
     SchemaObject2: {
       /**
@@ -895,37 +994,39 @@ export interface components {
        *
        * See [JSON Schema 8.2.2. The "$id" Keyword](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2).
        */
-      $id?: string | null;
+      $id?: unknown;
       /**
        * @description The `$ref` keyword.
        *
        * See [JSON Schema 8.2.4.1. Direct References with "$ref"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.4.1).
        */
-      $ref?: string | null;
+      $ref?: unknown;
       /**
        * @description The `additionalItems` keyword.
        *
        * See [JSON Schema 9.3.1.2. "additionalItems"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.1.2).
        */
-      additionalItems?: components["schemas"]["Schema"] | null;
+      additionalItems?: Partial<components["schemas"]["Schema"]> &
+        Partial<unknown>;
       /**
        * @description The `additionalProperties` keyword.
        *
        * See [JSON Schema 9.3.2.3. "additionalProperties"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.2.3).
        */
-      additionalProperties?: components["schemas"]["Schema"] | null;
+      additionalProperties?: Partial<components["schemas"]["Schema"]> &
+        Partial<unknown>;
       /**
        * @description The `allOf` keyword.
        *
        * See [JSON Schema 9.2.1.1. "allOf"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.1.1).
        */
-      allOf?: components["schemas"]["Schema"][] | null;
+      allOf?: components["schemas"]["Schema"][];
       /**
        * @description The `anyOf` keyword.
        *
        * See [JSON Schema 9.2.1.2. "anyOf"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.1.2).
        */
-      anyOf?: components["schemas"]["Schema"][] | null;
+      anyOf?: components["schemas"]["Schema"][];
       /**
        * @description The `const` keyword.
        *
@@ -937,7 +1038,7 @@ export interface components {
        *
        * See [JSON Schema 9.3.1.4. "contains"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.1.4).
        */
-      contains?: components["schemas"]["Schema"] | null;
+      contains?: Partial<components["schemas"]["Schema"]> & Partial<unknown>;
       /**
        * @description The `default` keyword.
        *
@@ -955,19 +1056,19 @@ export interface components {
        *
        * See [JSON Schema Validation 9.1. "title" and "description"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-9.1).
        */
-      description?: string | null;
+      description?: unknown;
       /**
        * @description The `else` keyword.
        *
        * See [JSON Schema 9.2.2.3. "else"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.2.3).
        */
-      else?: components["schemas"]["Schema"] | null;
+      else?: Partial<components["schemas"]["Schema"]> & Partial<unknown>;
       /**
        * @description The `enum` keyword.
        *
        * See [JSON Schema Validation 6.1.2. "enum"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.1.2)
        */
-      enum?: unknown[] | null;
+      enum?: unknown[];
       /**
        * @description The `examples` keyword.
        *
@@ -980,135 +1081,133 @@ export interface components {
        *
        * See [JSON Schema Validation 6.2.3. "exclusiveMaximum"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.3).
        */
-      exclusiveMaximum?: number | null;
+      exclusiveMaximum?: unknown;
       /**
        * Format: double
        * @description The `exclusiveMinimum` keyword.
        *
        * See [JSON Schema Validation 6.2.5. "exclusiveMinimum"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.5).
        */
-      exclusiveMinimum?: number | null;
+      exclusiveMinimum?: unknown;
       /**
        * @description The `format` keyword.
        *
        * See [JSON Schema Validation 7. A Vocabulary for Semantic Content With "format"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-7).
        */
-      format?: string | null;
+      format?: unknown;
       /**
        * @description The `if` keyword.
        *
        * See [JSON Schema 9.2.2.1. "if"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.2.1).
        */
-      if?: components["schemas"]["Schema"] | null;
+      if?: Partial<components["schemas"]["Schema"]> & Partial<unknown>;
       /**
        * @description The `items` keyword.
        *
        * See [JSON Schema 9.3.1.1. "items"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.1.1).
        */
-      items?: components["schemas"]["SingleOrVec_for_Schema"] | null;
+      items?: Partial<components["schemas"]["SingleOrVec_for_Schema"]> &
+        Partial<unknown>;
       /**
        * Format: uint32
        * @description The `maxItems` keyword.
        *
        * See [JSON Schema Validation 6.4.1. "maxItems"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.1).
        */
-      maxItems?: number | null;
+      maxItems?: unknown;
       /**
        * Format: uint32
        * @description The `maxLength` keyword.
        *
        * See [JSON Schema Validation 6.3.1. "maxLength"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.1).
        */
-      maxLength?: number | null;
+      maxLength?: unknown;
       /**
        * Format: uint32
        * @description The `maxProperties` keyword.
        *
        * See [JSON Schema Validation 6.5.1. "maxProperties"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.5.1).
        */
-      maxProperties?: number | null;
+      maxProperties?: unknown;
       /**
        * Format: double
        * @description The `maximum` keyword.
        *
        * See [JSON Schema Validation 6.2.2. "maximum"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.2).
        */
-      maximum?: number | null;
+      maximum?: unknown;
       /**
        * Format: uint32
        * @description The `minItems` keyword.
        *
        * See [JSON Schema Validation 6.4.2. "minItems"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.2).
        */
-      minItems?: number | null;
+      minItems?: unknown;
       /**
        * Format: uint32
        * @description The `minLength` keyword.
        *
        * See [JSON Schema Validation 6.3.2. "minLength"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.2).
        */
-      minLength?: number | null;
+      minLength?: unknown;
       /**
        * Format: uint32
        * @description The `minProperties` keyword.
        *
        * See [JSON Schema Validation 6.5.2. "minProperties"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.5.2).
        */
-      minProperties?: number | null;
+      minProperties?: unknown;
       /**
        * Format: double
        * @description The `minimum` keyword.
        *
        * See [JSON Schema Validation 6.2.4. "minimum"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.4).
        */
-      minimum?: number | null;
+      minimum?: unknown;
       /**
        * Format: double
        * @description The `multipleOf` keyword.
        *
        * See [JSON Schema Validation 6.2.1. "multipleOf"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.1).
        */
-      multipleOf?: number | null;
+      multipleOf?: unknown;
       /**
        * @description The `not` keyword.
        *
        * See [JSON Schema 9.2.1.4. "not"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.1.4).
        */
-      not?: components["schemas"]["Schema"] | null;
+      not?: Partial<components["schemas"]["Schema"]> & Partial<unknown>;
       /**
        * @description The `oneOf` keyword.
        *
        * See [JSON Schema 9.2.1.3. "oneOf"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.1.3).
        */
-      oneOf?: components["schemas"]["Schema"][] | null;
+      oneOf?: components["schemas"]["Schema"][];
       /**
        * @description The `pattern` keyword.
        *
        * See [JSON Schema Validation 6.3.3. "pattern"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.3).
        */
-      pattern?: string | null;
+      pattern?: unknown;
       /**
        * @description The `patternProperties` keyword.
        *
        * See [JSON Schema 9.3.2.2. "patternProperties"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.2.2).
        */
-      patternProperties?: {
-        [key: string]: components["schemas"]["Schema"];
-      };
+      patternProperties?: { [key: string]: components["schemas"]["Schema"] };
       /**
        * @description The `properties` keyword.
        *
        * See [JSON Schema 9.3.2.1. "properties"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.2.1).
        */
-      properties?: {
-        [key: string]: components["schemas"]["Schema"];
-      };
+      properties?: { [key: string]: components["schemas"]["Schema"] };
       /**
        * @description The `propertyNames` keyword.
        *
        * See [JSON Schema 9.3.2.5. "propertyNames"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.2.5).
        */
-      propertyNames?: components["schemas"]["Schema"] | null;
+      propertyNames?: Partial<components["schemas"]["Schema"]> &
+        Partial<unknown>;
       /**
        * @description The `readOnly` keyword.
        *
@@ -1126,125 +1225,118 @@ export interface components {
        *
        * See [JSON Schema 9.2.2.2. "then"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.2.2.2).
        */
-      then?: components["schemas"]["Schema"] | null;
+      then?: Partial<components["schemas"]["Schema"]> & Partial<unknown>;
       /**
        * @description The `title` keyword.
        *
        * See [JSON Schema Validation 9.1. "title" and "description"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-9.1).
        */
-      title?: string | null;
+      title?: unknown;
       /**
        * @description The `type` keyword.
        *
        * See [JSON Schema Validation 6.1.1. "type"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.1.1) and [JSON Schema 4.2.1. Instance Data Model](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-4.2.1).
        */
-      type?: components["schemas"]["SingleOrVec_for_InstanceType"] | null;
+      type?: Partial<components["schemas"]["SingleOrVec_for_InstanceType"]> &
+        Partial<unknown>;
       /**
        * @description The `uniqueItems` keyword.
        *
        * See [JSON Schema Validation 6.4.3. "uniqueItems"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.3).
        */
-      uniqueItems?: boolean | null;
+      uniqueItems?: unknown;
       /**
        * @description The `writeOnly` keyword.
        *
        * See [JSON Schema Validation 9.4. "readOnly" and "writeOnly"](https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-9.4).
        */
       writeOnly?: boolean;
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     /** @description Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header or as a query parameter), OAuth2's common flows (implicit, password, application and access code) as defined in RFC6749, and OpenID Connect Discovery. */
-    SecurityScheme: OneOf<[{
-      description?: string | null;
-      in: components["schemas"]["ApiKeyLocation"];
-      name: string;
-      /** @enum {string} */
-      type: "apiKey";
-      [key: string]: unknown;
-    }, {
-      bearerFormat?: string | null;
-      description?: string | null;
-      scheme: string;
-      /** @enum {string} */
-      type: "http";
-      [key: string]: unknown;
-    }, {
-      description?: string | null;
-      flows: components["schemas"]["OAuth2Flows"];
-      /** @enum {string} */
-      type: "oauth2";
-      [key: string]: unknown;
-    }, {
-      description?: string | null;
-      openIdConnectUrl: string;
-      /** @enum {string} */
-      type: "openIdConnect";
-      [key: string]: unknown;
-    }, {
-      description?: string | null;
-      /** @enum {string} */
-      type: "mutualTLS";
-      [key: string]: unknown;
-    }]>;
+    SecurityScheme:
+      | ({
+          description?: unknown;
+          in: components["schemas"]["ApiKeyLocation"];
+          name: string;
+          /** @enum {string} */
+          type: "apiKey";
+        } & { [key: string]: unknown })
+      | ({
+          bearerFormat?: unknown;
+          description?: unknown;
+          scheme: string;
+          /** @enum {string} */
+          type: "http";
+        } & { [key: string]: unknown })
+      | ({
+          description?: unknown;
+          flows: components["schemas"]["OAuth2Flows"];
+          /** @enum {string} */
+          type: "oauth2";
+        } & { [key: string]: unknown })
+      | ({
+          description?: unknown;
+          openIdConnectUrl: string;
+          /** @enum {string} */
+          type: "openIdConnect";
+        } & { [key: string]: unknown })
+      | ({
+          description?: unknown;
+          /** @enum {string} */
+          type: "mutualTLS";
+        } & { [key: string]: unknown });
     /** @description An object representing a Server. */
     Server: {
       /** @description An optional string describing the host designated by the URL. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description REQUIRED. A URL to the target host. This URL supports Server Variables and MAY be relative, to indicate that the host location is relative to the location where the OpenAPI document is being served. Variable substitutions will be made when a variable is named in {brackets}. */
       url: string;
       /** @description A map between a variable name and its value. The value is used for substitution in the server's URL template. */
-      variables?: {
-        [key: string]: components["schemas"]["ServerVariable"];
-      };
-      [key: string]: unknown;
-    };
+      variables?: { [key: string]: components["schemas"]["ServerVariable"] };
+    } & { [key: string]: unknown };
     /** @description An object representing a Server Variable for server URL template substitution. */
     ServerVariable: {
       /** @description REQUIRED. The default value to use for substitution, and to send, if an alternate value is not supplied. Unlike the Schema Object's default, this value MUST be provided by the consumer. */
       default: string;
       /** @description An optional description for the server variable. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description An enumeration of string values to be used if the substitution options are from a limited set. */
       enum?: string[];
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     /**
      * @description A type which can be serialized as a single item, or multiple items.
      *
      * In some contexts, a `Single` may be semantically distinct from a `Vec` containing only item.
      */
-    SingleOrVec_for_InstanceType: components["schemas"]["InstanceType"] | components["schemas"]["InstanceType"][];
+    SingleOrVec_for_InstanceType: Partial<
+      components["schemas"]["InstanceType"]
+    > &
+      Partial<components["schemas"]["InstanceType"][]>;
     /**
      * @description A type which can be serialized as a single item, or multiple items.
      *
      * In some contexts, a `Single` may be semantically distinct from a `Vec` containing only item.
      */
-    SingleOrVec_for_Schema: components["schemas"]["Schema"] | components["schemas"]["Schema"][];
+    SingleOrVec_for_Schema: Partial<components["schemas"]["Schema"]> &
+      Partial<components["schemas"]["Schema"][]>;
     /** @description Adds metadata to a single tag that is used by the Operation Object. It is not mandatory to have a Tag Object per tag defined in the Operation Object instances. */
     Tag: {
       /** @description A description for the tag. CommonMark syntax MAY be used for rich text representation. */
-      description?: string | null;
+      description?: unknown;
       /** @description Additional external documentation for this tag. */
-      externalDocs?: components["schemas"]["ExternalDocumentation"] | null;
+      externalDocs?: Partial<components["schemas"]["ExternalDocumentation"]> &
+        Partial<unknown>;
       /** @description REQUIRED. The name of the tag. */
       name: string;
-      [key: string]: unknown;
-    };
+    } & { [key: string]: unknown };
     TransferRequest: {
       /** Format: uint64 */
       amount: number;
       to: string;
     };
   };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
 }
 
-export type $defs = Record<string, never>;
+export interface operations {}
 
-export type external = Record<string, never>;
-
-export type operations = Record<string, never>;
+export interface external {}

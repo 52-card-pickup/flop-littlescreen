@@ -1,10 +1,10 @@
-import { MouseEventHandler } from "react";
+import { forwardRef, MouseEventHandler } from "react";
 import cn from "~/utils/cn";
 
 export type ButtonColor = "gray" | "blue" | "green" | "watercourse" | "red";
 export type ButtonVariant = "solid" | "outline";
 
-export default function FlopButton(props: {
+export interface FlopButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement> | undefined;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
@@ -13,52 +13,57 @@ export default function FlopButton(props: {
   variant?: ButtonVariant;
   slim?: boolean;
   className?: string;
-}) {
-  const { bg, bgBase, border, text } = colorClassNames(
-    props.color || "gray",
-    props.variant || "outline"
-  );
-  return (
-    <div className={props.className} style={{ display: "flex" }}>
-      <button
-        className="relative inline-block text-lg w-full group disabled:opacity-50"
-        type={props.type || "button"}
-        disabled={props.disabled}
-        onClick={props.onClick}
-      >
-        <span
-          className={cn(
-            "relative z-10 block overflow-hidden font-medium leading-tight",
-            "transition-colors duration-300 ease-out border-2 rounded-md",
-            props.slim ? "" : "px-6 py-3",
-            border,
-            text
-          )}
+}
+
+export const FlopButton = forwardRef<HTMLButtonElement, FlopButtonProps>(
+  (props, ref) => {
+    const { bg, bgBase, border, text } = colorClassNames(
+      props.color || "gray",
+      props.variant || "outline"
+    );
+    return (
+      <div className={props.className} style={{ display: "flex" }}>
+        <button
+          className="relative inline-block text-lg w-full group disabled:opacity-50 focus:outline-none focus:opacity-90"
+          type={props.type || "button"}
+          disabled={props.disabled}
+          onClick={props.onClick}
+          ref={ref}
         >
           <span
-            className={cn("absolute inset-0 w-full h-full px-5 py-3", bgBase)}
-          ></span>
+            className={cn(
+              "relative z-10 block overflow-hidden font-medium leading-tight",
+              "transition-colors duration-300 ease-out border-2 rounded-md",
+              props.slim ? "" : "px-6 py-3",
+              border,
+              text
+            )}
+          >
+            <span
+              className={cn("absolute inset-0 w-full h-full px-5 py-3", bgBase)}
+            ></span>
+            <span
+              className={cn(
+                "absolute left-0 w-96 h-96 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
+                "-translate-x-full translate-y-12 group-hover:-rotate-180 ease",
+                props.disabled ? "" : "group-hover:-rotate-180",
+                bg
+              )}
+            ></span>
+            <span className="relative truncate">{props.children}</span>
+          </span>
           <span
             className={cn(
-              "absolute left-0 w-96 h-96 -ml-2 transition-all duration-300 origin-top-right -rotate-90",
-              "-translate-x-full translate-y-12 group-hover:-rotate-180 ease",
-              props.disabled ? "" : "group-hover:-rotate-180",
+              "absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear",
+              "rounded-md group-hover:mb-0 group-hover:mr-0",
               bg
             )}
           ></span>
-          <span className="relative truncate">{props.children}</span>
-        </span>
-        <span
-          className={cn(
-            "absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear",
-            "rounded-md group-hover:mb-0 group-hover:mr-0",
-            bg
-          )}
-        ></span>
-      </button>
-    </div>
-  );
-}
+        </button>
+      </div>
+    );
+  }
+);
 
 function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
   switch (which) {
@@ -132,3 +137,5 @@ function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
       };
   }
 }
+
+export default FlopButton;

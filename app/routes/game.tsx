@@ -48,10 +48,10 @@ export default function Game() {
       <div className="fixed w-screen h-screen">
         <FlopLandingLayout animate={false}>
           <div></div>
-          <WaitingRoom />
+          <WaitingRoom state={player} />
         </FlopLandingLayout>
         <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
-        <div className="fixed right-8 bottom-12 w-8 h-8 grid justify-center items-center z-50">
+        <div className="fixed right-6 bottom-16 w-8 h-8 grid justify-center items-center z-50">
           <PlayerSendButton />
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function Game() {
       <GameScreen state={player} actions={actions} />
       <GoogleCastButton className="fixed top-8 right-8 w-8 h-8" />
 
-      <div className="fixed right-8 bottom-1/3 w-8 h-8 grid justify-center items-center z-50">
+      <div className="fixed right-6 bottom-1/3 w-8 h-8 grid justify-center items-center z-50 -translate-y-2">
         <PlayerSendButton />
       </div>
     </div>

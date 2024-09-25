@@ -17,6 +17,12 @@ interface StorageValue<T> {
   };
 }
 
+export function useRoomCode() {
+  const [playerDetails] = useRecoilState(playerDetailsState);
+
+  return playerDetails.roomCode;
+}
+
 // a hook which hides getting and setting of playerDetails behind a localstorage cache
 export default function usePlayerDetails() {
   const [playerDetails, setPlayerDetailsRecoilState] =

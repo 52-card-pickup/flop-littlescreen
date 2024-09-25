@@ -1,13 +1,13 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
   ArrowRightCircleIcon,
+  ArrowRightEndOnRectangleIcon,
   CameraIcon,
   CurrencyPoundIcon,
-  EllipsisVerticalIcon,
 } from "@heroicons/react/20/solid";
 import cn from "~/utils/cn";
 import { client } from "~/flopClient";
@@ -16,6 +16,8 @@ import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { createPortal } from "react-dom";
 import FlopButton from "./FlopButton";
 import { PlayerPhotoCameraOverlay } from "./PlayerPhotoCamera";
+import { FlopMenuButtonIcon } from "./FlopMenuButtonIcon";
+import { useDocument } from "../hooks/useDocument";
 
 export default function PlayerSendButton() {
   const { playerDetails } = usePlayerDetails();
@@ -37,6 +39,15 @@ export default function PlayerSendButton() {
     });
   }
 
+  function leaveGame() {
+    client.POST("/api/v1/player/{player_id}/leave", {
+      params: {
+        // @ts-expect-error - required for player_id path param
+        path: { player_id: playerDetails.id },
+      },
+    });
+  }
+
   function openSendMoneyModal() {
     setSendMoneyModalOpen(true);
   }
@@ -54,133 +65,151 @@ export default function PlayerSendButton() {
       )}
       <FullScreenEmojiPreview hidden={!preview} emoji={preview || ""} />
       <Menu as="div" className="relative inline-block text-left">
-        <div>
-          <Menu.Button
-            className="inline-flex justify-center items-center gap-x-1.5 rounded-md bg-watercourse-950 w-12 h-12 text-xl
-            font-semibold text-watercourse-50 shadow-sm shadow-black/80 ring-1 ring-inset ring-gray-300 hover:bg-watercourse-900
+        {({ open }) => (
+          <>
+            <div>
+              <Menu.Button
+                className="inline-flex justify-center items-center gap-x-1.5 w-12 h-20 text-xl font-semibold text-watercourse-50 relative
               focus:outline-none focus:ring-0"
-          >
-            <EllipsisVerticalIcon className="h-6 w-6" aria-hidden="true" />
-          </Menu.Button>
-        </div>
-
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <Menu.Items
-            className="absolute bottom-14 right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-300
+              >
+                <FlopMenuButtonIcon className="w-full h-full" open={open} />
+              </Menu.Button>
+            </div>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-300"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Menu.Items
+                className="absolute bottom-24 right-0 z-10 mt-2 w-56 origin-bottom-right divide-y divide-gray-300
           rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-30 overflow-hidden opacity-95 focus:outline-none"
-          >
-            <div className="py-1">
-              <Menu.Item>
-                <a
-                  onClick={() => setShowCameraOverlay(true)}
-                  className={cn(
-                    "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
-                  )}
-                >
-                  <CameraIcon
-                    className="mr-3 h-6 w-6 text-gray-700"
-                    aria-hidden="true"
-                  />
-                  Take a picture
-                </a>
-              </Menu.Item>
-            </div>
-            <div className="py-1">
-              <Menu.Item>
-                <a
-                  onClick={() => openSendMoneyModal()}
-                  className={cn(
-                    "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
-                  )}
-                >
-                  <CurrencyPoundIcon
-                    className="mr-3 h-6 w-6 text-gray-700"
-                    aria-hidden="true"
-                  />
-                  Send money
-                </a>
-              </Menu.Item>
-            </div>
-            <div className="py-1 bg-watercourse-900 ring-t-4 ring-black">
-              <Menu.Item disabled>
-                <span
-                  className={cn(
-                    "flex items-center px-4 py-2 font-medium text-xl text-white"
-                  )}
-                >
-                  <ArrowRightCircleIcon
-                    className="mr-3 h-6 w-6"
-                    aria-hidden="true"
-                  />
-                  Send a reaction
-                </span>
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <div className="grid grid-cols-4 gap-1 px-2 py-1 pb-2">
-                    <EmojiButton
-                      payload=":+1:"
-                      active={active}
-                      onClick={sendEmoji}
+              >
+                <div className="py-1 bg-red-700">
+                  <Menu.Item>
+                    <a
+                      onClick={leaveGame}
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-gray-100"
+                      )}
                     >
-                      👍
-                    </EmojiButton>
-                    <EmojiButton
-                      payload=":-1:"
-                      active={active}
-                      onClick={sendEmoji}
+                      <ArrowRightEndOnRectangleIcon
+                        className="mr-3 h-6 w-6 text-red-50"
+                        aria-hidden="true"
+                      />
+                      Leave the game
+                    </a>
+                  </Menu.Item>
+                </div>
+                <div className="py-1">
+                  <Menu.Item>
+                    <a
+                      onClick={() => setShowCameraOverlay(true)}
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
+                      )}
                     >
-                      👎
-                    </EmojiButton>
-                    <EmojiButton
-                      payload=":clapping:"
-                      active={active}
-                      onClick={sendEmoji}
+                      <CameraIcon
+                        className="mr-3 h-6 w-6 text-gray-700"
+                        aria-hidden="true"
+                      />
+                      Take a picture
+                    </a>
+                  </Menu.Item>
+                </div>
+                <div className="py-1">
+                  <Menu.Item>
+                    <a
+                      onClick={() => openSendMoneyModal()}
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
+                      )}
                     >
-                      👏
-                    </EmojiButton>
-                    <EmojiButton
-                      payload=":time:"
-                      active={active}
-                      onClick={sendEmoji}
+                      <CurrencyPoundIcon
+                        className="mr-3 h-6 w-6 text-gray-700"
+                        aria-hidden="true"
+                      />
+                      Send money
+                    </a>
+                  </Menu.Item>
+                </div>
+                <div className="py-1 bg-watercourse-900 ring-t-4 ring-black">
+                  <Menu.Item disabled>
+                    <span
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-white"
+                      )}
                     >
-                      ⏳
-                    </EmojiButton>
-                    <EmojiButton
-                      payload=":thinking:"
-                      active={active}
-                      onClick={sendEmoji}
-                    >
-                      🤔
-                    </EmojiButton>
-                    <EmojiButton
-                      payload=":money:"
-                      active={active}
-                      onClick={sendEmoji}
-                    >
-                      💰
-                    </EmojiButton>
-                    <EmojiButton
-                      payload=":angry:"
-                      active={active}
-                      onClick={sendEmoji}
-                    >
-                      😡
-                    </EmojiButton>
-                  </div>
-                )}
-              </Menu.Item>
-            </div>
-          </Menu.Items>
-        </Transition>
+                      <ArrowRightCircleIcon
+                        className="mr-3 h-6 w-6"
+                        aria-hidden="true"
+                      />
+                      Send a reaction
+                    </span>
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <div className="grid grid-cols-4 gap-1 px-2 py-1 pb-2">
+                        <EmojiButton
+                          payload=":+1:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          👍
+                        </EmojiButton>
+                        <EmojiButton
+                          payload=":-1:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          👎
+                        </EmojiButton>
+                        <EmojiButton
+                          payload=":clapping:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          👏
+                        </EmojiButton>
+                        <EmojiButton
+                          payload=":time:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          ⏳
+                        </EmojiButton>
+                        <EmojiButton
+                          payload=":thinking:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          🤔
+                        </EmojiButton>
+                        <EmojiButton
+                          payload=":money:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          💰
+                        </EmojiButton>
+                        <EmojiButton
+                          payload=":angry:"
+                          active={active}
+                          onClick={sendEmoji}
+                        >
+                          😡
+                        </EmojiButton>
+                      </div>
+                    )}
+                  </Menu.Item>
+                </div>
+              </Menu.Items>
+            </Transition>
+          </>
+        )}
       </Menu>
     </>
   );
@@ -206,14 +235,6 @@ function EmojiButton(props: {
       {props.children}
     </a>
   );
-}
-
-function useDocument() {
-  const documentRef = useRef<Document>();
-  useEffect(() => {
-    documentRef.current = document;
-  }, []);
-  return documentRef.current;
 }
 
 function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
