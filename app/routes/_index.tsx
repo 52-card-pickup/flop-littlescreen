@@ -18,6 +18,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { Transition } from "@headlessui/react";
 import { useToast } from "~/contexts/toaster";
+import { HeadersFunction } from "@remix-run/node";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -384,6 +385,11 @@ export default function Index() {
     setState("default");
   }
 }
+
+export const headers: HeadersFunction = ({}) => ({
+  "Cache-Control": "public, max-age=604800, s-maxage=604800",
+  "Cache-Tag": "f-ls-home",
+});
 
 function ResumeSessionModal({
   resume,
