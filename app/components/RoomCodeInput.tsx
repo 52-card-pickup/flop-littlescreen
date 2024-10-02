@@ -126,6 +126,7 @@ export function RoomCodeInput({
       >
         <input
           type="text"
+          aria-label="Room code character 1"
           className="w-14 h-14 text-center text-2xl font-extrabold uppercase text-watercourse-800 bg-slate-200 border border-transparent hover:border-slate-300 appearance-none rounded p-4 outline-none focus:bg-white focus:border-watercourse-600 focus:ring-2 focus:ring-watercourse-100"
           pattern="[A-z]*"
           maxLength={1}
@@ -137,6 +138,7 @@ export function RoomCodeInput({
         />
         <input
           type="text"
+          aria-label="Room code character 2"
           className="w-14 h-14 text-center text-2xl font-extrabold uppercase text-watercourse-800 bg-slate-200 border border-transparent hover:border-slate-300 appearance-none rounded p-4 outline-none focus:bg-white focus:border-watercourse-600 focus:ring-2 focus:ring-watercourse-100"
           maxLength={1}
           disabled={disabled}
@@ -147,6 +149,7 @@ export function RoomCodeInput({
         />
         <input
           type="text"
+          aria-label="Room code character 3"
           className="w-14 h-14 text-center text-2xl font-extrabold uppercase text-watercourse-800 bg-slate-200 border border-transparent hover:border-slate-300 appearance-none rounded p-4 outline-none focus:bg-white focus:border-watercourse-600 focus:ring-2 focus:ring-watercourse-100"
           maxLength={1}
           disabled={disabled}
@@ -157,6 +160,7 @@ export function RoomCodeInput({
         />
         <input
           type="text"
+          aria-label="Room code character 4"
           className="w-14 h-14 text-center text-2xl font-extrabold uppercase text-watercourse-800 bg-slate-200 border border-transparent hover:border-slate-300 appearance-none rounded p-4 outline-none focus:bg-white focus:border-watercourse-600 focus:ring-2 focus:ring-watercourse-100"
           maxLength={1}
           disabled={disabled}
@@ -171,6 +175,7 @@ export function RoomCodeInput({
           type="submit"
           color="watercourse"
           variant="solid"
+          label="Submit"
           className="w-full"
           ref={submitRef}
         >

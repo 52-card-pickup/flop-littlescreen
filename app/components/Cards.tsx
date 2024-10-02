@@ -15,6 +15,7 @@ export default function Cards(props: {
       className="flex justify-center items-center h-full w-full"
       onClick={props.onClick}
       role="button"
+      aria-label="Your cards"
       tabIndex={0}
     >
       <div className="relative w-full h-full flex justify-center items-center">
@@ -28,6 +29,7 @@ export default function Cards(props: {
                 : "/assets/playing-cards/backs/blue2.svg"
             }
             alt={`${card[0]}-${card[1]}`}
+            title="Your card"
             style={{ zIndex: 10 - idx, width: "auto", height: "80%" }}
             className={cn(
               "absolute shadow-md drop-shadow-lg transform",
