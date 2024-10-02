@@ -71,6 +71,8 @@ export default function PlayerSendButton() {
               <Menu.Button
                 className="inline-flex justify-center items-center gap-x-1.5 w-12 h-20 text-xl font-semibold text-watercourse-50 relative
               focus:outline-none focus:ring-0"
+                aria-label="Open actions menu"
+                role="button"
               >
                 <FlopMenuButtonIcon className="w-full h-full" open={open} />
               </Menu.Button>
@@ -92,6 +94,7 @@ export default function PlayerSendButton() {
                   <Menu.Item>
                     <a
                       onClick={leaveGame}
+                      role="menuitem"
                       className={cn(
                         "flex items-center px-4 py-2 font-medium text-xl text-gray-100"
                       )}
@@ -108,6 +111,7 @@ export default function PlayerSendButton() {
                   <Menu.Item>
                     <a
                       onClick={() => setShowCameraOverlay(true)}
+                      role="menuitem"
                       className={cn(
                         "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
                       )}
@@ -124,6 +128,7 @@ export default function PlayerSendButton() {
                   <Menu.Item>
                     <a
                       onClick={() => openSendMoneyModal()}
+                      role="menuitem"
                       className={cn(
                         "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
                       )}

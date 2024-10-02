@@ -12,6 +12,7 @@ export interface FlopButtonProps {
   color?: ButtonColor;
   variant?: ButtonVariant;
   slim?: boolean;
+  label?: string;
   className?: string;
 }
 
@@ -26,6 +27,7 @@ export const FlopButton = forwardRef<HTMLButtonElement, FlopButtonProps>(
         <button
           className="relative inline-block text-lg w-full group disabled:opacity-50 focus:outline-none focus:opacity-90"
           type={props.type || "button"}
+          aria-label={props.label}
           disabled={props.disabled}
           onClick={props.onClick}
           ref={ref}
