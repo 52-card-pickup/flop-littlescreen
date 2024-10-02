@@ -110,6 +110,7 @@ export default function GameScreen(props: GameScreenProps) {
           ? "grid-rows-[1fr,5fr,1fr,1fr,0.2fr] delay-0 bg-[linear-gradient(329deg,#52745c,#9fd19f)]"
           : "grid-rows-[0fr,5fr,1fr] delay-300 bg-[linear-gradient(149deg,#52745c,#74907c)]"
       )}
+      title="Flop Poker Game Screen"
     >
       <RulesHelpButton
         className="fixed top-8 right-8 w-8 h-8 z-50"
@@ -202,6 +203,7 @@ export default function GameScreen(props: GameScreenProps) {
                     onClick={() => handleFoldClick()}
                     color="red"
                     variant="solid"
+                    label="Fold"
                     disabled={loading}
                   >
                     Fold
@@ -211,6 +213,7 @@ export default function GameScreen(props: GameScreenProps) {
                   <FlopButton
                     onClick={() => handleBetActionClick()}
                     variant="outline"
+                    label="Bet"
                     disabled={loading}
                   >
                     {betAction === "check"
@@ -233,6 +236,7 @@ export default function GameScreen(props: GameScreenProps) {
             )}
           >
             <FlopButton
+              label="Next Round"
               onClick={() => {
                 client.POST("/api/v1/room/close", {
                   body: {

@@ -43,7 +43,11 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
             </>
           ) : (
             playerDetails?.name && (
-              <div onClick={copyRoomCode}>
+              <div
+                onClick={copyRoomCode}
+                role="banner"
+                aria-label="Room details"
+              >
                 <h3 className="text-watercourse-900 font-medium text-xl text-center px-12">
                   <span className="text-watercourse-800 font-semibold">
                     {playerDetails.name},
@@ -57,7 +61,10 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
                   {playerDetails.roomCode ? " for room: " : "."}
                 </h3>
                 {playerDetails.roomCode && (
-                  <h2 className="text-watercourse-950 font-semibold text-2xl p-2 text-center animate-pulse">
+                  <h2
+                    className="text-watercourse-950 font-semibold text-2xl p-2 text-center animate-pulse"
+                    title="Room code"
+                  >
                     {playerDetails.roomCode}
                   </h2>
                 )}
@@ -68,6 +75,7 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
         <div className={cn(error ? "animate-shake" : "")}>
           <FlopButton
             color="watercourse"
+            label="Start game"
             disabled={state.playersCount < 2}
             onClick={() => {
               setHasErrored(false);
