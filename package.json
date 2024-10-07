@@ -4,10 +4,10 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev --manual",
+    "build": "remix vite:build",
+    "dev": "remix vite:dev --manual",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "remix-serve ./build/index.js",
+    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "generate-types": "npx openapi-typescript http://127.0.0.1:5000/docs/private/api.json -o ./app/flopClient/spec.ts"
   },
@@ -40,7 +40,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite": "^5.4.8",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
