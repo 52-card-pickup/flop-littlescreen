@@ -389,10 +389,10 @@ export default function Index() {
   }
 }
 
-export const headers: HeadersFunction = ({}) => ({
-  "Cache-Control": "public, max-age=604800, s-maxage=604800",
-  "Cache-Tag": "f-ls-home",
-});
+// export const headers: HeadersFunction = ({}) => ({
+//   "Cache-Control": "public, max-age=604800, s-maxage=604800",
+//   "Cache-Tag": "f-ls-home",
+// });
 
 function ResumeSessionModal({
   resume,
