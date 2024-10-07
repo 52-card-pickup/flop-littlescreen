@@ -12,6 +12,7 @@ import "./tailwind.css";
 import { RecoilRoot } from "recoil";
 import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
 import { ToasterProvider } from "./contexts/toaster";
+import { safeEnv } from "./utils/safeEnv";
 
 declare global {
   var ENV: {
@@ -19,16 +20,20 @@ declare global {
   };
 }
 
-export async function loader() {
-  return json({
-    FLOP_CONFIG: {
-      API_URL: process.env.API_URL,
-    },
-  });
-}
+// export async function loader() {
+//   return json({
+//     FLOP_CONFIG: {
+//       API_URL: process.env.API_URL,
+//     },
+//   });
+// }
 
 export default function App() {
-  const data = useLoaderData<typeof loader>();
+  const data = {
+    FLOP_CONFIG: {
+      API_URL: import.meta.env.DEV ? "http://localhost:8080/" : null,
+    },
+  };
   useGoogleCastScripts();
 
   return (
