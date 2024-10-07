@@ -76,6 +76,23 @@ export interface paths {
       };
     };
   };
+  "/api/v1/pair": {
+    /** Pairs a big screen with a room. */
+    post: {
+      responses: {
+        200: {
+          content: {
+            "application/json": unknown;
+          };
+        };
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["PairRequest"];
+        };
+      };
+    };
+  };
   "/api/v1/player/{player_id}": {
     /** Get the current state of a player. */
     get: {
@@ -240,18 +257,6 @@ export interface paths {
       };
     };
   };
-  "/api/v1/dump": {
-    /** Dump all room game states. */
-    get: {
-      responses: {
-        200: {
-          content: {
-            "application/json": { [key: string]: string };
-          };
-        };
-      };
-    };
-  };
   "/docs/": {
     /** This documentation page. */
     get: {
@@ -395,6 +400,7 @@ export interface components {
       balance: number;
       /** Format: uint16 */
       colorHue: number;
+      emoji?: unknown;
       folded: boolean;
       name: string;
       photo?: unknown;
@@ -408,6 +414,7 @@ export interface components {
       ][];
       completed?: Partial<components["schemas"]["CompletedGame"]> &
         Partial<unknown>;
+      connectScreenCode?: unknown;
       /** Format: uint64 */
       lastUpdate: number;
       players: components["schemas"]["GameClientPlayer"][];
@@ -655,6 +662,10 @@ export interface components {
       /** @description A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier. */
       tags?: string[];
     } & { [key: string]: unknown };
+    PairRequest: {
+      roomCode: string;
+      screenCode: string;
+    };
     Parameter:
       | ((
           | {

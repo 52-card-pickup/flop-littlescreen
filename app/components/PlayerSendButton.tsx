@@ -8,6 +8,7 @@ import {
   ArrowRightEndOnRectangleIcon,
   CameraIcon,
   CurrencyPoundIcon,
+  TvIcon,
 } from "@heroicons/react/20/solid";
 import cn from "~/utils/cn";
 import { client } from "~/flopClient";
@@ -18,12 +19,16 @@ import FlopButton from "./FlopButton";
 import { PlayerPhotoCameraOverlay } from "./PlayerPhotoCamera";
 import { FlopMenuButtonIcon } from "./FlopMenuButtonIcon";
 import { useDocument } from "../hooks/useDocument";
+import { CloseButton } from "./CloseButton";
+import { useToast } from "~/contexts/toaster";
 
 export default function PlayerSendButton() {
   const { playerDetails } = usePlayerDetails();
   const [preview, setPreview] = useTimeoutState<string | null>(null, 750);
   const [sendMoneyModalOpen, setSendMoneyModalOpen] = useState(false);
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
+  const [showScreenPairOverlay, setShowScreenPairOverlay] = useState(false);
+  const [leaveGameModalOpen, setLeaveGameModalOpen] = useState(false);
 
   function sendEmoji(payload: string, preview: string) {
     console.log("Sending emoji", payload);
@@ -58,6 +63,19 @@ export default function PlayerSendButton() {
         open={sendMoneyModalOpen}
         onClose={() => setSendMoneyModalOpen(false)}
       />
+      <PairBigScreenModal
+        open={showScreenPairOverlay}
+        onClose={() => setShowScreenPairOverlay(false)}
+      />
+      <ConfirmModal
+        open={leaveGameModalOpen}
+        onClose={() => setLeaveGameModalOpen(false)}
+        onConfirm={leaveGame}
+        confirmText="Leave"
+        cancelText={null}
+      >
+        Are you sure you want to leave the game?
+      </ConfirmModal>
       {showCameraOverlay && (
         <PlayerPhotoCameraOverlay
           onCompleted={() => setShowCameraOverlay(false)}
@@ -87,13 +105,13 @@ export default function PlayerSendButton() {
               leaveTo="transform opacity-0 scale-95"
             >
               <Menu.Items
-                className="absolute bottom-24 right-0 z-10 mt-2 w-56 origin-bottom-right divide-y divide-gray-300
+                className="absolute bottom-24 right-0 z-10 mt-2 w-60 origin-bottom-right divide-y divide-gray-300
           rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-30 overflow-hidden opacity-95 focus:outline-none"
               >
                 <div className="py-1 bg-red-700">
                   <Menu.Item>
                     <a
-                      onClick={leaveGame}
+                      onClick={() => setLeaveGameModalOpen(true)}
                       role="menuitem"
                       className={cn(
                         "flex items-center px-4 py-2 font-medium text-xl text-gray-100"
@@ -104,6 +122,23 @@ export default function PlayerSendButton() {
                         aria-hidden="true"
                       />
                       Leave the game
+                    </a>
+                  </Menu.Item>
+                </div>
+                <div className="py-1">
+                  <Menu.Item>
+                    <a
+                      onClick={() => setShowScreenPairOverlay(true)}
+                      role="menuitem"
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
+                      )}
+                    >
+                      <TvIcon
+                        className="mr-3 h-6 w-6 text-gray-700"
+                        aria-hidden="true"
+                      />
+                      Pair TV with code
                     </a>
                   </Menu.Item>
                 </div>
@@ -239,6 +274,187 @@ function EmojiButton(props: {
     >
       {props.children}
     </a>
+  );
+}
+
+function FlopModal(props: {
+  children: React.ReactNode | React.ReactNode[];
+  open: boolean;
+  onClose: () => void;
+  hasError?: boolean;
+  shakeOnError?: boolean;
+}) {
+  const documentRef = useDocument();
+
+  // listen for escape key or location change
+  useEffect(() => {
+    if (!documentRef) return;
+
+    const locationListener = (e: PopStateEvent) => {
+      e.preventDefault();
+      props.onClose();
+    };
+
+    const kbListener = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        props.onClose();
+      }
+    };
+
+    documentRef.addEventListener("keydown", kbListener);
+    window.addEventListener("popstate", locationListener);
+    return () => {
+      documentRef.removeEventListener("keydown", kbListener);
+      window.removeEventListener("popstate", locationListener);
+    };
+  }, [documentRef, props.onClose]);
+
+  if (!documentRef) return null;
+  return createPortal(
+    <Transition
+      as={Fragment}
+      show={props.open}
+      enter="transition transform duration-100"
+      enterFrom="transform origin-center scale-0 opacity-0"
+      enterTo="transform origin-center scale-100 opacity-100"
+      leave="transition transform duration-100"
+      leaveFrom="transform origin-center scale-100 opacity-100"
+      leaveTo="transform origin-center scale-0 opacity-0"
+    >
+      <div
+        className={cn(
+          "fixed w-screen h-screen left-0 top-0 inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center transition-colors",
+          props.hasError ? "bg-gray-600/50" : "bg-black/20"
+        )}
+        onClick={(e) => e.target === e.currentTarget && props.onClose()}
+      >
+        <div
+          className={cn(
+            "relative bg-white p-6 rounded-lg grid grid-rows-[auto,auto,auto] gap-6 justify-center items-center justify-items-center",
+            props.hasError
+              ? "shadow-sm shadow-red-800"
+              : "shadow-xl shadow-black/20",
+            props.shakeOnError && props.hasError ? "animate-shake" : ""
+          )}
+        >
+          <CloseButton onClick={props.onClose} />
+          {props.children}
+        </div>
+      </div>
+    </Transition>,
+    documentRef?.body
+  );
+}
+
+function ConfirmModal(props: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  children: React.ReactNode;
+  confirmText?: string;
+  cancelText?: string | null;
+}) {
+  return (
+    <FlopModal open={props.open} onClose={props.onClose}>
+      <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
+        {props.children}
+      </h2>
+      <div
+        className={cn(
+          "grid items-center gap-4",
+          props.cancelText === null ? "grid-cols-1" : "grid-cols-2"
+        )}
+      >
+        {props.cancelText !== null && (
+          <FlopButton onClick={props.onClose} color="gray" variant="outline">
+            {props.cancelText || "Cancel"}
+          </FlopButton>
+        )}
+        <FlopButton onClick={props.onConfirm} color="blue" variant="solid">
+          {props.confirmText || "Confirm"}
+        </FlopButton>
+      </div>
+    </FlopModal>
+  );
+}
+
+function PairBigScreenModal(props: { open: boolean; onClose: () => void }) {
+  const { playerDetails } = usePlayerDetails();
+  const [sending, setPairing] = useState(false);
+  const [input, setInput] = useState("");
+  const [hasError, setHasError] = useTimeoutState(false, 1000);
+
+  const toast = useToast();
+
+  function pair() {
+    if (!playerDetails.roomCode) return;
+    setPairing(true);
+    client
+      .POST("/api/v1/pair", {
+        body: {
+          roomCode: playerDetails.roomCode,
+          screenCode: input,
+        },
+      })
+      .then((resp) => {
+        if (resp.error) {
+          toast.show("Failed to pair screen. Check the code and try again.");
+          setHasError(true);
+          return;
+        }
+        setInput("");
+        props.onClose();
+      })
+      .finally(() => {
+        setPairing(false);
+      });
+  }
+
+  function cancel() {
+    setInput("");
+    props.onClose();
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    pair();
+  }
+
+  return (
+    <FlopModal
+      open={props.open}
+      onClose={props.onClose}
+      hasError={hasError}
+      shakeOnError
+    >
+      <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
+        Enter the pair code from the big screen
+      </h2>
+      <form
+        className="grid justify-center items-center gap-4"
+        onSubmit={handleSubmit}
+      >
+        <div className="grid justify-center items-center gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            maxLength={6}
+            disabled={sending}
+            placeholder="Pair code"
+            className="w-full px-3 py-2 text-xl border border-gray-300 rounded-lg"
+          />
+        </div>
+        <FlopButton
+          disabled={sending || !/^\d{6}$/.test(input)}
+          color="blue"
+          variant="solid"
+          type="submit"
+        >
+          Pair
+        </FlopButton>
+      </form>
+    </FlopModal>
   );
 }
 

@@ -14,11 +14,11 @@ import { useSearchParams } from "@remix-run/react";
 import { useVibrate } from "~/hooks/useVibrate";
 import FlopLandingLayout from "~/components/FlopLandingLayout";
 import { RoomCodeInput } from "~/components/RoomCodeInput";
-import { XCircleIcon } from "@heroicons/react/24/outline";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { Transition } from "@headlessui/react";
 import { useToast } from "~/contexts/toaster";
 import { HeadersFunction } from "@remix-run/node";
+import { CloseButton } from "~/components/CloseButton";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -118,7 +118,7 @@ export default function Index() {
       .catch(() => {
         setHasJoinError(true);
         setLoading(false);
-        setState("join");
+        setState("new");
       });
   }
 
@@ -454,20 +454,5 @@ function ResumeSessionModal({
         </div>
       </div>
     </Transition>
-  );
-}
-
-function CloseButton({ onClick }: { onClick: () => void }) {
-  return (
-    <div className="absolute top-2 right-2">
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={onClick}
-        className="rounded-md hover:bg-slate-200 h-10 w-10 flex items-center justify-center"
-      >
-        <XCircleIcon className="h-6 w-6 text-slate-500" />
-      </button>
-    </div>
   );
 }
