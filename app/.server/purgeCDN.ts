@@ -1,4 +1,4 @@
-import { safeEnv } from "../root";
+import { safeEnv } from "~/utils/safeEnv";
 
 export async function purgeCDN() {
   const cloudflareToken = safeEnv("CLOUDFLARE_API_TOKEN");
@@ -64,16 +64,47 @@ export async function purgeCDN() {
 
   for (const key of purgeKeys) {
     console.log(`Populating cache for ${key} @ ${urls[key]}`);
-    await fetch(urls[key], { method: "PURGE" })
+    const success = await refreshCache(urls, key);
+    if (!success) {
+      console.error(`Failed to populate cache for ${key} @ ${urls[key]}`);
+      continue;
+    }
+
+    console.log(`Successfully populated cache for ${key} @ ${urls[key]}`);
+  }
+}
+async function refreshCache<T extends string>(urls: Record<T, string>, key: T) {
+  let attempts = 0;
+  while (attempts < 5) {
+    const cacheStatus = await fetch(urls[key])
       .then((response) => {
-        if (response.ok) {
-          console.log(`Purged cache for ${key} @ ${urls[key]}`);
-        } else {
-          console.error(`Failed to purge cache for ${key} @ ${urls[key]}`);
+        if (!response.ok) {
+          console.error(`Failed to populate cache for ${key} @ ${urls[key]}`);
+          return null;
         }
+
+        const cacheStatusHeader = response.headers.get("cf-cache-status");
+        console.log(
+          `Purged cache for ${key} @ ${urls[key]} (response: ${cacheStatusHeader})`
+        );
+
+        return cacheStatusHeader;
       })
       .catch((err) => {
-        console.error(`Failed to purge cache for ${key} @ ${urls[key]}`, err);
+        console.error(
+          `Failed to populate cache for ${key} @ ${urls[key]}`,
+          err
+        );
+        return null;
       });
+
+    if (cacheStatus === "HIT") {
+      return true;
+    }
+
+    attempts++;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
+
+  return false;
 }
