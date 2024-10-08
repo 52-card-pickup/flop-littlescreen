@@ -57,7 +57,7 @@ export default function App() {
       <AppBody>
         <RecoilRoot>
           <ToasterProvider>
-            <Index />
+            <Outlet />
           </ToasterProvider>
         </RecoilRoot>
         <ScrollRestoration />
