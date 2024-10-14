@@ -27,6 +27,7 @@ export const RulesHelpButton = React.forwardRef<
     <div {...props} ref={ref}>
       <button
         className="flex justify-center items-center h-full w-full max-w-[48px] max-h-[48px]"
+        aria-label="Game Rules"
         onClick={handleOpen}
       >
         <svg

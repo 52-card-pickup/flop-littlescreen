@@ -18,6 +18,13 @@ export const links: LinksFunction = () => [
 import { RecoilRoot } from "recoil";
 import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
 import { ToasterProvider } from "./contexts/toaster";
+import { purgeCDN } from "./.server/purgeCDN";
+
+declare global {
+  var ENV: {
+    API_URL: string;
+  };
+}
 
 export async function loader() {
   return json({
@@ -26,6 +33,16 @@ export async function loader() {
     },
   });
 }
+
+export function safeEnv(key: string): string {
+  try {
+    return process.env[key] || "";
+  } catch {
+    return "";
+  }
+}
+
+purgeCDN();
 
 export default function App() {
   const data = useLoaderData<typeof loader>();
@@ -89,7 +106,7 @@ export default function App() {
           </ToasterProvider>
           <script
             dangerouslySetInnerHTML={{
-              __html: `window.ENV = ${JSON.stringify(data.FLOP_CONFIG)}`,
+              __html: `globalThis.ENV = ${JSON.stringify(data.FLOP_CONFIG)}`,
             }}
           />
         </RecoilRoot>

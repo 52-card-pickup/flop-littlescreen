@@ -18,6 +18,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { Transition } from "@headlessui/react";
 import { useToast } from "~/contexts/toaster";
+import { HeadersFunction } from "@remix-run/node";
 
 function useDocument() {
   const [document, setDocument] = React.useState<Document | null>(null);
@@ -292,6 +293,7 @@ export default function Index() {
                 onClick={() => setState("new")}
                 color="gray"
                 variant="outline"
+                label="New"
                 className="transition-all duration-300 ease-in-out"
                 disabled={loading}
               >
@@ -304,6 +306,7 @@ export default function Index() {
                 }}
                 color="watercourse"
                 variant="solid"
+                label="Join"
                 className="transition-all duration-300 ease-in-out"
                 disabled={loading}
               >
@@ -356,6 +359,7 @@ export default function Index() {
                   type="submit"
                   color="watercourse"
                   variant="solid"
+                  label="Submit"
                   className="transition-all duration-300 ease-in-out"
                   disabled={loading}
                 >
@@ -384,6 +388,11 @@ export default function Index() {
     setState("default");
   }
 }
+
+export const headers: HeadersFunction = ({}) => ({
+  "Cache-Control": "public, max-age=604800, s-maxage=604800",
+  "Cache-Tag": "f-ls-home",
+});
 
 function ResumeSessionModal({
   resume,
@@ -424,6 +433,7 @@ function ResumeSessionModal({
               }}
               color="watercourse"
               variant="solid"
+              label="Resume"
               className="transition-all duration-300 ease-in-out"
               disabled={disabled}
             >
@@ -433,6 +443,7 @@ function ResumeSessionModal({
               onClick={() => setResume(null)}
               color="watercourse"
               variant="outline"
+              label="Cancel"
               className="transition-all duration-300 ease-in-out"
               disabled={disabled}
             >
@@ -451,6 +462,7 @@ function CloseButton({ onClick }: { onClick: () => void }) {
     <div className="absolute top-2 right-2">
       <button
         type="button"
+        aria-label="Close"
         onClick={onClick}
         className="rounded-md hover:bg-slate-200 h-10 w-10 flex items-center justify-center"
       >
