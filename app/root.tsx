@@ -1,7 +1,5 @@
-import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -9,16 +7,11 @@ import {
   json,
   useLoaderData,
 } from "@remix-run/react";
-import stylesheet from "~/tailwind.css";
-
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesheet },
-];
+import "./tailwind.css";
 
 import { RecoilRoot } from "recoil";
 import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
 import { ToasterProvider } from "./contexts/toaster";
-import { purgeCDN } from "./.server/purgeCDN";
 
 declare global {
   var ENV: {
@@ -34,16 +27,6 @@ export async function loader() {
   });
 }
 
-export function safeEnv(key: string): string {
-  try {
-    return process.env[key] || "";
-  } catch {
-    return "";
-  }
-}
-
-purgeCDN();
-
 export default function App() {
   const data = useLoaderData<typeof loader>();
   useGoogleCastScripts();
@@ -53,7 +36,10 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="description" content="No chips, no cards, no table? Play poker with your friends and family - we've got the accessories.">
+        <meta
+          name="description"
+          content="No chips, no cards, no table? Play poker with your friends and family - we've got the accessories."
+        />
         <title>flop. poker - the mobile game</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -112,7 +98,6 @@ export default function App() {
         </RecoilRoot>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
