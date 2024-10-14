@@ -72,6 +72,10 @@ function AppHead(props: React.PropsWithChildren<{}>) {
     <head>
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta
+        name="description"
+        content="No chips, no cards, no table? Play poker with your friends and family - we've got the accessories."
+      />
       <title>flop. poker - the mobile game</title>
 
       <link rel="preconnect" href="https://fonts.googleapis.com" />
