@@ -414,9 +414,9 @@ export interface components {
       ][];
       completed?: Partial<components["schemas"]["CompletedGame"]> &
         Partial<unknown>;
-      connectScreenCode?: unknown;
       /** Format: uint64 */
       lastUpdate: number;
+      pairScreenCode?: unknown;
       players: components["schemas"]["GameClientPlayer"][];
       /** Format: uint64 */
       pot: number;
