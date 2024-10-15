@@ -13,6 +13,7 @@ export default defineConfig({
     tsconfigPaths(),
     remix({
       ignoredRouteFiles: ["**/*.css"],
+      ssr: false,
 
       // appDirectory: "app",
       // assetsBuildDirectory: "public/build",
