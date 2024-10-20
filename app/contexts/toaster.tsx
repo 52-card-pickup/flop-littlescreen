@@ -9,7 +9,6 @@ import {
   useContext,
   useMemo,
 } from "react";
-import { createPortal } from "react-dom";
 import { useDocument } from "~/hooks/useDocument";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 
@@ -34,7 +33,7 @@ export const Toaster = forwardRef<Toaster, ToasterProps>((props, ref) => {
 
   if (!document) return null;
 
-  return createPortal(
+  return (
     <div data-testid="toaster">
       <Transition
         as={Fragment}
@@ -52,8 +51,7 @@ export const Toaster = forwardRef<Toaster, ToasterProps>((props, ref) => {
           </div>
         </div>
       </Transition>
-    </div>,
-    document.body
+    </div>
   );
 });
 

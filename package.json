@@ -7,7 +7,6 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev --manual",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "generate-types": "npx openapi-typescript http://127.0.0.1:5000/docs/private/api.json -o ./app/flopClient/spec.ts"
   },
