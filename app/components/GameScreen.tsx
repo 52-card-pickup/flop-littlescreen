@@ -1,4 +1,5 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import ReactSlider from "react-slider";
 import Cards from "~/components/Cards";
 import { client } from "~/flopClient";
 import { useCountdown } from "~/hooks/useCountdown";
@@ -87,14 +88,6 @@ export default function GameScreen(props: GameScreenProps) {
     props.state.currentRoundStake
   );
 
-  function onStakeChange(e: ChangeEvent<HTMLInputElement>) {
-    const value = parseFloat(e.target.value);
-    if (value < props.state.minRaiseTo) {
-      return setStake(0);
-    }
-    return setStake(value);
-  }
-
   const timeLeftToPlay = props.state.yourTurn
     ? Math.ceil(timer.timeLeft).toString().split("")
     : null;
@@ -181,23 +174,19 @@ export default function GameScreen(props: GameScreenProps) {
         >
           {mode === "yourturn" && (
             <>
-              <div className="place-self-center grid gap-3 px-1 w-full">
-                <div className="flex items-center gap-4 p-2">
-                  <input
-                    type="range"
-                    className={cn(
-                      "slider touch-none w-full h-3 bg-french_gray-100 rounded-xl appearance-none cursor-pointer range-lg color-red accent-french_gray-900 grow",
-                      "border-[16px] border-x-[8px] border-french_gray-100"
-                    )}
+              <div className="place-self-center grid gap-3 px-3 py-2 w-full">
+                <div className="flex items-center gap-4">
+                  <ReactSlider
+                    className="w-full h-10 bg-emerald-900 rounded-xl cursor-pointer border-4 border-black ring-2 ring-emerald-950 shadow-md shadow-emerald-900/40"
+                    thumbClassName="h-8 w-8 bg-emerald-950 rounded-full border-4 border-zinc-100 ring-4 ring-black shadow-lg shadow-slate-800/40 text-center font-bold text-black"
                     min={0} // Enforce minimum value
                     max={props.state.balance} // Maximum value
                     value={stake} // Current value
-                    onChange={(e) => onStakeChange(e)}
-                    step={5} // Adjust stepping as necessary
+                    onChange={(value) => setStake(value)}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-[2fr,5fr] w-full gap-4 p-3">
+              <div className="grid grid-cols-[2fr,5fr] w-full gap-4 px-3 py-2">
                 <div className="place-self-center w-full flex flex-col">
                   <FlopButton
                     onClick={() => handleFoldClick()}
