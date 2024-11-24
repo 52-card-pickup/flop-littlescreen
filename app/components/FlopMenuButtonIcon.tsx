@@ -33,7 +33,7 @@ export const FlopMenuButtonIcon = forwardRef<
           rx="63"
           fill="black"
           stroke="black"
-          stroke-width="2"
+          strokeWidth="2"
         />
         <rect
           x="5"
@@ -43,7 +43,7 @@ export const FlopMenuButtonIcon = forwardRef<
           rx="59"
           fill="white"
           stroke="#007357"
-          stroke-width="6"
+          strokeWidth="6"
         />
       </svg>
       <svg
@@ -67,8 +67,8 @@ export const FlopMenuButtonIcon = forwardRef<
             "transition-all duration-100",
             open ? "text-watercourse-800" : "text-[#338F79]"
           )}
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M62.3648 54.8023C63.2679 53.8992 64.7321 53.8992 65.6352 54.8023L88.7602 77.9273C89.6633 78.8304 89.6633 80.2946 88.7602 81.1977C87.8571 82.1008 86.3929 82.1008 85.4898 81.1977L64 59.7079L42.5102 81.1977C41.6071 82.1008 40.1429 82.1008 39.2398 81.1977C38.3367 80.2946 38.3367 78.8304 39.2398 77.9273L62.3648 54.8023Z"
           fill="currentColor"
         />
