@@ -9,7 +9,7 @@ export default function DesktopLanding() {
   const howItWorksSectionRef = useRef<HTMLDivElement>(null);
 
   const bigScreen = useBigScreenUrl();
-  const bigScreenUrl = bigScreen.toString();
+  const bigScreenUrl = bigScreen.url.toString();
 
   function LittleScreenLink() {
     return (
@@ -34,7 +34,7 @@ export default function DesktopLanding() {
         rel="noreferrer"
         className="text-watercourse-800 font-medium hover:underline"
       >
-        tv.flop.party
+        {bigScreen.displayUrl}
       </a>
     );
   }

@@ -10,7 +10,17 @@ export function useBigScreenUrl(roomCode?: string | null) {
 
   const bigScreenUrl = roomCode ? `${url}/${roomCode}` : url;
 
-  return new URL(bigScreenUrl);
+  const bigScreenUrlObject = new URL(bigScreenUrl);
+  return {
+    url: bigScreenUrlObject,
+    displayUrl: stripSchemeFromUrl(bigScreenUrlObject),
+  };
+}
+
+function stripSchemeFromUrl(bigScreenUrl: URL) {
+  return bigScreenUrl.pathname === "/"
+    ? bigScreenUrl.hostname
+    : bigScreenUrl.hostname + bigScreenUrl.pathname;
 }
 
 function resolveBigScreenPath(location: Location | null) {
