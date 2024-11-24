@@ -3,13 +3,26 @@ import FlopBrandLogoText from "./FlopBrandLogoText";
 import { useBigScreenUrl } from "~/hooks/useBigScreenUrl";
 import { CrtTvDisplay } from "./CrtTvDisplay";
 import { FlopQRCode } from "./FlopQRCode";
+import { RoomCodeDialog } from "./RoomCodeDialog";
+import { MobileWarningModal } from "./MobileWarningModal";
 
 export default function DesktopLanding() {
   const [showMobileWarning, setShowMobileWarning] = useState(false);
+  const [showRoomCodeDialog, setShowRoomCodeDialog] = useState(false);
+
   const howItWorksSectionRef = useRef<HTMLDivElement>(null);
 
   const bigScreen = useBigScreenUrl();
   const bigScreenUrl = bigScreen.url.toString();
+
+  const handleRoomCodeSubmit = (code: string | null) => {
+    if (code === null) {
+      window.open(bigScreenUrl, "_blank");
+    } else {
+      window.open(`${bigScreenUrl}/${code}`, "_blank");
+    }
+    setShowRoomCodeDialog(false);
+  };
 
   function LittleScreenLink() {
     return (
@@ -55,7 +68,13 @@ export default function DesktopLanding() {
           </p>
           <div className="flex gap-4">
             <a href={bigScreenUrl} target="_blank" rel="noreferrer">
-              <button className="border-2 border-transparent bg-watercourse-600 text-white px-6 py-3 rounded-lg font-semibold uppercase hover:bg-watercourse-700 transition-colors">
+              <button
+                className="border-2 border-transparent bg-watercourse-600 text-white px-6 py-3 rounded-lg font-semibold uppercase hover:bg-watercourse-700 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowRoomCodeDialog(true);
+                }}
+              >
                 Go to Big Screen
               </button>
             </a>
@@ -208,33 +227,18 @@ export default function DesktopLanding() {
       </section>
 
       {/* Mobile Warning Modal */}
-      {showMobileWarning && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md">
-            <h3 className="text-2xl font-bold uppercase text-watercourse-900 mb-4">
-              ⚠️ Designed for Mobile
-            </h3>
-            <p className="text-watercourse-700 mb-6">
-              This game is designed for mobile devices in portrait orientation.
-              The experience might not be optimal on a desktop browser.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => (window.location.href = "/?ignore_device=1")}
-                className="bg-watercourse-600 text-white px-6 py-3 rounded-lg font-semibold uppercase hover:bg-watercourse-700 transition-colors"
-              >
-                Continue Anyway
-              </button>
-              <button
-                onClick={() => setShowMobileWarning(false)}
-                className="border-2 border-watercourse-600 text-watercourse-600 px-6 py-3 rounded-lg font-semibold uppercase hover:bg-watercourse-50 transition-colors"
-              >
-                Go Back
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MobileWarningModal
+        show={showMobileWarning}
+        onClose={() => setShowMobileWarning(false)}
+        onContinue={() => (window.location.href = "/?ignore_device=1")}
+      />
+
+      <RoomCodeDialog
+        show={showRoomCodeDialog}
+        onClose={() => setShowRoomCodeDialog(false)}
+        onSubmit={handleRoomCodeSubmit}
+        bigScreenUrl={bigScreen.displayUrl}
+      />
     </div>
   );
 }
