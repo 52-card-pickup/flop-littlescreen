@@ -220,7 +220,7 @@ export default function DesktopLanding() {
             </p>
             <div className="flex gap-4 justify-center">
               <button
-                onClick={() => (window.location.href = "/game")}
+                onClick={() => (window.location.href = "/?ignore_device=1")}
                 className="bg-watercourse-600 text-white px-6 py-3 rounded-lg font-semibold uppercase hover:bg-watercourse-700 transition-colors"
               >
                 Continue Anyway

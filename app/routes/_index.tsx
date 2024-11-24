@@ -54,6 +54,7 @@ export default function Index() {
 
   const bigScreenUrlWithScheme = bigScreenUrl.url.toString();
   const bigScreenUrlWithoutScheme = bigScreenUrl.displayUrl;
+  const skipLandingPage = searchParams.has("ignore_device");
 
   function join() {
     if (name === "dev") {
@@ -169,10 +170,19 @@ export default function Index() {
   }
 
   useEffect(() => {
-    if (!deviceType.isLoading && deviceType.isDesktopOrLandscape) {
+    if (
+      !deviceType.isLoading &&
+      deviceType.isDesktopOrLandscape &&
+      !skipLandingPage
+    ) {
       navigate("/home");
     }
-  }, [deviceType.isDesktopOrLandscape, deviceType.isLoading, navigate]);
+  }, [
+    deviceType.isDesktopOrLandscape,
+    deviceType.isLoading,
+    skipLandingPage,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (searchParams.has("z")) {
@@ -180,7 +190,10 @@ export default function Index() {
     }
     const sessionId = Math.random().toString(36).substring(2, 5);
     sessionStorage.setItem("z", sessionId);
-    setSearchParams({ z: sessionId });
+    setSearchParams((prev) => {
+      prev.set("z", sessionId);
+      return prev;
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
