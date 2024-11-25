@@ -45,6 +45,19 @@ export function RoomCodeDialog({
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text").toUpperCase();
+
+    // Check if pasted text matches room code format
+    if (!/^[A-Z]{4}$/.test(pastedText)) return;
+
+    // Fill in the code inputs
+    const newCode = pastedText.split("");
+    setCode(newCode);
+    setError(false);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const fullCode = code.join("");
@@ -96,6 +109,7 @@ export function RoomCodeDialog({
               value={digit}
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
+              onPaste={handlePaste}
               className={cn(
                 "w-14 h-14 text-center text-2xl font-bold uppercase text-watercourse-900",
                 "bg-mystic-50 rounded-lg focus:outline-none",
