@@ -246,9 +246,6 @@ export default function DesktopLanding() {
 function LandingCtrDisplay() {
   return (
     <CrtTvDisplay rotateMs={6_000}>
-      {/* <div className="flex items-center justify-center h-full">
-        <FlopBrandLogoText className="w-48 mix-blend-screen animate-bobUpDown" />
-      </div> */}
       <div className="flex items-center justify-center h-full bg-zinc-900">
         <img
           src="/assets/landing/screenshots/big-screen-preview.png"
@@ -256,13 +253,6 @@ function LandingCtrDisplay() {
           className="w-full h-full object-contain"
         />
       </div>
-      {/* <div className="flex items-center justify-center h-full bg-white">
-        <img
-          src="/assets/landing/screenshots/mobile-home-screenshot.png"
-          alt="Mobile App Preview"
-          className="w-2/3 h-full object-cover transition-all duration-1000 ease-out transform object-[0%_50%]"
-        />
-      </div> */}
       <div className="flex items-center justify-center h-full p-2">
         <div className="border-8 border-black rounded-[1rem] p-1 bg-watercourse-900 shadow-xl shadow-black/60 h-full">
           <img
