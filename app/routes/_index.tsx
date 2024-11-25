@@ -16,9 +16,10 @@ import FlopLandingLayout from "~/components/FlopLandingLayout";
 import { RoomCodeInput } from "~/components/RoomCodeInput";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { useToast } from "~/contexts/toaster";
-import { useDocument } from "~/hooks/useDocument";
 import { CloseButton } from "~/components/CloseButton";
 import { ResumeSessionModal } from "~/components/ResumeSessionModal";
+import { useDeviceType } from "~/hooks/useDeviceType";
+import { useBigScreenUrl } from "../hooks/useBigScreenUrl";
 
 export default function Index() {
   const setDev = useSetRecoilState(devState);
@@ -47,8 +48,13 @@ export default function Index() {
   const navigate = useNavigate();
   const toast = useToast();
   const submitVibrate = useVibrate([5], 5);
-  const document = useDocument();
   const share = useShare();
+  const deviceType = useDeviceType();
+  const bigScreenUrl = useBigScreenUrl(roomCode);
+
+  const bigScreenUrlWithScheme = bigScreenUrl.url.toString();
+  const bigScreenUrlWithoutScheme = bigScreenUrl.displayUrl;
+  const skipLandingPage = searchParams.has("ignore_device");
 
   function join() {
     if (name === "dev") {
@@ -164,12 +170,30 @@ export default function Index() {
   }
 
   useEffect(() => {
+    if (
+      !deviceType.isLoading &&
+      deviceType.isDesktopOrLandscape &&
+      !skipLandingPage
+    ) {
+      navigate("/home");
+    }
+  }, [
+    deviceType.isDesktopOrLandscape,
+    deviceType.isLoading,
+    skipLandingPage,
+    navigate,
+  ]);
+
+  useEffect(() => {
     if (searchParams.has("z")) {
       return;
     }
     const sessionId = Math.random().toString(36).substring(2, 5);
     sessionStorage.setItem("z", sessionId);
-    setSearchParams({ z: sessionId });
+    setSearchParams((prev) => {
+      prev.set("z", sessionId);
+      return prev;
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -204,8 +228,6 @@ export default function Index() {
       abortController.abort();
     };
   }, [playerDetails, navigate]);
-
-  const bigScreenUrl = getBigScreenUrl();
 
   function onRoomCodeSubmit(code: string) {
     if (!code) return;
@@ -245,15 +267,13 @@ export default function Index() {
     setState("default");
   }
 
-  function getBigScreenUrl() {
-    const url = document?.location.host.startsWith("beta.")
-      ? "beta.flop.party/big-screen"
-      : "tv.flop.party";
-
-    return roomCode ? `${url}/${roomCode}` : url;
+  if (deviceType.isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-mystic-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-watercourse-600"></div>
+      </div>
+    );
   }
-
-  const urlWithScheme = `https://${bigScreenUrl}`;
 
   return (
     <>
@@ -271,12 +291,12 @@ export default function Index() {
                 ? share({
                     title: "Flop Poker",
                     text: "Host a game of Flop Poker on the big screen",
-                    url: urlWithScheme,
+                    url: bigScreenUrlWithScheme,
                   })
-                : window.open(urlWithScheme)
+                : window.open(bigScreenUrlWithScheme)
             }
           >
-            {bigScreenUrl}
+            {bigScreenUrlWithoutScheme}
           </p>
         </div>
         <div className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16 animate-fadeInFromBottom">
