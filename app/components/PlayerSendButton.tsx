@@ -138,7 +138,7 @@ export default function PlayerSendButton() {
                         className="mr-3 h-6 w-6 text-gray-700"
                         aria-hidden="true"
                       />
-                      Pair TV with code
+                      Link TV with code
                     </a>
                   </Menu.Item>
                 </div>
