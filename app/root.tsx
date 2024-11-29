@@ -4,8 +4,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  json,
-  useLoaderData,
 } from "@remix-run/react";
 import "./tailwind.css";
 
@@ -13,6 +11,7 @@ import { RecoilRoot } from "recoil";
 import { useGoogleCastScripts } from "./hooks/cast_sender/useGoogleCastScripts";
 import { ToasterProvider } from "./contexts/toaster";
 import Index from "./routes/_index";
+import { tryInitializeClient } from "./flopClient";
 
 declare global {
   var ENV: {
@@ -43,9 +42,10 @@ export function HydrateFallback() {
 export default function App() {
   const data = {
     FLOP_CONFIG: {
-      API_URL: import.meta.env.DEV ? "http://localhost:8080/" : null,
+      API_URL: import.meta.env.VITE_API_URL || null,
     },
   };
+  tryInitializeClient(data.FLOP_CONFIG);
   useGoogleCastScripts();
 
   return (
@@ -54,7 +54,7 @@ export default function App() {
         <Meta />
         <Links />
       </AppHead>
-      <AppBody>
+      <AppBody config={data.FLOP_CONFIG}>
         <RecoilRoot>
           <ToasterProvider>
             <Outlet />

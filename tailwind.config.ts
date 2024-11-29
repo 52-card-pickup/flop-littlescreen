@@ -103,6 +103,10 @@ export default {
           "hidden 1s linear, fadeIn 1s 1s ease-in-out, fromTop 2s ease-in-out",
         fadeInFromBottom:
           "hidden 1s linear, fadeIn 1s 1s ease-in-out, fromBottom 2s ease-in-out",
+        glitchLayer1: "glitchLayer1 750ms infinite",
+        glitchLayer2: "glitchLayer2 750ms infinite",
+        glitchLayer3:
+          "glitchLayer3 11.3s ease 2000ms normal none infinite running",
       },
       fontFamily: {
         emoji: ['"Noto Emoji"', ...defaultTheme.fontFamily.sans],
@@ -198,6 +202,54 @@ export default {
           "100%": {
             transform: "translateY(0)",
           },
+        },
+        glitchLayer1: {
+          "0%": {
+            transform: "translate(0)",
+          },
+          "40%": {
+            transform: "translate(-2px)",
+          },
+          "80%": {
+            transform: "translate(2px)",
+          },
+          "100%": {
+            transform: "translate(0)",
+          },
+        },
+        glitchLayer2: {
+          "0%": {
+            transform: "translate(0)",
+          },
+          "40%": {
+            transform: "translate(2px)",
+          },
+          "80%": {
+            transform: "translate(-2px)",
+          },
+          "100%": {
+            transform: "translate(0)",
+          },
+        },
+        glitchLayer3: {
+          "30%": {},
+          "40%": {
+            opacity: "1",
+            transform: "scale(1, 1) skew(0, 0)",
+          },
+          "40.25%": {
+            opacity: "0.8",
+            transform: "scale(1, 1.2) skew(40deg, 0)",
+          },
+          "40.5%": {
+            opacity: "0.8",
+            transform: "scale(1, 1.2) skew(-25deg, 0)",
+          },
+          "40.75%": {
+            opacity: "1",
+            transform: "scale(1, 1) skew(0, 0)",
+          },
+          "65%": {},
         },
       },
     },
