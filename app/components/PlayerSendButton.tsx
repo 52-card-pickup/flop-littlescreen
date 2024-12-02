@@ -18,9 +18,14 @@ import FlopButton from "./FlopButton";
 import { PlayerPhotoCameraOverlay } from "./PlayerPhotoCamera";
 import { FlopMenuButtonIcon } from "./FlopMenuButtonIcon";
 import { useDocument } from "../hooks/useDocument";
+import useSpotifyAuthorization from "~/hooks/useSpotifyAuthorization";
+import { useRecoilState } from "recoil";
+import { playerState } from "~/state";
 
 export default function PlayerSendButton() {
   const { playerDetails } = usePlayerDetails();
+  const [player] = useRecoilState(playerState);
+
   const [preview, setPreview] = useTimeoutState<string | null>(null, 750);
   const [sendMoneyModalOpen, setSendMoneyModalOpen] = useState(false);
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
@@ -51,6 +56,9 @@ export default function PlayerSendButton() {
   function openSendMoneyModal() {
     setSendMoneyModalOpen(true);
   }
+
+  const { handleLogin, handleLogout, state } = useSpotifyAuthorization();
+
 
   return (
     <>
@@ -104,6 +112,47 @@ export default function PlayerSendButton() {
                         aria-hidden="true"
                       />
                       Leave the game
+                    </a>
+                  </Menu.Item>
+                </div>
+                <div className="py-1">
+                  <Menu.Item>
+                    <a
+                      onClick={() => {
+                        switch (state) {
+                          case "connected": {
+                            handleLogout();
+                            break;
+                          }
+                          case "offline": {
+                            handleLogin();
+                            break;
+                          }
+                          case "other-player-connected": {
+
+                            break;
+                          }
+                        }
+                      }}
+                      role="menuitem"
+                      className={cn(
+                        "flex items-center px-4 py-2 font-medium text-xl text-gray-700"
+                      )}
+                      disabled={state === "other-player-connected"}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="mr-3 h-6 w-6 text-gray-700"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M12 0C5.372 0 0 5.372 0 12c0 6.628 5.372 12 12 12s12-5.372 12-12C24 5.372 18.628 0 12 0zm5.248 17.42a.749.749 0 01-1.03.222c-2.822-1.837-6.372-2.248-10.566-1.206a.748.748 0 11-.436-1.43c4.547-1.388 8.528-.908 11.645 1.274.347.227.442.698.222 1.03zm1.47-2.985a.937.937 0 01-1.288.277c-3.23-2.084-8.13-2.683-11.7-1.441a.937.937 0 11-.576-1.785c4.07-1.316 9.523-.662 13.15 1.63a.938.938 0 01.276 1.288zm.035-3.223c-3.68-2.34-10.385-2.558-14.11-1.375a1.124 1.124 0 01-.688-2.146c4.29-1.378 11.65-1.12 15.84 1.62a1.124 1.124 0 11-1.17 1.9z" />
+                      </svg>
+                      {/* {player.spotifyPlayerId === playerDetails.id ? "Disconnect Spotify" : "Connect Spotify"} */}
+                      {state === "other-player-connected" && " (Another player is connected)"}
+                      {state === "connected" && "Disconnect Spotify"}
+                      {state === "offline" && "Connect Spotify"}
                     </a>
                   </Menu.Item>
                 </div>

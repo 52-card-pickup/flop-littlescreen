@@ -26,6 +26,7 @@ const initialPlayerState: GamePlayerState = {
   playersCount: 0,
   turnExpiresDt: new Date().getTime(),
   lastUpdate: new Date().getTime(),
+  spotifyPlayerId: null
 };
 
 const defaultPlayerDetails: PlayerDetails = {
