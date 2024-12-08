@@ -102,7 +102,7 @@ export default function DesktopLanding() {
           <h2 className="text-4xl font-bold text-center text-watercourse-900 mb-16">
             how it works
           </h2>
-          <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+          <div className="grid tablet:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 bg-watercourse-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">
                 1
@@ -145,7 +145,7 @@ export default function DesktopLanding() {
       {/* Features */}
       <section className="py-24">
         <div className="container mx-auto px-8">
-          <div className="grid md:grid-cols-2 gap-16 max-w-5xl mx-auto">
+          <div className="grid tablet:grid-cols-2 gap-16 max-w-5xl mx-auto">
             <div>
               <h2 className="text-4xl font-bold text-watercourse-900 mb-8">
                 why flop poker?

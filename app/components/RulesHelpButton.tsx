@@ -26,11 +26,12 @@ export const RulesHelpButton = React.forwardRef<
   return (
     <div {...props} ref={ref}>
       <button
-        className="flex justify-center items-center h-full w-full max-w-[48px] max-h-[48px]"
+        className="flex justify-center items-center h-full w-full max-w-[48px] max-h-[48px] text-white"
         aria-label="Game Rules"
         onClick={handleOpen}
       >
         <svg
+          className="w-8 h-8"
           fill="none"
           strokeWidth={2}
           stroke="currentColor"
@@ -58,13 +59,13 @@ function RuleHelpModal({ onClose }: { onClose: () => void }) {
   if (!document) return null;
 
   return createPortal(
-    <div className="fixed grid top-8 left-8 bottom-8 right-8 bg-[#b0dbbf] rounded-lg p-4 grid-rows-[auto,1fr,auto] gap-4 shadow-lg shadow-slate-800/20 z-50">
+    <div className="fixed grid top-8 left-8 bottom-8 right-8 bg-[#b0dbbf] rounded-lg p-4 shadow-lg shadow-slate-800/20 z-50">
       {handStrengthsVisible ? (
-        <>
+        <div className="grid grid-rows-[auto,1fr,auto] overflow-auto">
           <h2 className="text-slate-900 font-bold text-xl mt-4 text-center">
             Hand Strengths
           </h2>
-          <div className="overflow-auto max-h-full">
+          <div className="overflow-x-clip overflow-y-auto max-h-full">
             <p className="text-black text-start">
               The strength of a poker hand is determined by the best combination
               of 5 cards from a maximum of 7 cards (2 cards in your hand and 5
@@ -194,13 +195,23 @@ function RuleHelpModal({ onClose }: { onClose: () => void }) {
               </li>
             </ul>
           </div>
-        </>
+          <div className="grid justify-center">
+            <button
+              className="px-4 py-3 my-2 bg-green-300 text-black font-bold rounded-lg shadow-md shadow-black/20 transition duration-150 ease-in-out hover:bg-white hover:shadow-xl"
+              onClick={() => {
+                setHandStrengthsVisible((prev) => !prev);
+              }}
+            >
+              Hide Hand Strengths
+            </button>
+          </div>
+        </div>
       ) : (
-        <>
+        <div className="grid grid-rows-[auto,1fr,auto] overflow-auto">
           <h2 className="text-black font-bold text-2xl p-2 text-center">
             flop.
           </h2>
-          <div className="grid content-start px-2 gap-6">
+          <div className="grid content-start px-2 gap-6 overflow-auto">
             <p className="text-black">
               <b>flop</b> is a poker game of skill and strategy. The goal is to
               win as large of a pot as possible by betting on the strength of
@@ -222,19 +233,19 @@ function RuleHelpModal({ onClose }: { onClose: () => void }) {
               the pot.
             </p>
           </div>
-        </>
+          <div className="grid justify-center">
+            <button
+              className="px-4 py-3 my-2 bg-green-300 text-black font-bold rounded-lg shadow-md shadow-black/20 transition duration-150 ease-in-out hover:bg-white hover:shadow-xl"
+              onClick={() => {
+                setHandStrengthsVisible((prev) => !prev);
+              }}
+            >
+              See Hand Strengths
+            </button>
+          </div>
+        </div>
       )}
-      <div className="grid justify-center gap-4 self-end">
-        <button
-          className="px-4 py-3 my-2 bg-green-300 text-black font-bold rounded-lg shadow-md shadow-black/20 transition duration-150 ease-in-out hover:bg-white hover:shadow-xl"
-          onClick={() => {
-            setHandStrengthsVisible((prev) => !prev);
-          }}
-        >
-          {handStrengthsVisible ? "Hide" : "See"} Hand Strengths
-        </button>
-      </div>
-      <button className="absolute top-2 left-2 w-8 h-8 m-2" onClick={onClose}>
+      <button className="absolute top-2 right-2 w-8 h-8 m-2" onClick={onClose}>
         <svg
           fill="none"
           strokeWidth={1.5}

@@ -436,7 +436,9 @@ function PairBigScreenModal(props: { open: boolean; onClose: () => void }) {
       >
         <div className="grid justify-center items-center gap-2">
           <input
-            type="text"
+            type="number"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             maxLength={6}

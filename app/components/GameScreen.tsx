@@ -113,7 +113,7 @@ export default function GameScreen(props: GameScreenProps) {
       title="Flop Poker Game Screen"
     >
       <RulesHelpButton
-        className="fixed top-8 right-8 w-8 h-8 z-50"
+        className="fixed top-4 right-4 w-8 h-8 sm:top-8 sm:right-8 z-50"
         open={showRules}
         onOpenChange={setShowRules}
       />
