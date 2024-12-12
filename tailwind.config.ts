@@ -93,6 +93,15 @@ export default {
           900: "#cadae7",
         },
       },
+      screens: {
+        xs: "320px", // iPhone SE, older small phones
+        sm: "375px", // iPhone X/11/12/13 Mini
+        md: "390px", // iPhone 12/13/14
+        lg: "414px", // iPhone 8/7/6 Plus, many Android phones
+        xl: "428px", // iPhone Pro Max models
+        tablet: "768px", // iPad Mini/Air, most tablets
+        desktop: "1024px", // Small laptops, iPad Pro and up
+      },
       animation: {
         pop: "pop 1.5s cubic-bezier(.36,.07,.19,.97) 1",
         float: "float .5s cubic-bezier(.36,.07,.19,.97) 5",

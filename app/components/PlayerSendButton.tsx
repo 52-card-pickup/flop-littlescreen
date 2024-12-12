@@ -330,7 +330,7 @@ function FlopModal(props: {
       >
         <div
           className={cn(
-            "relative bg-white p-6 rounded-lg grid grid-rows-[auto,auto,auto] gap-6 justify-center items-center justify-items-center",
+            "relative max-w-[70vw] bg-white p-6 pt-10 rounded-lg grid gap-6 justify-center items-center justify-items-center",
             props.hasError
               ? "shadow-sm shadow-red-800"
               : "shadow-xl shadow-black/20",
@@ -356,9 +356,7 @@ function ConfirmModal(props: {
 }) {
   return (
     <FlopModal open={props.open} onClose={props.onClose}>
-      <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
-        {props.children}
-      </h2>
+      <h2 className="text-xl font-bold text-center pb-2">{props.children}</h2>
       <div
         className={cn(
           "grid items-center gap-4",
@@ -370,7 +368,11 @@ function ConfirmModal(props: {
             {props.cancelText || "Cancel"}
           </FlopButton>
         )}
-        <FlopButton onClick={props.onConfirm} color="blue" variant="solid">
+        <FlopButton
+          onClick={props.onConfirm}
+          color="watercourse"
+          variant="solid"
+        >
           {props.confirmText || "Confirm"}
         </FlopButton>
       </div>
@@ -427,33 +429,37 @@ function PairBigScreenModal(props: { open: boolean; onClose: () => void }) {
       hasError={hasError}
       shakeOnError
     >
-      <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
-        Enter the pair code from the big screen
-      </h2>
-      <form
-        className="grid justify-center items-center gap-4"
-        onSubmit={handleSubmit}
-      >
-        <div className="grid justify-center items-center gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            maxLength={6}
-            disabled={sending}
-            placeholder="Pair code"
-            className="w-full px-3 py-2 text-xl border border-gray-300 rounded-lg"
-          />
-        </div>
-        <FlopButton
-          disabled={sending || !/^\d{6}$/.test(input)}
-          color="blue"
-          variant="solid"
-          type="submit"
+      <div className="grid gap-2">
+        <form
+          className="grid justify-center items-center gap-4"
+          onSubmit={handleSubmit}
         >
-          Pair
-        </FlopButton>
-      </form>
+          <h2 className="text-xl font-bold text-center">
+            Enter the pair code from the big screen
+          </h2>
+          <div className="grid justify-center items-center gap-2">
+            <input
+              type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={input}
+              onChange={(e) => setInput(e.target.value.slice(0, 6))}
+              maxLength={6}
+              disabled={sending}
+              placeholder="Pair code"
+              className="w-full px-3 py-2 text-xl border border-gray-300 rounded-lg"
+            />
+          </div>
+          <FlopButton
+            disabled={sending || !/^\d{6}$/.test(input)}
+            color="watercourse"
+            variant="solid"
+            type="submit"
+          >
+            Pair
+          </FlopButton>
+        </form>
+      </div>
     </FlopModal>
   );
 }
@@ -533,8 +539,8 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
         className="fixed w-screen h-screen left-0 top-0 inset-0 bg-black/20 backdrop-blur-sm flex justify-center items-center"
         onClick={(e) => e.target === e.currentTarget && props.onClose()}
       >
-        <div className="bg-white p-6 rounded-lg grid grid-rows-[auto,auto,auto] gap-6 justify-center items-center justify-items-center shadow-xl shadow-black/20">
-          <h2 className="text-xl font-bold max-w-[50vw] text-center pb-2">
+        <div className="bg-white max-w-[70vw] p-6 rounded-lg grid grid-rows-[auto,auto,auto] gap-6 justify-center items-center justify-items-center shadow-xl shadow-black/20">
+          <h2 className="text-xl font-bold text-center pb-2">
             Who do you want to send money to?
           </h2>
           <div className="grid justify-center items-center gap-2">
@@ -572,7 +578,7 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
             <FlopButton
               onClick={sendMoney}
               disabled={sending || amount <= 0 || !selectedAccountId}
-              color="blue"
+              color="watercourse"
               variant="solid"
             >
               Send

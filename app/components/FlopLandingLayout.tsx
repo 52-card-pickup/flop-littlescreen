@@ -1,6 +1,7 @@
 import cn from "~/utils/cn";
 import FlopBrandLogoText from "./FlopBrandLogoText";
 import { ShareButton } from "./ShareButton";
+import { DebugOverlay } from "./DebugOverlay";
 
 export default function FlopLandingLayout(props: {
   animate?: boolean;
@@ -9,7 +10,7 @@ export default function FlopLandingLayout(props: {
   const animate = props.animate ?? true;
   return (
     <div
-      className="w-screen h-screen grid grid-flow-row grid-rows-[auto,5fr,auto] overflow-hidden"
+      className="w-screen h-dvh grid grid-flow-row grid-rows-[auto,5fr,auto] overflow-hidden"
       style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
     >
       {props.children[0]}
@@ -21,13 +22,16 @@ export default function FlopLandingLayout(props: {
       >
         <>
           <FlopBrandLogoText
-            className={cn("w-40 h-40 mb-8", animate ? "animate-scaleIn" : "")}
+            className={cn(
+              "w-40 h-40 mb-0 sm:mb-4 lg:mb-8",
+              animate ? "animate-scaleIn" : ""
+            )}
             aria-label="flop."
           />
         </>
         <h2
           className={cn(
-            "text-2xl font-medium px-2 my-1 text-center text-watercourse-900/80",
+            "text-2xl font-medium px-4 my-1 text-center text-watercourse-900/80",
             animate ? "animate-fadeIn" : ""
           )}
         >
@@ -35,7 +39,7 @@ export default function FlopLandingLayout(props: {
         </h2>
         <h2
           className={cn(
-            "text-2xl font-medium px-2 my-1 text-center text-watercourse-900/80",
+            "text-2xl font-medium px-4 my-1 text-center text-watercourse-900/80",
             animate ? "animate-fadeIn" : ""
           )}
         >
@@ -43,12 +47,13 @@ export default function FlopLandingLayout(props: {
         </h2>
       </div>
       <ShareButton
-        className="fixed top-8 right-8 w-8 h-8"
+        className="fixed top-4 right-4 w-8 h-8 sm:top-8 sm:right-8"
         title="Flop Poker"
         text="Play Flop Poker with your friends"
         url="https://flop.poker"
       />
       {props.children[1]}
+      <DebugOverlay />
     </div>
   );
 }

@@ -278,13 +278,13 @@ export default function Index() {
   return (
     <>
       <FlopLandingLayout>
-        <div className="grid grid-cols-1 items-center justify-center justify-items-center gap-4 px-4 py-16 pb-0 text-slate-500 animate-fadeInFromTop">
-          <h2 className="text-lg font-medium m-0 text-center min-w-48 w-9/12">
+        <div className="grid grid-cols-1 items-center justify-center justify-items-center gap-4 px-4 pt-12 sm:pt-16 text-slate-500 text-base sm:text-lg animate-fadeInFromTop">
+          <h2 className="font-medium text-center min-w-48 w-full mx-4 sm:w-9/12 sm:mx-0">
             grab a chromecast-enabled big screen, or go to:
           </h2>
           <p
             className={cn(
-              "text-lg font-bold m-0 text-center text-slate-600 tracking-wider select-none cursor-pointer"
+              "font-bold m-0 text-center text-slate-600 tracking-wider select-none cursor-pointer"
             )}
             onClick={() =>
               share.isSupported
@@ -299,11 +299,16 @@ export default function Index() {
             {bigScreenUrlWithoutScheme}
           </p>
         </div>
-        <div className="grid grid-cols-1 items-center justify-center space-y-4 gap-2 px-8 mb-16 animate-fadeInFromBottom">
+        <div
+          className={cn(
+            "relative grid grid-cols-1 items-center justify-center space-y-4 gap-2 animate-fadeInFromBottom",
+            state === "default" || state === "room-code-entry" ? "h-40" : ""
+          )}
+        >
           {state === "default" ? (
-            <div className="grid gap-4 grid-cols-2">
+            <div className="grid gap-x-4 gap-y-6 grid-cols-2 mx-8 mb-4 sm:mb-8 lg:mb-16">
               <div className="flex flex-col gap-4 col-span-2">
-                <h3 className="text-md font-semibold text-center text-slate-700 pb-2">
+                <h3 className="text-md font-semibold text-center text-slate-700">
                   Start a new room? Or join an existing one?
                 </h3>
               </div>
@@ -332,29 +337,36 @@ export default function Index() {
               </FlopButton>
             </div>
           ) : state === "room-code-entry" ? (
-            <div
-              className={cn(
-                "max-w-md mx-auto text-center bg-white px-4 -mb-4 sm:px-8 py-12 rounded-xl shadow relative",
-                hasJoinCodeError ? "animate-shake" : "",
-                isRoomEntryAnimating ? "animate-fadeIn" : ""
-              )}
-            >
-              <CloseButton onClick={() => returnToDefaultState()} />
-              <div className="mb-8">
-                <h1 className="text-2xl font-bold mb-1">Join Room</h1>
-                <p className="text-[15px] text-slate-500">
-                  Enter the 4-character code to join a room
-                </p>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+              <div
+                className={cn(
+                  "max-w-md mx-auto text-center bg-white px-4 -mb-4 py-12 rounded-xl shadow relative",
+                  hasJoinCodeError ? "animate-shake" : "",
+                  isRoomEntryAnimating
+                    ? "animate-[fromBottom_0.3s_ease-in-out]"
+                    : ""
+                )}
+              >
+                <CloseButton onClick={() => returnToDefaultState()} />
+                <div className="mb-8">
+                  <h1 className="text-2xl font-bold mb-1">Join Room</h1>
+                  <p className="text-[15px] text-slate-500">
+                    Enter the 4-character code to join a room
+                  </p>
+                </div>
+                <RoomCodeInput onSubmit={onRoomCodeSubmit} submitLabel="Join" />
               </div>
-              <RoomCodeInput onSubmit={onRoomCodeSubmit} submitLabel="Join" />
             </div>
           ) : state === "new" || state === "join" ? (
             <form
               onSubmit={state === "new" ? onNewRoom : onSubmit}
               autoComplete="off"
             >
-              <div className="grid gap-4 grid-cols-1 pt-14 relative animate-fadeIn">
-                <CloseButton onClick={() => returnToDefaultState()} />
+              <div className="grid gap-4 grid-cols-1 mx-8 mb-4 sm:mb-8 lg:mb-16 pt-10 sm:pt-12 relative animate-fadeIn">
+                <CloseButton
+                  className="absolute top-0 right-2"
+                  onClick={() => returnToDefaultState()}
+                />
                 <input
                   ref={inputRef}
                   disabled={!!resume && state === "join"}
@@ -370,7 +382,7 @@ export default function Index() {
                   placeholder="Enter your name"
                   accessKey="n"
                   onChange={(e) => {
-                    setName(e.target.value);
+                    setName(e.target.value?.trim());
                   }}
                 />
                 <FlopButton

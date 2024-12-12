@@ -1,8 +1,14 @@
 import { XCircleIcon } from "@heroicons/react/24/outline";
 
-export function CloseButton({ onClick }: { onClick: () => void }) {
+export function CloseButton({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick: () => void;
+}) {
   return (
-    <div className="absolute top-2 right-2">
+    <div className={className ?? "absolute top-2 right-2"}>
       <button
         type="button"
         aria-label="Close"
