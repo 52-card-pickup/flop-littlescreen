@@ -116,7 +116,7 @@ export default function Index() {
       .catch(() => {
         setHasJoinError(true);
         setLoading(false);
-        setState("join");
+        setState("new");
       });
   }
 
