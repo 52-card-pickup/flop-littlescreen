@@ -183,17 +183,13 @@ export default function GameScreen(props: GameScreenProps) {
             <>
               <div className="place-self-center grid gap-3 px-1 w-full">
                 <div className="flex items-center gap-4 p-2">
-                  <input
-                    type="range"
-                    className={cn(
-                      "slider touch-none w-full h-3 bg-french_gray-100 rounded-xl appearance-none cursor-pointer range-lg color-red accent-french_gray-900 grow",
-                      "border-[16px] border-x-[8px] border-french_gray-100"
-                    )}
-                    min={0} // Enforce minimum value
-                    max={props.state.balance} // Maximum value
-                    value={stake} // Current value
-                    onChange={(e) => onStakeChange(e)}
-                    step={5} // Adjust stepping as necessary
+                  <FlopSlider
+                    value={stake}
+                    onChange={setStake}
+                    min={0}
+                    max={props.state.balance}
+                    step={5}
+                    label="Bet Amount"
                   />
                 </div>
               </div>
@@ -216,11 +212,7 @@ export default function GameScreen(props: GameScreenProps) {
                     label="Bet"
                     disabled={loading}
                   >
-                    {betAction === "check"
-                      ? "Check"
-                      : betAction === "call"
-                      ? `Call (£${stakeToCall})`
-                      : `Raise to £${stake}`}
+                    {betButtonText()}
                   </FlopButton>
                 </div>
               </div>
@@ -253,6 +245,20 @@ export default function GameScreen(props: GameScreenProps) {
     </div>
   );
 
+  function betButtonText() {
+    switch (betAction) {
+      case "check":
+        return "Check";
+      case "call":
+        return `Call (£${stakeToCall})`;
+      default:
+        if (stake === props.state.balance) {
+          return "All In";
+        }
+        return `Raise to £${stake}`;
+    }
+  }
+
   function handleBetActionClick() {
     setLoading(true);
     switch (betAction) {
@@ -280,6 +286,38 @@ export default function GameScreen(props: GameScreenProps) {
       setLoading(false);
     });
   }
+}
+
+function FlopSlider({
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  label,
+}: {
+  value: number;
+  onChange: (newValue: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  label?: string;
+}) {
+  return (
+    <input
+      type="range"
+      className={cn(
+        "slider touch-none w-full h-3 bg-french_gray-100 rounded-xl appearance-none cursor-pointer range-lg color-red accent-french_gray-900 grow",
+        "border-[16px] border-x-[8px] border-french_gray-100"
+      )}
+      aria-label={label}
+      min={min} // Enforce minimum value
+      max={max} // Maximum value
+      value={value} // Current value
+      onChange={(e) => onChange(Number(e.target.value))}
+      step={step}
+    />
+  );
 }
 
 function calculateBetAction(
