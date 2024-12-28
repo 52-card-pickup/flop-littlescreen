@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { client } from "../flopClient";
+import { useClient } from "../flopClient";
 import { useNavigate } from "@remix-run/react";
 
 export default function Reset() {
+  const { client } = useClient();
   const navigate = useNavigate();
   useEffect(() => {
     client

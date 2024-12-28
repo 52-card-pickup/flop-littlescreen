@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
-import { client } from "../flopClient";
+import { useClient } from "../flopClient";
 import FlopButton from "~/components/FlopButton";
 import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
@@ -22,6 +22,7 @@ import { useDeviceType } from "~/hooks/useDeviceType";
 import { useBigScreenUrl } from "../hooks/useBigScreenUrl";
 
 export default function Index() {
+  const { client } = useClient();
   const setDev = useSetRecoilState(devState);
   const { playerDetails, setPlayerDetails } = usePlayerDetails();
 

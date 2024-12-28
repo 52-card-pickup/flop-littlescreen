@@ -11,7 +11,7 @@ import {
   TvIcon,
 } from "@heroicons/react/20/solid";
 import cn from "~/utils/cn";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { createPortal } from "react-dom";
@@ -23,6 +23,7 @@ import { CloseButton } from "./CloseButton";
 import { useToast } from "~/contexts/toaster";
 
 export default function PlayerSendButton() {
+  const { client } = useClient();
   const { playerDetails } = usePlayerDetails();
   const [preview, setPreview] = useTimeoutState<string | null>(null, 750);
   const [sendMoneyModalOpen, setSendMoneyModalOpen] = useState(false);
@@ -381,6 +382,7 @@ function ConfirmModal(props: {
 }
 
 function PairBigScreenModal(props: { open: boolean; onClose: () => void }) {
+  const { client } = useClient();
   const { playerDetails } = usePlayerDetails();
   const [sending, setPairing] = useState(false);
   const [input, setInput] = useState("");
@@ -465,6 +467,7 @@ function PairBigScreenModal(props: { open: boolean; onClose: () => void }) {
 }
 
 function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
+  const { client } = useClient();
   const documentRef = useDocument();
   const { playerDetails } = usePlayerDetails();
   const [sending, setSending] = useState(false);

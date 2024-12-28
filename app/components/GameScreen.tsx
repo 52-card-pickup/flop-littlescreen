@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import Cards from "~/components/Cards";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import { useCountdown } from "~/hooks/useCountdown";
 import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
@@ -22,6 +22,7 @@ export interface GameScreenProps {
 }
 
 export default function GameScreen(props: GameScreenProps) {
+  const { client } = useClient();
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);

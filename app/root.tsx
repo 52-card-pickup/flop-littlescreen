@@ -20,6 +20,8 @@ declare global {
 }
 
 export function HydrateFallback() {
+  tryInitializeClient();
+
   return (
     <html lang="en">
       <AppHead>

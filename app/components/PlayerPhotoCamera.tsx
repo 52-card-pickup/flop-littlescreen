@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SVGAttributes, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import FlopButton from "./FlopButton";
 import { createPortal } from "react-dom";
@@ -58,6 +58,7 @@ export function PlayerPhotoCamera(
 }
 
 export function PlayerPhotoCameraOverlay(props: { onCompleted?: () => void }) {
+  const { client } = useClient();
   const { playerDetails, loading: playerDetailsLoading } = usePlayerDetails();
   const [showInstructions, setShowInstructions] = useState(true);
   const [loading, setLoading] = useState(false);

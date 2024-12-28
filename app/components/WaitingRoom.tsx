@@ -1,5 +1,5 @@
 import FlopButton from "~/components/FlopButton";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import cn from "~/utils/cn";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
@@ -13,6 +13,7 @@ export interface WaitingRoomProps {
 }
 
 export function WaitingRoom({ state }: WaitingRoomProps) {
+  const { client } = useClient();
   const [error, setError] = useTimeoutState(false, 1000);
   const [hasErrored, setHasErrored] = useTimeoutState(false, 5000);
   const { playerDetails } = usePlayerDetails();
