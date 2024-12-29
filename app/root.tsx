@@ -14,12 +14,15 @@ import Index from "./routes/_index";
 import { tryInitializeClient } from "./flopClient";
 
 declare global {
+  // eslint-disable-next-line no-var
   var ENV: {
     API_URL: string | null;
   };
 }
 
 export function HydrateFallback() {
+  tryInitializeClient();
+
   return (
     <html lang="en">
       <AppHead>
@@ -67,7 +70,7 @@ export default function App() {
   );
 }
 
-function AppHead(props: React.PropsWithChildren<{}>) {
+function AppHead(props: React.PropsWithChildren) {
   return (
     <head>
       <meta charSet="utf-8" />

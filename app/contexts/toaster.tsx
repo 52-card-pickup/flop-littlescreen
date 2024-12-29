@@ -28,7 +28,7 @@ export const Toaster = forwardRef<Toaster, ToasterProps>((props, ref) => {
         setShow(true);
       },
     }),
-    [setMessage]
+    [setMessage, setShow]
   );
 
   if (!document) return null;
@@ -54,6 +54,7 @@ export const Toaster = forwardRef<Toaster, ToasterProps>((props, ref) => {
     </div>
   );
 });
+Toaster.displayName = "Toaster";
 
 const ToasterContext = createContext<{
   toasterRef: React.RefObject<Toaster> | null;
@@ -79,8 +80,7 @@ export function useToast() {
     throw new Error("ToasterProvider not found");
   }
 
-  return useMemo(
-    () => ({ show: toasterRef.current ? toasterRef.current.show : () => {} }),
-    [toasterRef.current]
-  );
+  const toast = toasterRef.current;
+
+  return useMemo(() => ({ show: toast ? toast.show : () => {} }), [toast]);
 }

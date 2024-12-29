@@ -66,6 +66,7 @@ export const FlopButton = forwardRef<HTMLButtonElement, FlopButtonProps>(
     );
   }
 );
+FlopButton.displayName = "FlopButton";
 
 function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
   switch (which) {
@@ -139,5 +140,3 @@ function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
       };
   }
 }
-
-export default FlopButton;

@@ -1,5 +1,5 @@
-import FlopButton from "~/components/FlopButton";
-import { client } from "~/flopClient";
+import { FlopButton } from "~/components/FlopButton";
+import { useClient } from "~/flopClient";
 import cn from "~/utils/cn";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
@@ -13,6 +13,7 @@ export interface WaitingRoomProps {
 }
 
 export function WaitingRoom({ state }: WaitingRoomProps) {
+  const { client } = useClient();
   const [error, setError] = useTimeoutState(false, 1000);
   const [hasErrored, setHasErrored] = useTimeoutState(false, 5000);
   const { playerDetails } = usePlayerDetails();
@@ -52,7 +53,7 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
                   <span className="text-watercourse-800 font-semibold">
                     {playerDetails.name},
                   </span>{" "}
-                  you're in the waiting room
+                  you&apos;re in the waiting room
                   {state.playersCount > 2
                     ? ` with ${state.playersCount - 1} other players`
                     : state.playersCount === 2
@@ -99,7 +100,7 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
                 });
             }}
           >
-            Everyone's here
+            Everyone&apos;s here
           </FlopButton>
         </div>
       </div>

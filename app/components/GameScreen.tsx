@@ -1,10 +1,10 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Cards from "~/components/Cards";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import { useCountdown } from "~/hooks/useCountdown";
 import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
-import FlopButton from "./FlopButton";
+import { FlopButton } from "./FlopButton";
 import { RulesHelpButton } from "./RulesHelpButton";
 import { useVibrate } from "../hooks/useVibrate";
 import { useRoomCode } from "~/hooks/usePlayerDetails";
@@ -22,6 +22,7 @@ export interface GameScreenProps {
 }
 
 export default function GameScreen(props: GameScreenProps) {
+  const { client } = useClient();
   const [mode, setMode] = useState<(typeof modes)[number]>("waiting");
   const [stake, setStakeImpl] = useState<number>(0);
   const [showCards, setShowCards] = useState(true);
@@ -31,9 +32,9 @@ export default function GameScreen(props: GameScreenProps) {
   const vibrate = useVibrate([20, 20, 40, 20, 60]);
   const roomCode = useRoomCode();
 
-  function setStake(newStake: number) {
-    if (newStake > 0 && newStake < props.state.minRaiseTo) {
-      newStake = props.state.minRaiseTo;
+  function setStake(newStake: number, minRaiseTo: number) {
+    if (newStake > 0 && newStake < minRaiseTo) {
+      newStake = minRaiseTo;
     }
     if (Number.isNaN(newStake)) {
       newStake = 0;
@@ -61,17 +62,17 @@ export default function GameScreen(props: GameScreenProps) {
       return;
     }
     setMode("waiting");
-  }, [props.state.state, props.state.yourTurn]);
+  }, [hasCompletedGame, props.state.state, props.state.yourTurn]);
 
   useEffect(() => {
     if (props.state.yourTurn) {
       vibrate();
-      setStake(0);
+      setStake(0, props.state.minRaiseTo);
       return;
     }
 
     setShowCards(false);
-  }, [props.state.yourTurn, vibrate]);
+  }, [props.state.yourTurn, props.state.minRaiseTo, vibrate]);
 
   const timer = useCountdown({
     turnExpiresDt: (props.state.turnExpiresDt as number | undefined) || 0,
@@ -87,12 +88,11 @@ export default function GameScreen(props: GameScreenProps) {
     props.state.currentRoundStake
   );
 
-  function onStakeChange(e: ChangeEvent<HTMLInputElement>) {
-    const value = parseFloat(e.target.value);
+  function onStakeChange(value: number) {
     if (value < props.state.minRaiseTo) {
-      return setStake(0);
+      return setStake(0, props.state.minRaiseTo);
     }
-    return setStake(value);
+    return setStake(value, props.state.minRaiseTo);
   }
 
   const timeLeftToPlay = props.state.yourTurn
@@ -183,17 +183,13 @@ export default function GameScreen(props: GameScreenProps) {
             <>
               <div className="place-self-center grid gap-3 px-1 w-full">
                 <div className="flex items-center gap-4 p-2">
-                  <input
-                    type="range"
-                    className={cn(
-                      "slider touch-none w-full h-3 bg-french_gray-100 rounded-xl appearance-none cursor-pointer range-lg color-red accent-french_gray-900 grow",
-                      "border-[16px] border-x-[8px] border-french_gray-100"
-                    )}
-                    min={0} // Enforce minimum value
-                    max={props.state.balance} // Maximum value
-                    value={stake} // Current value
-                    onChange={(e) => onStakeChange(e)}
-                    step={5} // Adjust stepping as necessary
+                  <FlopSlider
+                    value={stake}
+                    onChange={onStakeChange}
+                    min={0}
+                    max={props.state.balance}
+                    step={5}
+                    label="Bet Amount"
                   />
                 </div>
               </div>
@@ -216,11 +212,7 @@ export default function GameScreen(props: GameScreenProps) {
                     label="Bet"
                     disabled={loading}
                   >
-                    {betAction === "check"
-                      ? "Check"
-                      : betAction === "call"
-                      ? `Call (£${stakeToCall})`
-                      : `Raise to £${stake}`}
+                    {betButtonText()}
                   </FlopButton>
                 </div>
               </div>
@@ -253,6 +245,20 @@ export default function GameScreen(props: GameScreenProps) {
     </div>
   );
 
+  function betButtonText() {
+    switch (betAction) {
+      case "check":
+        return "Check";
+      case "call":
+        return `Call (£${stakeToCall})`;
+      default:
+        if (stake === props.state.balance) {
+          return "All In";
+        }
+        return `Raise to £${stake}`;
+    }
+  }
+
   function handleBetActionClick() {
     setLoading(true);
     switch (betAction) {
@@ -280,6 +286,38 @@ export default function GameScreen(props: GameScreenProps) {
       setLoading(false);
     });
   }
+}
+
+function FlopSlider({
+  value,
+  onChange,
+  min,
+  max,
+  step,
+  label,
+}: {
+  value: number;
+  onChange: (newValue: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  label?: string;
+}) {
+  return (
+    <input
+      type="range"
+      className={cn(
+        "slider touch-none w-full h-3 bg-french_gray-100 rounded-xl appearance-none cursor-pointer range-lg color-red accent-french_gray-900 grow",
+        "border-[16px] border-x-[8px] border-french_gray-100"
+      )}
+      aria-label={label}
+      min={min} // Enforce minimum value
+      max={max} // Maximum value
+      value={value} // Current value
+      onChange={(e) => onChange(Number(e.target.value))}
+      step={step}
+    />
+  );
 }
 
 function calculateBetAction(

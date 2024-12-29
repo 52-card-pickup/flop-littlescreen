@@ -2,7 +2,7 @@ import { useNavigate } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import { useRecoilState } from "recoil";
 import GameScreen, { GameScreenProps } from "~/components/GameScreen";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import { useGoogleCastContext } from "~/hooks/cast_sender/useGoogleCastContext";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { usePlayerPolling } from "~/hooks/usePlayerPolling";
@@ -16,6 +16,7 @@ export default function Game() {
   usePlayerPolling();
   useGoogleCastContext();
 
+  const { client } = useClient();
   const [player] = useRecoilState(playerState);
   const { playerDetails, loading } = usePlayerDetails();
   const resolvers = useRef<(() => void)[]>([]);

@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { client } from "~/flopClient";
+import { useClient } from "~/flopClient";
 import { devState, playerState } from "~/state";
 import usePlayerDetails from "./usePlayerDetails";
 import { useDocumentVisibility } from "./useDocumentVisibility";
 
 export function usePlayerPolling() {
+  const { client } = useClient();
   const { lastVisibleEvent } = useDocumentVisibility();
   const setPlayerState = useSetRecoilState(playerState);
   const { setPlayerDetails } = usePlayerDetails();

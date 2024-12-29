@@ -2,54 +2,14 @@ import type { paths } from "~/flopClient/spec";
 import createClient from "openapi-fetch";
 
 type FlopClientState = {
-  client: ReturnType<typeof createClient<paths>>;
-  setClient: (client: ReturnType<typeof createClient<paths>>) => void;
+  client: ReturnType<typeof createClient<paths>> | null;
   isInitialized: () => boolean;
 };
 
-const state = init();
-
-function init(): FlopClientState {
-  let resolve: (() => void) | undefined = undefined;
-  const promise = new Promise<void>((r) => {
-    resolve = r;
-  });
-
-  let clientState: ReturnType<typeof createClient<paths>> | null = null;
-
-  const flopClientState: FlopClientState = {
-    setClient(client: ReturnType<typeof createClient<paths>>) {
-      clientState = client;
-      resolve?.();
-      resolve = undefined;
-    },
-    client: clientState!,
-    isInitialized: () => !!clientState,
-  };
-
-  const clientProxy = new Proxy({} as ReturnType<typeof createClient<paths>>, {
-    get(target, prop) {
-      if (!clientState) {
-        return async (...args: any[]) => {
-          await promise;
-          if (!clientState) {
-            throw new Error("Client not initialized");
-          }
-
-          return Reflect.get(clientState, prop)(...args);
-        };
-      }
-
-      return Reflect.get(clientState, prop);
-    },
-    set() {
-      throw new Error("Client cannot be modified");
-    },
-  });
-
-  flopClientState.client = clientProxy;
-  return flopClientState;
-}
+const state: FlopClientState = {
+  client: null,
+  isInitialized: () => state.client !== null,
+};
 
 export function tryInitializeClient(
   env: { API_URL: string | null } = globalThis.ENV
@@ -62,7 +22,12 @@ export function tryInitializeClient(
     baseUrl: env?.API_URL ?? undefined,
   });
 
-  state.setClient(client);
+  state.client = client;
 }
 
-export const client = state.client;
+export function useClient() {
+  if (!state.client) {
+    throw new Error("Client not initialized");
+  }
+  return { client: state.client };
+}
