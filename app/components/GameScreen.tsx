@@ -4,7 +4,7 @@ import { useClient } from "~/flopClient";
 import { useCountdown } from "~/hooks/useCountdown";
 import { GamePlayerState } from "~/state";
 import cn from "~/utils/cn";
-import FlopButton from "./FlopButton";
+import { FlopButton } from "./FlopButton";
 import { RulesHelpButton } from "./RulesHelpButton";
 import { useVibrate } from "../hooks/useVibrate";
 import { useRoomCode } from "~/hooks/usePlayerDetails";
@@ -88,8 +88,7 @@ export default function GameScreen(props: GameScreenProps) {
     props.state.currentRoundStake
   );
 
-  function onStakeChange(e: ChangeEvent<HTMLInputElement>) {
-    const value = parseFloat(e.target.value);
+  function onStakeChange(value: number) {
     if (value < props.state.minRaiseTo) {
       return setStake(0);
     }
@@ -186,7 +185,7 @@ export default function GameScreen(props: GameScreenProps) {
                 <div className="flex items-center gap-4 p-2">
                   <FlopSlider
                     value={stake}
-                    onChange={setStake}
+                    onChange={onStakeChange}
                     min={0}
                     max={props.state.balance}
                     step={5}
