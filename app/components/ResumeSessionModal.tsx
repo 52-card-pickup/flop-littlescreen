@@ -1,6 +1,6 @@
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react/jsx-runtime";
-import FlopButton from "./FlopButton";
+import { FlopButton } from "./FlopButton";
 import { CloseButton } from "./CloseButton";
 
 export function ResumeSessionModal({

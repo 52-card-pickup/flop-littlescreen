@@ -18,6 +18,8 @@ module.exports = {
     browser: true,
     es6: true,
   },
+  ignorePatterns: ["app/flopClient/spec.ts"],
+
   extends: ["eslint:recommended"],
 
   overrides: [

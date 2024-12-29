@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import {
@@ -15,7 +12,7 @@ import { useClient } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { useTimeoutState } from "~/hooks/useTimeoutState";
 import { createPortal } from "react-dom";
-import FlopButton from "./FlopButton";
+import { FlopButton } from "./FlopButton";
 import { PlayerPhotoCameraOverlay } from "./PlayerPhotoCamera";
 import { FlopMenuButtonIcon } from "./FlopMenuButtonIcon";
 import { useDocument } from "../hooks/useDocument";
@@ -290,15 +287,16 @@ function FlopModal(props: {
   // listen for escape key or location change
   useEffect(() => {
     if (!documentRef) return;
+    const onClose = props.onClose;
 
     const locationListener = (e: PopStateEvent) => {
       e.preventDefault();
-      props.onClose();
+      onClose();
     };
 
     const kbListener = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        props.onClose();
+        onClose();
       }
     };
 
@@ -427,7 +425,7 @@ function PairBigScreenModal(props: { open: boolean; onClose: () => void }) {
   return (
     <FlopModal
       open={props.open}
-      onClose={props.onClose}
+      onClose={cancel}
       hasError={hasError}
       shakeOnError
     >
@@ -496,7 +494,7 @@ function SendPlayerMoneyModal(props: { open: boolean; onClose: () => void }) {
         if (!data.data) return;
         setPlayers(data.data?.accounts);
       });
-  }, [playerDetails.id, props.open]);
+  }, [client, playerDetails.id, props.open]);
 
   function sendMoney() {
     if (!selectedAccountId || amount <= 0) return;

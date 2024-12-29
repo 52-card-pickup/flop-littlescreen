@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Cards from "~/components/Cards";
 import { useClient } from "~/flopClient";
 import { useCountdown } from "~/hooks/useCountdown";
@@ -32,9 +32,9 @@ export default function GameScreen(props: GameScreenProps) {
   const vibrate = useVibrate([20, 20, 40, 20, 60]);
   const roomCode = useRoomCode();
 
-  function setStake(newStake: number) {
-    if (newStake > 0 && newStake < props.state.minRaiseTo) {
-      newStake = props.state.minRaiseTo;
+  function setStake(newStake: number, minRaiseTo: number) {
+    if (newStake > 0 && newStake < minRaiseTo) {
+      newStake = minRaiseTo;
     }
     if (Number.isNaN(newStake)) {
       newStake = 0;
@@ -62,17 +62,17 @@ export default function GameScreen(props: GameScreenProps) {
       return;
     }
     setMode("waiting");
-  }, [props.state.state, props.state.yourTurn]);
+  }, [hasCompletedGame, props.state.state, props.state.yourTurn]);
 
   useEffect(() => {
     if (props.state.yourTurn) {
       vibrate();
-      setStake(0);
+      setStake(0, props.state.minRaiseTo);
       return;
     }
 
     setShowCards(false);
-  }, [props.state.yourTurn, vibrate]);
+  }, [props.state.yourTurn, props.state.minRaiseTo, vibrate]);
 
   const timer = useCountdown({
     turnExpiresDt: (props.state.turnExpiresDt as number | undefined) || 0,
@@ -90,9 +90,9 @@ export default function GameScreen(props: GameScreenProps) {
 
   function onStakeChange(value: number) {
     if (value < props.state.minRaiseTo) {
-      return setStake(0);
+      return setStake(0, props.state.minRaiseTo);
     }
-    return setStake(value);
+    return setStake(value, props.state.minRaiseTo);
   }
 
   const timeLeftToPlay = props.state.yourTurn

@@ -1,5 +1,5 @@
 import { ClipboardEvent, FocusEvent, FormEvent, KeyboardEvent } from "react";
-import FlopButton from "~/components/FlopButton";
+import { FlopButton } from "~/components/FlopButton";
 import React from "react";
 
 export function RoomCodeInput({

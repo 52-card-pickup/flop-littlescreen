@@ -28,7 +28,7 @@ export const Toaster = forwardRef<Toaster, ToasterProps>((props, ref) => {
         setShow(true);
       },
     }),
-    [setMessage]
+    [setMessage, setShow]
   );
 
   if (!document) return null;

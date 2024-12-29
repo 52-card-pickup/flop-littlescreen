@@ -1,13 +1,10 @@
-/* eslint-disable jsx-a11y/no-access-key */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-import React, { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
 import { devState } from "~/state";
 import { useClient } from "../flopClient";
-import FlopButton from "~/components/FlopButton";
+import { FlopButton } from "~/components/FlopButton";
 import { useShare } from "~/hooks/useShare";
 import cn from "~/utils/cn";
 import { useSearchParams } from "@remix-run/react";
@@ -27,24 +24,24 @@ export default function Index() {
   const { playerDetails, setPlayerDetails } = usePlayerDetails();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [state, setState] = React.useState<
+  const [state, setState] = useState<
     "default" | "room-code-entry" | "join" | "new"
   >(searchParams.has("room") ? "join" : "default");
 
-  const [name, setName] = React.useState<string>("");
-  const [roomCode, setRoomCode] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
-  const [hasJoinError, setHasJoinError] = React.useState(false);
+  const [name, setName] = useState<string>("");
+  const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [hasJoinError, setHasJoinError] = useState(false);
   const [hasJoinCodeError, setHasJoinCodeError] = useTimeoutState(false, 500);
   const [isRoomEntryAnimating, setIsRoomEntryAnimating] = useTimeoutState(
     false,
     1000
   );
-  const [resume, setResume] = React.useState<{
+  const [resume, setResume] = useState<{
     room: string;
     name: string;
   } | null>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -228,7 +225,7 @@ export default function Index() {
     return () => {
       abortController.abort();
     };
-  }, [playerDetails, navigate]);
+  }, [client, playerDetails, navigate]);
 
   function onRoomCodeSubmit(code: string) {
     if (!code) return;

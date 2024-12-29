@@ -140,5 +140,3 @@ function colorClassNames(which: ButtonColor, variant: ButtonVariant) {
       };
   }
 }
-
-export default FlopButton;

@@ -1,4 +1,4 @@
-import FlopButton from "~/components/FlopButton";
+import { FlopButton } from "~/components/FlopButton";
 import { useClient } from "~/flopClient";
 import cn from "~/utils/cn";
 import { useTimeoutState } from "~/hooks/useTimeoutState";

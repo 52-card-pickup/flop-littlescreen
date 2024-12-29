@@ -1,10 +1,8 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { SVGAttributes, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { useClient } from "~/flopClient";
 import usePlayerDetails from "~/hooks/usePlayerDetails";
-import FlopButton from "./FlopButton";
+import { FlopButton } from "./FlopButton";
 import { createPortal } from "react-dom";
 import cn from "~/utils/cn";
 
@@ -149,7 +147,6 @@ function CameraPreview(props: { onPhotoTaken: (file: File) => void }) {
 
   return (
     <div className="bg-white p-4 rounded-lg grid grid-rows-[1fr, auto] gap-4 justify-center items-center">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <Webcam
         ref={videoRef}
         className={cn(
