@@ -53,7 +53,7 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
                   <span className="text-watercourse-800 font-semibold">
                     {playerDetails.name},
                   </span>{" "}
-                  you're in the waiting room
+                  you&apos;re in the waiting room
                   {state.playersCount > 2
                     ? ` with ${state.playersCount - 1} other players`
                     : state.playersCount === 2
@@ -100,7 +100,7 @@ export function WaitingRoom({ state }: WaitingRoomProps) {
                 });
             }}
           >
-            Everyone's here
+            Everyone&apos;s here
           </FlopButton>
         </div>
       </div>
